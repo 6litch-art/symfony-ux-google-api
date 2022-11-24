@@ -31,7 +31,7 @@ class Configuration implements ConfigurationInterface
     private function addRecaptchaOptions(ArrayNodeDefinition $rootNode)
     {
         $rootNode->children()
-            ->arrayNode('recaptcha')
+            ->arrayNode('recaptcha')->addDefaultsIfNotSet()
             ->children()
                 ->booleanNode('enable')
                     ->info('Enable feature')
@@ -99,7 +99,7 @@ class Configuration implements ConfigurationInterface
     private function addMapsOptions(ArrayNodeDefinition $rootNode)
     {
         $rootNode->children()
-            ->arrayNode('maps')
+            ->arrayNode('maps')->addDefaultsIfNotSet()
             ->children()
                 ->booleanNode('enable')
                     ->info('Enable feature')
@@ -190,7 +190,7 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->arrayNode('analytics')
+                ->arrayNode('analytics')->addDefaultsIfNotSet()
                 ->children()
                     ->booleanNode('enable')
                         ->info('Enable feature')
@@ -225,7 +225,7 @@ class Configuration implements ConfigurationInterface
     {
         $rootNode
             ->children()
-                ->arrayNode('tag_manager')
+                ->arrayNode('tag_manager')->addDefaultsIfNotSet()
                 ->children()
                     ->booleanNode('enable')
                         ->info('Enable feature')
