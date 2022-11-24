@@ -51,7 +51,7 @@
 
 
         <!-- Google Maps API -->
-        <service id="gm.builder" class="Google\Builder\GmBuilder">
+        <service id="Google\Builder\GmBuilder">
             <argument type="service" id="kernel" />
             <argument type="service" id="twig" />
             <argument type="service" id="cache.adapter" />
