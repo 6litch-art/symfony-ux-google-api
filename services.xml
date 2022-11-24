@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+
+        <defaults public="false" />
+
+        <!-- Twig declarations -->
+        <service id="gtm.twig_extension" class="Google\Tag\Manager\Twig\GtmTwigExtension" >
+            <tag name="twig.extension" />
+        </service>
+
+        <!-- Service declarations -->
+        <service id="gtm.service" class="Google\Tag\Manager\Service\GtmService">
+            <argument type="service" id="kernel" />
+        </service>
+
+        <service id="Google\Tag\Manager\Inspector\DataCollector">
+            <tag name="data_collector" id="gtm" />
+            <argument type="service" id="parameter_bag" />
+        </service>
+
+        <!-- Litener declarations -->
+        <service id="gtm.listener" class="Google\Tag\Manager\Subscriber\GtmListener">
+            <tag name="kernel.event_listener" event="kernel.request"   method="onKernelRequest" priority="128" />
+            <tag name="kernel.event_listener" event="kernel.response" method="onKernelResponse" />
+            <argument type="service" id="request_stack" />
+            <argument type="service" id="parameter_bag" />
+            <argument type="service" id="twig" />
+        </service>
+    </services>
+</container>
