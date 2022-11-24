@@ -17,12 +17,6 @@ Encore
 
     .disableSingleRuntimeChunk()
 
-    // enables and configure @babel/preset-env polyfills
-    .configureBabelPresetEnv((config) => {
-        config.useBuiltIns = 'usage';
-        config.corejs = '3.23';
-    })
-
     // uncomment if you're having problems with a jQuery plugin
     .autoProvidejQuery()
 
