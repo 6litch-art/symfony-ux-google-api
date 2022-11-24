@@ -55,7 +55,6 @@ class Configuration implements ConfigurationInterface
                         ->defaultValue('@Gr/form/form_div_layout.html.twig')
                         ->end()
                     ->end()
-                ->end()
                 ->arrayNode('apiv2')
                     ->addDefaultsIfNotSet()
                     ->children()
