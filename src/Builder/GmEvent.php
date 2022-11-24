@@ -2,7 +2,6 @@
 
 namespace Google\Builder;
 
-use Symfony\Component\Config\Definition\Exception\Exception;
 class GmEvent extends GmObject implements GmEventInterface
 {
     protected string $event;

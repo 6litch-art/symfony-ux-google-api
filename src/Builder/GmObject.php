@@ -246,10 +246,10 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
         return $this;
     }
 
-    public function buildListener(GmBuilderInterface $google.maps.uilder): self
+    public function buildListener(GmBuilderInterface $gmBuilder): self
     {
         foreach($this->listener as $event) {
-             $google.maps.uilder->addListener($event);
+             $gmBuilder->addListener($event);
              $this->removeListener($event);
         }
 
@@ -272,11 +272,11 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
 
         return $this;
     }
-    public function buildEntries(GmBuilderInterface $google.maps.uilder): self
+    public function buildEntries(GmBuilderInterface $gmBuilder): self
     {
         foreach ($this->entries as $entry) {
 
-            $google.maps.uilder->addEntry($entry);
+            $gmBuilder->addEntry($entry);
             $this->removeEntry($entry);
         }
 
@@ -350,10 +350,10 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
                         "            url: url," . PHP_EOL .
                         "            dataType: 'text'," . PHP_EOL .
                         "            data: {" . PHP_EOL .
-                        "                google.maps.base64data : imgData," . PHP_EOL .
-                        "                google.maps.tilesize : ".(GmBuilder::getInstance()->cacheTilesize ?? "null")."," . PHP_EOL .
-                        "                google.maps.csrf_token : \"" . $csrfToken . "\"" . PHP_EOL .
-                        "            }, success: function(response) {".PHP_EOL.
+                        "                gm_base64data : imgData," . PHP_EOL .
+                        "                gm_tilesize : ".(GmBuilder::getInstance()->cacheTilesize ?? "null")."," . PHP_EOL .
+                        "                gm_csrf_token : \"" . $csrfToken . "\"" . PHP_EOL .
+                        "            }, success: function(response) {".PHP_EOL.
                         "                   var status = (JSON.parse(response)['status'] == '".GmBuilder::STATUS_OK."');".PHP_EOL.
                         "                   if(status) $(that).css('color', '#9ce62a99');".
                         "                   else  $(that).css('color', 'google.recaptcha.');".
@@ -396,7 +396,7 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
             $ytiles     = $metadata["image_ytiles"]    ?? 0;
             $tilesize   = $metadata["image_tilesize"]  ?? null;
 
-            $noimage = "bundles/google.maps.no-image.png";
+            $noimage = "bundles/google/images/no-image.png";
 
             $cacheImage .= PHP_EOL;
             $cacheImage .= "<div ".
@@ -408,7 +408,7 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
                 "data-missing='".GmBuilder::getInstance()->getAsset($noimage)."' ".
                 "width='" . $imagewidth . "'  height='" . $imageheight . "'></div>" . PHP_EOL;
 
-            $cacheImage .= "<script>google.maps.tilemap('#" . $this->getId() . "_html2canvas'); </script>" .PHP_EOL;
+            $cacheImage .= "<script>gm_tilemap('#" . $this->getId() . "_html2canvas'); </script>" .PHP_EOL;
         }
 
         return "<div " . $options . ">".$cacheImage."</div>" . PHP_EOL;
@@ -441,9 +441,9 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
     public function getCacheUrl(): string
     {
         $signature = $this->getSignatureWithOptions();
-        $url = (GmBuilder::getInstance()->router ? GmBuilder::getInstance()->router->generate("google.maps.show", ["signature" => $signature]) : null);
+        $url = (GmBuilder::getInstance()->router ? GmBuilder::getInstance()->router->generate("gm_show", ["signature" => $signature]) : null);
         if(!$url)
-            throw new Exception("\"google.maps.show\" route not properly configured..");
+            throw new Exception("\"gm_show\" route not properly configured..");
 
         return $url;
     }

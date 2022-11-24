@@ -182,7 +182,7 @@ class GmBuilder implements GmBuilderInterface
 
     public static function getPublicDirectory(): string
     {
-        return dirname(__FILE__, 6) . "/public/bundles/google.maps.;
+        return dirname(__FILE__, 6) . "/public/bundles/google";
     }
 
     public function getCacheDirectory(): ?string
@@ -205,7 +205,7 @@ class GmBuilder implements GmBuilderInterface
 
         if($object instanceof GmEvent) {
 
-            $google.maps.vent = $object;
+            $gmEvent = $object;
             $id = $object->getParentId();
             $event = $object->getEvent();
             $callback = $object->getCallback();
@@ -215,12 +215,12 @@ class GmBuilder implements GmBuilderInterface
             if (!$event) throw new Exception("Empty event provided for \"$object\"");
             if (!$callback) throw new Exception("Empty callback provided for \"$object\"");
 
-            $google.maps.vent = new GmEvent($object, $event, $callback);
+            $gmEvent = new GmEvent($object, $event, $callback);
             $id = $object->getId();
         }
 
         $id = $id . "_" . $event . "_" . md5($callback);
-        $this->bind($id, $google.maps.vent);
+        $this->bind($id, $gmEvent);
         $this->rules[] = $this->getInstance($id);
         return $this;
     }
