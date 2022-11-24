@@ -31,7 +31,7 @@ class Configuration implements ConfigurationInterface
     private function addRecaptchaOptions(ArrayNodeDefinition $rootNode)
     {
         $rootNode->children()
-            ->arrayNode('recaptcha')->addDefaultsIfNotSet()
+            ->arrayNode('recaptcha')
             ->children()
                 ->booleanNode('enable')
                     ->info('Enable feature')
@@ -55,6 +55,7 @@ class Configuration implements ConfigurationInterface
                         ->defaultValue('@Gr/form/form_div_layout.html.twig')
                         ->end()
                     ->end()
+                ->end()
                 ->arrayNode('apiv2')
                     ->addDefaultsIfNotSet()
                     ->children()
@@ -99,7 +100,7 @@ class Configuration implements ConfigurationInterface
     private function addMapsOptions(ArrayNodeDefinition $rootNode)
     {
         $rootNode->children()
-            ->arrayNode('maps')->addDefaultsIfNotSet()
+            ->arrayNode('maps')
             ->children()
                 ->booleanNode('enable')
                     ->info('Enable feature')
@@ -190,7 +191,7 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->arrayNode('analytics')->addDefaultsIfNotSet()
+                ->arrayNode('analytics')
                 ->children()
                     ->booleanNode('enable')
                         ->info('Enable feature')
@@ -225,7 +226,7 @@ class Configuration implements ConfigurationInterface
     {
         $rootNode
             ->children()
-                ->arrayNode('tag_manager')->addDefaultsIfNotSet()
+                ->arrayNode('tag_manager')
                 ->children()
                     ->booleanNode('enable')
                         ->info('Enable feature')
