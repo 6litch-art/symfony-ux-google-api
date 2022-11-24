@@ -15,9 +15,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ReCaptchaV3Type extends AbstractType
 {
-    public function __construct(GrService $google.recaptcha.rvice)
+    public function __construct(GrService $grService)
     {
-        $this->google.recaptcha.rvice = $google.recaptcha.rvice;
+        $this->grService = $grService;
     }
 
     /**
@@ -49,13 +49,13 @@ class ReCaptchaV3Type extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars["enable"] = $this->google.recaptcha.rvice->isEnabled();
-        if(!$this->google.recaptcha.rvice->isEnabled()) return;
+        $view->vars["enable"] = $this->grService->isEnabled();
+        if(!$this->grService->isEnabled()) return;
 
         $view->vars["api"] = GrService::APIV3;
         $view->vars["type"] = "invisible";
-        $view->vars["sitekey"] = $options['sitekey'] ?? $this->google.recaptcha.rvice->getSiteKey(GrService::APIV3);
+        $view->vars["sitekey"] = $options['sitekey'] ?? $this->grService->getSiteKey(GrService::APIV3);
 
-        $this->google.recaptcha.rvice->initJs();
+        $this->grService->initJs();
     }
 }

@@ -18,7 +18,7 @@ class DataCollector extends AbstractDataCollector
         $this->parameterBag = $parameterBag;
     }
 
-    public function getName(): string { return 'google.tag_manager.; }
+    public function getName(): string { return 'gtm'; }
 
     public static function getTemplate(): ?string { return '@Gtm/inspector/data_collector.html.twig'; }
 

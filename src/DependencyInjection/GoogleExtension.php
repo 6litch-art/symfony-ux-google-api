@@ -42,7 +42,7 @@ class GoogleExtension extends Extension
         $container->setAlias(GmBuilderInterface::class, 'gm.builder');
 
         $container->setParameter('twig.form.resources', array_merge(
-            $config["form_themes"],
+            $config["recaptcha"]["form_themes"] ?? [],
             $container->getParameter('twig.form.resources')
         ));
     }

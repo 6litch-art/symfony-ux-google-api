@@ -68,14 +68,14 @@ class GrListener
 
     public function onKernelResponse(ResponseEvent $event)
     {
-        $this->enable = $this->parameterBag->get("google.recaptcha.nable");
-        $this->enableOnAdmin = $this->parameterBag->get("google.recaptcha.nable_on_admin");
-        $this->autoAppend = $this->parameterBag->get("google.recaptcha.utoappend");
+        $this->enable = $this->parameterBag->get("google.recaptcha.enable");
+        $this->enableOnAdmin = $this->parameterBag->get("google.recaptcha.enable_on_admin");
+        $this->autoAppend = $this->parameterBag->get("google.recaptcha.autoappend");
         if (!$this->allowRender($event)) return false;
 
         $response = $event->getResponse();
-        $javascripts = $this->twig->getGlobals()["google.recaptcha.]["javascripts"] ?? "";
-        $stylesheets = $this->twig->getGlobals()["google.recaptcha.]["stylesheets"] ?? "";
+        $javascripts = $this->twig->getGlobals()["google_recaptcha"]["javascripts"] ?? "";
+        $stylesheets = $this->twig->getGlobals()["google_recaptcha"]["stylesheets"] ?? "";
 
         $content = preg_replace([
             '/<\/head\b[^>]*>/',

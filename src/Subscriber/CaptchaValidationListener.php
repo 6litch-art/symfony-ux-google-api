@@ -39,9 +39,9 @@ class CaptchaValidationListener implements EventSubscriberInterface
         ];
     }
 
-    public function __construct(GrService $google.recaptcha.rvice, string $fieldName, string $api, ValidatorInterface $validator, TranslatorInterface $translator, string $translationDomain = null, ServerParams $serverParams = null)
+    public function __construct(GrService $grService, string $fieldName, string $api, ValidatorInterface $validator, TranslatorInterface $translator, string $translationDomain = null, ServerParams $serverParams = null)
     {
-        $this->google.recaptcha.rvice = $google.recaptcha.rvice;
+        $this->grService = $grService;
         $this->fieldName = $fieldName;
         $this->api = $api;
         $this->translator = $translator;
@@ -54,8 +54,8 @@ class CaptchaValidationListener implements EventSubscriberInterface
     {
         $form = $event->getForm();
 
-        if($form->isSubmitted() && $form->isValid()) $this->google.recaptcha.rvice->resetFailedAttempt($form->getName());
-        else $this->google.recaptcha.rvice->addFailedAttempt($form->getName());
+        if($form->isSubmitted() && $form->isValid()) $this->grService->resetFailedAttempt($form->getName());
+        else $this->grService->addFailedAttempt($form->getName());
     }
 
     public function onPreSubmit(FormEvent $event)
@@ -65,9 +65,9 @@ class CaptchaValidationListener implements EventSubscriberInterface
         $postRequestSizeExceeded = 'POST' === $form->getConfig()->getMethod() && $this->serverParams->hasPostMaxSizeBeenExceeded();
 
         if (!$form->getConfig()->getOption('captcha_protection')) return;
-        if (!$this->google.recaptcha.rvice->hasTriggeredMinimumAttempts($form, $form->getConfig()->getOptions())) return;
+        if (!$this->grService->hasTriggeredMinimumAttempts($form, $form->getConfig()->getOptions())) return;
         
-        if($this->google.recaptcha.rvice->findCaptchaType($form)) return;
+        if($this->grService->findCaptchaType($form)) return;
         
         if ($form->isRoot() && $form->getConfig()->getOption('compound') && !$postRequestSizeExceeded) {
 
@@ -77,7 +77,7 @@ class CaptchaValidationListener implements EventSubscriberInterface
             $executionContextFactory = new ExecutionContextFactory($this->translator, $this->translationDomain);
             $context = $executionContextFactory->createContext($this->validator, $value);
 
-            $constraintValidator = new CaptchaValidator($this->google.recaptcha.rvice);
+            $constraintValidator = new CaptchaValidator($this->grService);
             $constraintValidator->initialize($context);
 
             $violations = $this->validator->validate($value ?? " ", new Captcha(["api" => $this->api]));

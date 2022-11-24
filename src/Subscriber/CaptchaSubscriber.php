@@ -21,10 +21,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CaptchaSubscriber implements EventSubscriberInterface
 {
-    public function __construct(GrService $google.recaptcha.rvice, ValidatorInterface $validator, TranslatorInterface $translator, string $translationDomain = null) 
+    public function __construct(GrService $grService, ValidatorInterface $validator, TranslatorInterface $translator, string $translationDomain = null) 
     {
         $this->validator         = $validator;
-        $this->google.recaptcha.rvice         = $google.recaptcha.rvice;
+        $this->grService         = $grService;
         $this->translator        = $translator;
         $this->translationDomain = $translationDomain;
     }
@@ -42,18 +42,18 @@ class CaptchaSubscriber implements EventSubscriberInterface
 
     public function onLoginFailure(LoginFailureEvent $event)
     {
-        $this->google.recaptcha.rvice->addFailedAttempt("login");
+        $this->grService->addFailedAttempt("login");
     }
 
     public function onLoginSuccess(LoginSuccessEvent $event)
     {
-        $this->google.recaptcha.rvice->resetFailedAttempt("login");
+        $this->grService->resetFailedAttempt("login");
     }
 
     public function onKernelException(ResponseEvent $event)
     {
         $exception = $event->getThrowable()->getClass() ?? "";
-        $this->google.recaptcha.rvice->addFailedAttempt("exception[".$exception."]");
+        $this->grService->addFailedAttempt("exception[".$exception."]");
     }
 
     public function checkPassport(CheckPassportEvent $event): void
@@ -76,7 +76,7 @@ class CaptchaSubscriber implements EventSubscriberInterface
         $executionContextFactory = new ExecutionContextFactory($this->translator, $this->translationDomain);
         $context = $executionContextFactory->createContext($this->validator, $value);
 
-        $constraintValidator = new CaptchaValidator($this->google.recaptcha.rvice);
+        $constraintValidator = new CaptchaValidator($this->grService);
         $constraintValidator->initialize($context);
 
         $violations = $this->validator->validate($value, new Captcha(["api" => $api]));

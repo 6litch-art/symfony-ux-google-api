@@ -27,9 +27,9 @@ class FormTypeCaptchaExtension extends AbstractTypeExtension
 {
     private $defaultEnabled;
 
-    public function __construct(GrService $google.recaptcha.rvice, ValidatorInterface $validator, TranslatorInterface $translator, AdminContextProvider $adminContextProvider, bool $defaultEnabled = true)
+    public function __construct(GrService $grService, ValidatorInterface $validator, TranslatorInterface $translator, AdminContextProvider $adminContextProvider, bool $defaultEnabled = true)
     {
-        $this->google.recaptcha.rvice        = $google.recaptcha.rvice;
+        $this->grService        = $grService;
         $this->translator       = $translator;
         $this->validator        = $validator;
         $this->easyadminContext = $adminContextProvider->getContext();
@@ -64,7 +64,7 @@ class FormTypeCaptchaExtension extends AbstractTypeExtension
         if (!$builder->getForm()->isRoot()) return;
 
         $builder->addEventSubscriber(new CaptchaValidationListener(
-            $this->google.recaptcha.rvice,
+            $this->grService,
             $options['captcha_field_name'],
             $options['captcha_api'],
             $this->validator,
@@ -102,15 +102,15 @@ class FormTypeCaptchaExtension extends AbstractTypeExtension
         if (!$options['captcha_protection']) return;
         if (!$view->parent && $options['compound']) {
 
-            if(!$this->google.recaptcha.rvice->hasTriggeredMinimumAttempts($form, $options)) return;
-            if($this->google.recaptcha.rvice->findCaptchaType($form)) return;
+            if(!$this->grService->hasTriggeredMinimumAttempts($form, $options)) return;
+            if($this->grService->findCaptchaType($form)) return;
 
             $factory = $form->getConfig()->getFormFactory();
-            $captchaForm = $factory->createNamed($options['captcha_field_name'], $this->google.recaptcha.rvice->getType($options["captcha_api"]), null, [
+            $captchaForm = $factory->createNamed($options['captcha_field_name'], $this->grService->getType($options["captcha_api"]), null, [
                 'mapped' => false,
             ]);
 
-            if( ($submitButton = $this->google.recaptcha.rvice->findSubmitButton($form)) ) {
+            if( ($submitButton = $this->grService->findSubmitButton($form)) ) {
 
                 $keys = array_keys($view->children);
                 $submitIndex = array_search($submitButton->getName(), $keys);

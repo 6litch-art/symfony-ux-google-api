@@ -34,7 +34,7 @@
 
 
         <!-- Google Tag Manager API -->
-        <service id="gtmservice" class="Google\Service\GtmService"><argument type="service" id="kernel" /></service>
+        <service id="gtm.service" class="Google\Service\GtmService"><argument type="service" id="kernel" /></service>
         <service id="Google\Inspector\DataCollector">
             <tag name="data_collector" id="gtm" />
             <argument type="service" id="parameter_bag" />
