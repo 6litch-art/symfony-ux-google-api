@@ -17,9 +17,9 @@ final class Captcha extends Constraint
     protected $api;
 
     public function getVersion() { return $this->api; } 
-    public function __construct(array $options = null, string $message = null, array $google.recaptcha.ps = null, $payload = null)
+    public function __construct(array $options = null, string $message = null, array $groups = null, $payload = null)
     {
-        parent::__construct($options ?? [], $google.recaptcha.ps, $payload);
+        parent::__construct($options ?? [], $groups, $payload);
 
         $api = $options["api"];
         switch($api) {

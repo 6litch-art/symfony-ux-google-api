@@ -14,9 +14,9 @@ final class CaptchaValidator extends ConstraintValidator
 {
     private $responses = [];
 
-    public function __construct(GrService $google.recaptcha.rvice)
+    public function __construct(GrService $grService)
     {
-        $this->google.recaptcha.rvice = $google.recaptcha.rvice;
+        $this->grService = $grService;
     }
 
     public function validate($value, Constraint $constraint): void
@@ -38,13 +38,13 @@ final class CaptchaValidator extends ConstraintValidator
         }
 
         $request = Request::createFromGlobals();
-        $reCaptcha = new ReCaptcha($this->google.recaptcha.rvice->getSecret($constraint->getVersion()));
+        $reCaptcha = new ReCaptcha($this->grService->getSecret($constraint->getVersion()));
 
 
         $response = $reCaptcha->verify($value, $request->getClientIp());
         $this->responses[] = $response;
 
-        $scoreThreshold = $this->google.recaptcha.rvice->getScoreThreshold();
+        $scoreThreshold = $this->grService->getScoreThreshold();
         if (!$response->isSuccess() || ($response->getScore() && $response->getScore() < $scoreThreshold)) {
 
             if(!$response->getErrorCodes())
