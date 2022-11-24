@@ -13,7 +13,7 @@ class GrController extends AbstractController
 {
     /**
      * Controller example
-     * @Route("/", name="app_google.recaptcha.)
+     * @Route("/", name="gr")
      */
     public function Main(Request $request): Response
     {

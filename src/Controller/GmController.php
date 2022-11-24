@@ -26,7 +26,7 @@ class GmController extends AbstractController
 
     /**
      * Controller example
-     * @Route("/", name="google.maps.)
+     * @Route("/", name="gm")
      */
     public function Main(): Response
     {
@@ -75,7 +75,7 @@ class GmController extends AbstractController
 
     /**
      * Display cache image
-     * @Route("/{signature}", name="google.maps.show_metadata")
+     * @Route("/{signature}", name="gm.show_metadata")
      */
     public function ShowMetadata(string $signature)
     {
@@ -85,21 +85,21 @@ class GmController extends AbstractController
 
     /**
      * Export using html2canvas
-     * @Route("/{signature}/export", name="google.maps.export")
+     * @Route("/{signature}/export", name="gm.export")
      */
     public function Export(string $signature, Request $request)
     {
         if (!$this->gmBuilder->isGranted())
             throw new AccessDeniedException('Access denied.');
 
-        $submittedToken = $request->request->get('google.maps.csrf_token');
+        $submittedToken = $request->request->get('gm_csrf_token');
         if (!$this->isCsrfTokenValid('html2canvas-export', $submittedToken))
             throw new Exception("Invalid CSRF token.");
 
-        $data = $request->request->get('google.maps.base64data') ?? null;
+        $data = $request->request->get('gm_base64data') ?? null;
         if(!$data) throw new Exception("No base64 data provided");
 
-        $tilesize = $request->request->get('google.maps.tilesize') ?? null;
+        $tilesize = $request->request->get('gm_tilesize') ?? null;
         if(!$tilesize) {
 
             list($width, $height) = getimagesizefromstring(base64_decode(explode('base64,', $data)[1]));
@@ -180,7 +180,7 @@ class GmController extends AbstractController
 
     /**
      * Suppress a cache image
-     * @Route("/{signature}/suppress", name="google.maps.suppress")
+     * @Route("/{signature}/suppress", name="gm.suppress")
      * */
     public function Suppress(string $signature)
     {
@@ -195,7 +195,7 @@ class GmController extends AbstractController
 
     /**
      * Display cache image
-     * @Route("/{signature}/{tile}", name="google.maps.show")
+     * @Route("/{signature}/{tile}", name="gm.show")
      */
     public function Show(string $signature, int $tile = 0)
     {
