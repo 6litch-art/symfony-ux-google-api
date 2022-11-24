@@ -1,0 +1,15 @@
+{% use "@Twig/Form/form_div_layout.html.twig" %}
+
+{% block recaptchaV2_widget %}
+{% if enable %}
+<div class="form-google.recaptcha.p captcha" id="{{ id }}_widget" data-api="{{api}}" data-toggle="recaptcha" data-name="{{name}}" data-id="{{id}}" data-type="{{ type }}" data-sitekey="{{ sitekey }}"></div>
+<input type="hidden" {{ block('widget_attributes') }}/>
+{% endif %} 
+{% endblock %}
+
+{% block recaptchaV3_widget %}
+{% if enable %}
+<input type="hidden" data-api="{{api}}" data-toggle="recaptcha" data-name="{{name}}" data-id="{{id}}" data-type="{{ type }}" data-sitekey="{{ sitekey }}"  {{ block('widget_attributes') }}/>
+{% endif %} 
+{% endblock %}
+

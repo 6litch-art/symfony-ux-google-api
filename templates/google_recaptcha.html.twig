@@ -1,0 +1,24 @@
+{% extends "base.html.twig" %}
+
+{% block stylesheets %}
+<style>
+body 
+{
+    width:50%;
+    margin:2.5em auto;
+}
+</style>
+
+{% endblock %}
+
+{% block body %}
+
+  {% for label, messages in app.flashes %}
+    {% for message in messages %}
+      {{ message }}
+    {% endfor %}
+  {% endfor %}
+
+  {{ form(form) }}
+
+{% endblock body %}

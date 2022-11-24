@@ -7,28 +7,125 @@
 
         <defaults public="false" />
 
-        <!-- Twig declarations -->
-        <service id="gtm.twig_extension" class="Google\Tag\Manager\Twig\GtmTwigExtension" >
-            <tag name="twig.extension" />
+
+        <!-- Google Analytics API -->
+        <service id="ga.controller" class="Google\Controller\GaController" public="true">
+            <call method="setContainer"><argument type="service" id="service_container" /></call>
+            <tag name="controller.service_arguments" />
+            <argument type="service" id="ga.service" />
+        </service>
+        <service id="ga.cache_warmer" class="Google\DependencyInjection\CacheWarmer" >
+            <tag name="kernel.cache_warmer" />
+            <argument type="service" id="ga.service" />
+        </service>
+        <service id="ga.service" class="Google\Service\GaService">
+            <argument type="service" id="parameter_bag" />
+            <argument type="service" id="cache.adapter" />
+        </service>
+        <service id="ga.listener" class="Google\Subscriber\GaListener">
+            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" />
+            <tag name="kernel.event_listener" event="kernel.response" method="onKernelResponse" />
+            <argument type="service" id="request_stack" />
+            <argument type="service" id="parameter_bag" />
+            <argument type="service" id="twig" />
         </service>
 
-        <!-- Service declarations -->
-        <service id="gtm.service" class="Google\Tag\Manager\Service\GtmService">
-            <argument type="service" id="kernel" />
-        </service>
 
-        <service id="Google\Tag\Manager\Inspector\DataCollector">
+
+
+        <!-- Google Tag Manager API -->
+        <service id="gtmservice" class="Google\Service\GtmService"><argument type="service" id="kernel" /></service>
+        <service id="Google\Inspector\DataCollector">
             <tag name="data_collector" id="gtm" />
             <argument type="service" id="parameter_bag" />
         </service>
-
-        <!-- Litener declarations -->
-        <service id="gtm.listener" class="Google\Tag\Manager\Subscriber\GtmListener">
+        <service id="gtm.listener" class="Google\Subscriber\GtmListener">
             <tag name="kernel.event_listener" event="kernel.request"   method="onKernelRequest" priority="128" />
             <tag name="kernel.event_listener" event="kernel.response" method="onKernelResponse" />
             <argument type="service" id="request_stack" />
             <argument type="service" id="parameter_bag" />
             <argument type="service" id="twig" />
         </service>
+
+
+
+
+        <!-- Google Maps API -->
+        <service id="gm.builder" class="Google\Builder\GmBuilder">
+            <argument type="service" id="kernel" />
+            <argument type="service" id="twig" />
+            <argument type="service" id="cache.adapter" />
+            <argument type="service" id="flysystem.adapter.lazy.factory" />
+            <argument type="service" id="request_stack" />
+            <argument type="service" id="monolog.http_client" />
+            <argument type="service" id="security.helper" />
+            <argument type="service" id="security.csrf.token_manager" />
+        </service>
+
+        <service id="Google\Controller\GmController">
+            <tag name="controller.service_arguments" />
+            <tag name="container.service_subscriber" />
+            <call method="setContainer"><argument type="service" id="Psr\Container\ContainerInterface" /></call>
+
+            <argument type="service" id="gm.builder" />
+        </service>
+
+        <service id="gm.twig_extension" class="Google\Twig\GmTwigExtension" ><tag name="twig.extension" /></service>
+        <service id="gm.listener" class="Google\Subscriber\GmListener">
+            <tag name="kernel.event_listener" event="kernel.response" method="onKernelResponse" />
+            <argument type="service" id="parameter_bag" />
+            <argument type="service" id="twig" />
+            <argument type="service" id="request_stack" />
+        </service>
+
+
+
+
+        <!-- Google ReCaptcha API -->
+        <service id="Google\Controller\GrController"><argument type="service" id="gr.service" /></service>
+        <service id="Google\Service\GrService">
+            <tag name="twig.runtime" />
+            <argument type="service" id="kernel" />
+            <argument type="service" id="twig" />
+            <argument type="service" id="request_stack" />
+            <argument type="service" id="cache.adapter" />
+        </service>
+
+        <service id="Google\Validator\Constraints\CaptchaValidator">
+            <tag name="validator.constraint_validator" />
+            <argument type="service" id="gr.service" />
+        </service>
+
+        <service id="Google\Form\Type\ReCaptchaV2Type">
+            <tag name="form.type" />
+            <argument type="service" id="gr.service" />
+        </service>
+        <service id="Google\Form\Type\ReCaptchaV3Type">
+            <tag name="form.type" />
+            <argument type="service" id="gr.service" />
+        </service>
+
+        <service id="Google\Form\Extension\FormTypeCaptchaExtension" >
+            <tag name="form.type_extension" />
+            <argument type="service" id="gr.service" />
+            <argument type="service" id="validator" />
+            <argument type="service" id="translator" />
+            <argument type="service" id="EasyCorp\Bundle\EasyAdminBundle\Provider\AdminContextProvider" />
+        </service>
+
+        <service id="Google\Subscriber\CaptchaSubscriber">
+            <tag name="kernel.event_subscriber" />
+            <argument type="service" id="gr.service" />
+            <argument type="service" id="validator" />
+            <argument type="service" id="translator" />
+        </service>
+
+        <service id="Google\Subscriber\GrListener">
+            <tag name="kernel.event_listener" event="kernel.response" method="onKernelResponse" />
+            <argument type="service" id="request_stack" />
+            <argument type="service" id="parameter_bag" />
+            <argument type="service" id="twig" />
+        </service>
+
     </services>
 </container>

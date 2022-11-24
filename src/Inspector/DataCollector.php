@@ -1,10 +1,10 @@
 <?php
 
-namespace Google\Tag\Manager\Inspector;
+namespace Google\Inspector;
 
 use Base\Service\ParameterBagInterface;
 
-use Google\Tag\Manager\GtmBundle;
+use Google\GtmBundle;
 use Symfony\Bundle\FrameworkBundle\DataCollector\AbstractDataCollector;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -18,7 +18,7 @@ class DataCollector extends AbstractDataCollector
         $this->parameterBag = $parameterBag;
     }
 
-    public function getName(): string { return 'gtm'; }
+    public function getName(): string { return 'google.tag_manager.; }
 
     public static function getTemplate(): ?string { return '@Gtm/inspector/data_collector.html.twig'; }
 
@@ -97,7 +97,7 @@ class DataCollector extends AbstractDataCollector
 
     private function collectData(): array
     {
-        $defaultContainer = $this->parameterBag->get("gtm.containers.default");
+        $defaultContainer = $this->parameterBag->get("google.tag_manager.containers.default");
 
         $data = [];
         $data[$this->getBundleFormattedName(GtmBundle::class)] = [

@@ -1,0 +1,15 @@
+captcha:
+  test:
+    success: Captcha test succeeded !
+    failed: Captcha test failed.
+  error:
+    invalid_keys: Captcha key invalid
+    hostname_mismatch: Hostname mismatch for captcha verification.
+    action_mismatch: Action mismatch for captcha verification
+    score_threshold_not_met: Captcha score threshold not met.
+    missing_input_secret: The captcha secret parameter is missing.
+    invalid_input_secret: The captcha secret parameter is invalid or malformed.
+    missing_input_response: The captcha response parameter is missing.
+    invalid_input_response: The captcha response parameter is invalid or malformed.
+    bad_request: The captcha request is invalid or malformed.
+    timeout_or_duplicate: The captcha response is no longer valid, either is too old or has been used previously.

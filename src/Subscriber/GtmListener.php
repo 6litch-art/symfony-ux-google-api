@@ -1,6 +1,6 @@
 <?php
 
-namespace Google\Tag\Manager\Subscriber;
+namespace Google\Subscriber;
 
 use Twig\Environment;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -74,12 +74,12 @@ class GtmListener
     {
         if (!$event->isMainRequest()) return;
 
-        $this->enable     = $this->parameterBag->get("gtm.enable");
-        $this->enableOnAdmin     = $this->parameterBag->get("gtm.enable_on_admin");
+        $this->enable     = $this->parameterBag->get("google.tag_manager.enable");
+        $this->enableOnAdmin     = $this->parameterBag->get("google.tag_manager.enable_on_admin");
         if (!$this->enable) return;
 
-        $this->autoAppend = $this->parameterBag->get("gtm.autoappend");
-        foreach($this->parameterBag->get("gtm.containers") ?? [] as $container) {
+        $this->autoAppend = $this->parameterBag->get("google.tag_manager.autoappend");
+        foreach($this->parameterBag->get("google.tag_manager.containers") ?? [] as $container) {
 
             $this->containerId   = $container["id"] ?? null;
             if(!$this->containerId) continue;
@@ -96,15 +96,15 @@ class GtmListener
                     (function (w, d, s, l, i) {
                         w[l] = w[l] || [];
                         w[l].push({
-                            'gtm.start': new Date().getTime(),
-                            event: 'gtm.js'
+                            'google.tag_manager.start': new Date().getTime(),
+                            event: 'google.tag_manager.js'
                         });
                         var f = d.getElementsByTagName(s)[0],
                             j = d.createElement(s),
                             dl = l != 'dataLayer' ? '&l=' + l : '';
                         j.async = true;
                         j.src =
-                            '".$this->serverUrl."/gtm.js?id=' + i + dl;
+                            '".$this->serverUrl."/google.tag_manager.js?id=' + i + dl;
                         f.parentNode.insertBefore(j, f);
                     })(window, document, 'script', 'dataLayer', '".$this->containerId."');
                 </script>";

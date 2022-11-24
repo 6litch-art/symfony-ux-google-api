@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+        <title>Google Maps Example</title>
+
+        {% if base is defined %}{{ base.stylesheets|raw }}{% endif %}
+        {% block stylesheets %}{% endblock %}
+
+        {% if base is defined %}{{ base.javascripts("head")|raw }}{% endif %}
+        {% block headJavascripts %}{% endblock %}
+        {% block javascripts %}{% endblock %}
+    </head>
+
+    <body>
+
+        <!-- JS requirements -->
+        <noscript>
+            <h1 style="color:#FFF; margin:1em">You need JS to access this page !</h1>
+        </noscript>
+
+        <!-- Map backgoogle.recaptcha.nd -->
+        {{ google_maps("myMap", {"style" : "height:100%; width:100%; position:absolute; top:0; left:0;"}) }}
+    </body>
+
+    {% if base is defined %}{{ base.javascripts("body")|raw }}{% endif %}
+    {% block bodyJavascripts %}{% endblock %}
+
+</html>
