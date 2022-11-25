@@ -1,12 +1,12 @@
 
-window.google.maps.tilemap = function (el) {
+window.gm_tilemap = function (el) {
 
   if(Object.keys(el).length === 0) return;
   if(el.length == 0 || el === undefined) return;
 
   var el = $(el)[0];
   if(el.tagName != "DIV")
-    throw "Element passed through google.maps.tilemap() must be a div";
+    throw "Element passed through gm_tilemap() must be a div";
 
   $(el).css("object-fit", "cover");
   $(el).css("position", "relative");
@@ -24,35 +24,35 @@ window.google.maps.tilemap = function (el) {
   var ytiles    = parseInt(el.getAttribute("data-ytiles"));
   var missing   = el.getAttribute("data-missing");
 
-  el.addEventListener("lazyload.google.maps.tilemap", function() {
+  el.addEventListener("lazyload.gm_tilemap", function() {
 
-    var lazyBackgoogle.recaptcha.nds = el.querySelectorAll("[data-backgoogle.recaptcha.nd-image]");
+    var lazyBackgrounds = el.querySelectorAll("[data-background-image]");
 
     if ("IntersectionObserver" in window && "IntersectionObserverEntry" in window && "intersectionRatio" in window.IntersectionObserverEntry.prototype) {
-      let lazyBackgoogle.recaptcha.ndObserver = new IntersectionObserver(function(entries, observer) {
+      let lazyBackgroundObserver = new IntersectionObserver(function(entries, observer) {
         entries.forEach(function(entry) {
           if (entry.isIntersecting) {
 
-            if(entry.target.dataset.backgoogle.recaptcha.ndImage) {
+            if(entry.target.dataset.backgroundImage) {
 
               let preloaderImg = document.createElement("img");
-                  preloaderImg.src = entry.target.dataset.backgoogle.recaptcha.ndImage;
+                  preloaderImg.src = entry.target.dataset.backgroundImage;
                   preloaderImg.addEventListener('load', (event) => {
 
-                    entry.target.style.backgoogle.recaptcha.ndImage = "url('"+event.target.src+"')";
+                    entry.target.style.backgroundImage = "url('"+event.target.src+"')";
                     entry.target.style.opacity   = "1";
                     preloaderImg = null;      
                   });
             }
 
-            entry.target.removeAttribute("data-backgoogle.recaptcha.nd-image");    
-            lazyBackgoogle.recaptcha.ndObserver.unobserve(entry.target);
+            entry.target.removeAttribute("data-background-image");    
+            lazyBackgroundObserver.unobserve(entry.target);
           }
         });
       });
   
-      lazyBackgoogle.recaptcha.nds.forEach(function(lazyBackgoogle.recaptcha.nd) {
-        lazyBackgoogle.recaptcha.ndObserver.observe(lazyBackgoogle.recaptcha.nd);
+      lazyBackgrounds.forEach(function(lazyBackground) {
+        lazyBackgroundObserver.observe(lazyBackground);
       });
     }
   });
@@ -111,7 +111,7 @@ window.google.maps.tilemap = function (el) {
             else tmp_src += "/" + index;
 
             elTile[index].setAttribute("id", el.getAttribute("id")+"_"+index);
-            elTile[index].setAttribute("data-backgoogle.recaptcha.nd-image", tmp_src); //url('"+missing+"')
+            elTile[index].setAttribute("data-background-image", tmp_src); //url('"+missing+"')
             elTile[index].style.opacity   = "0";
             elTile[index].style.transition   = "opacity 0.5s ease";
             el.append(elTile[index]);
@@ -122,9 +122,9 @@ window.google.maps.tilemap = function (el) {
         elTile[index].style.top      = tile.top  + (_tilesize*iy) + "px";    
         elTile[index].style.width    = _tilesize + "px";
         elTile[index].style.height   = _tilesize + "px";
-        elTile[index].style.backgoogle.recaptcha.ndSize   = _tilesize + "px";
+        elTile[index].style.backgroundSize   = _tilesize + "px";
 
-        el.dispatchEvent(new Event("lazyload.google.maps.tilemap"));
+        el.dispatchEvent(new Event("lazyload.gm_tilemap"));
       }
     }
   };

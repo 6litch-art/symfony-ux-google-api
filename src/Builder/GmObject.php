@@ -207,7 +207,7 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
         GmBuilder::getInstance($id)->bind($id, $this);
         return $this;
     }
-    public function unbind(): self {
+    public function unbind(?string $id = null): self {
 
         GmBuilder::getInstance($id)->unbind($this);
         return $this;

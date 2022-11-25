@@ -20,9 +20,9 @@ Encore
     // uncomment if you're having problems with a jQuery plugin
     .autoProvidejQuery()
 
-    .addEntry('google.maps', './assets/google.maps.js')
-    .addEntry('google.analytics', './assets/google.analytics.js')
-    .addEntry('google.recaptcha', './assets/google.recaptcha.js')
-    .addEntry('google.tag_manager', './assets/google.tag_manager.js');
+    .addEntry('maps', './assets/maps.js')
+    .addEntry('analytics', './assets/analytics.js')
+    .addEntry('recaptcha', './assets/recaptcha.js')
+    .addEntry('tag_manager', './assets/tag_manager.js');
 
 module.exports = Encore.getWebpackConfig();

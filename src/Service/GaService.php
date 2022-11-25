@@ -57,12 +57,15 @@ class GaService
 
         $this->cache = $cache;
 
-        $this->client = new Google_Client();
-        $this->client->setApplicationName("GoogleAnalytics");
-        $this->client->setScopes(['https://www.googleapis.com/auth/analytics.readonly']);
-        $this->client->setAuthConfig($this->jsonLocation);
+        if($this->enable) {
+            
+            $this->client = new Google_Client();
+            $this->client->setApplicationName("GoogleAnalytics");
+            $this->client->setScopes(['https://www.googleapis.com/auth/analytics.readonly']);
+            $this->client->setAuthConfig($this->jsonLocation);
 
-        $this->analytics = new Google_Service_AnalyticsReporting($this->client);
+            $this->analytics = new Google_Service_AnalyticsReporting($this->client);
+        }
     }
 
     /**
@@ -110,7 +113,6 @@ class GaService
      * @return mixed
      *
      * https://ga-dev-tools.appspot.com/query-explorer/
-     *
      */
     private const EnableCache = true;
     private const GoogleStartTime = "2005-01-01";

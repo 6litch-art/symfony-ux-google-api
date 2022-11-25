@@ -57,7 +57,7 @@
   })();
 
 
-  _html2canvas.Util.parseBackgoogle.recaptcha.ndImage = function (value) {
+  _html2canvas.Util.parseBackgroundImage = function (value) {
     var whitespace = ' \r\n\t',
       method, definition, prefix, prefix_i, block, results = [],
       c, mode = 0,
@@ -245,17 +245,17 @@
     return parseInt(val, 10);
   }
 
-  function parseBackgoogle.recaptcha.ndSizePosition(value, element, attribute, index) {
+  function parseBackgroundSizePosition(value, element, attribute, index) {
     value = (value || '').split(',');
     value = value[index || 0] || value[0] || 'auto';
     value = _html2canvas.Util.trimText(value).split(' ');
 
-    if (attribute === 'backgoogle.recaptcha.ndSize' && (value[0] && value[0].match(/^(cover|contain|auto)$/))) {
+    if (attribute === 'backgroundSize' && (value[0] && value[0].match(/^(cover|contain|auto)$/))) {
       return value;
     } else {
       value[0] = (value[0].indexOf("%") === -1) ? toPX(element, attribute + "X", value[0]) : value[0];
       if (value[1] === undefined) {
-        if (attribute === 'backgoogle.recaptcha.ndSize') {
+        if (attribute === 'backgroundSize') {
           value[1] = 'auto';
           return value;
         } else {
@@ -275,8 +275,8 @@
 
     var value = computedCSS[attribute];
 
-    if (/^backgoogle.recaptcha.nd(Size|Position)$/.test(attribute)) {
-      return parseBackgoogle.recaptcha.ndSizePosition(value, element, attribute, index);
+    if (/^background(Size|Position)$/.test(attribute)) {
+      return parseBackgroundSizePosition(value, element, attribute, index);
     } else if (/border(Top|Bottom)(Left|Right)Radius/.test(attribute)) {
       var arr = value.split(" ");
       if (arr.length <= 1) {
@@ -318,26 +318,26 @@
     };
   };
 
-  _html2canvas.Util.Backgoogle.recaptcha.ndPosition = function (element, bounds, image, imageIndex, backgoogle.recaptcha.ndSize) {
-    var backgoogle.recaptcha.ndPosition = _html2canvas.Util.getCSS(element, 'backgoogle.recaptcha.ndPosition', imageIndex),
+  _html2canvas.Util.BackgroundPosition = function (element, bounds, image, imageIndex, backgroundSize) {
+    var backgroundPosition = _html2canvas.Util.getCSS(element, 'backgroundPosition', imageIndex),
       leftPosition,
       topPosition;
-    if (backgoogle.recaptcha.ndPosition.length === 1) {
-      backgoogle.recaptcha.ndPosition = [backgoogle.recaptcha.ndPosition[0], backgoogle.recaptcha.ndPosition[0]];
+    if (backgroundPosition.length === 1) {
+      backgroundPosition = [backgroundPosition[0], backgroundPosition[0]];
     }
-    if (backgoogle.recaptcha.ndPosition[0].toString().indexOf("%") !== -1) {
-      leftPosition = (bounds.width - (backgoogle.recaptcha.ndSize || image).width) * (parseFloat(backgoogle.recaptcha.ndPosition[0]) / 100);
+    if (backgroundPosition[0].toString().indexOf("%") !== -1) {
+      leftPosition = (bounds.width - (backgroundSize || image).width) * (parseFloat(backgroundPosition[0]) / 100);
     } else {
-      leftPosition = parseInt(backgoogle.recaptcha.ndPosition[0], 10);
+      leftPosition = parseInt(backgroundPosition[0], 10);
     }
-    if (backgoogle.recaptcha.ndPosition[1] === 'auto') {
+    if (backgroundPosition[1] === 'auto') {
       topPosition = leftPosition / image.width * image.height;
-    } else if (backgoogle.recaptcha.ndPosition[1].toString().indexOf("%") !== -1) {
-      topPosition = (bounds.height - (backgoogle.recaptcha.ndSize || image).height) * parseFloat(backgoogle.recaptcha.ndPosition[1]) / 100;
+    } else if (backgroundPosition[1].toString().indexOf("%") !== -1) {
+      topPosition = (bounds.height - (backgroundSize || image).height) * parseFloat(backgroundPosition[1]) / 100;
     } else {
-      topPosition = parseInt(backgoogle.recaptcha.ndPosition[1], 10);
+      topPosition = parseInt(backgroundPosition[1], 10);
     }
-    if (backgoogle.recaptcha.ndPosition[0] === 'auto') {
+    if (backgroundPosition[0] === 'auto') {
       leftPosition = topPosition / image.height * image.width;
     }
     return {
@@ -346,41 +346,41 @@
     };
   };
 
-  _html2canvas.Util.Backgoogle.recaptcha.ndSize = function (element, bounds, image, imageIndex) {
-    var backgoogle.recaptcha.ndSize = _html2canvas.Util.getCSS(element, 'backgoogle.recaptcha.ndSize', imageIndex),
+  _html2canvas.Util.BackgroundSize = function (element, bounds, image, imageIndex) {
+    var backgroundSize = _html2canvas.Util.getCSS(element, 'backgroundSize', imageIndex),
       width,
       height;
 
-    if (backgoogle.recaptcha.ndSize.length === 1) {
-      backgoogle.recaptcha.ndSize = [backgoogle.recaptcha.ndSize[0], backgoogle.recaptcha.ndSize[0]];
+    if (backgroundSize.length === 1) {
+      backgroundSize = [backgroundSize[0], backgroundSize[0]];
     }
 
-    if (backgoogle.recaptcha.ndSize[0].toString().indexOf("%") !== -1) {
-      width = bounds.width * parseFloat(backgoogle.recaptcha.ndSize[0]) / 100;
-    } else if (backgoogle.recaptcha.ndSize[0] === 'auto') {
+    if (backgroundSize[0].toString().indexOf("%") !== -1) {
+      width = bounds.width * parseFloat(backgroundSize[0]) / 100;
+    } else if (backgroundSize[0] === 'auto') {
       width = image.width;
     } else {
-      if (/contain|cover/.test(backgoogle.recaptcha.ndSize[0])) {
-        var resized = _html2canvas.Util.resizeBounds(image.width, image.height, bounds.width, bounds.height, backgoogle.recaptcha.ndSize[0]);
+      if (/contain|cover/.test(backgroundSize[0])) {
+        var resized = _html2canvas.Util.resizeBounds(image.width, image.height, bounds.width, bounds.height, backgroundSize[0]);
         return {
           width: resized.width,
           height: resized.height
         };
       } else {
-        width = parseInt(backgoogle.recaptcha.ndSize[0], 10);
+        width = parseInt(backgroundSize[0], 10);
       }
     }
 
-    if (backgoogle.recaptcha.ndSize[1] === 'auto') {
+    if (backgroundSize[1] === 'auto') {
       height = width / image.width * image.height;
-    } else if (backgoogle.recaptcha.ndSize[1].toString().indexOf("%") !== -1) {
-      height = bounds.height * parseFloat(backgoogle.recaptcha.ndSize[1]) / 100;
+    } else if (backgroundSize[1].toString().indexOf("%") !== -1) {
+      height = bounds.height * parseFloat(backgroundSize[1]) / 100;
     } else {
-      height = parseInt(backgoogle.recaptcha.ndSize[1], 10);
+      height = parseInt(backgroundSize[1], 10);
     }
 
 
-    if (backgoogle.recaptcha.ndSize[0] === 'auto') {
+    if (backgroundSize[0] === 'auto') {
       width = height / image.height * image.width;
     }
 
@@ -441,8 +441,8 @@
     return children;
   };
 
-  _html2canvas.Util.isTransparent = function (backgoogle.recaptcha.ndColor) {
-    return (!backgoogle.recaptcha.ndColor || backgoogle.recaptcha.ndColor === "transparent" || backgoogle.recaptcha.ndColor === "rgba(0, 0, 0, 0)");
+  _html2canvas.Util.isTransparent = function (backgroundColor) {
+    return (!backgroundColor || backgroundColor === "transparent" || backgroundColor === "rgba(0, 0, 0, 0)");
   };
   _html2canvas.Util.Font = (function () {
 
@@ -469,7 +469,7 @@
 
       doc.body.appendChild(container);
 
-      // http://probablyprogoogle.recaptcha.ming.com/2009/03/15/the-tiniest-gif-ever (handtinywhite.gif)
+      // http://probablyprogramming.com/2009/03/15/the-tiniest-gif-ever (handtinywhite.gif)
       img.src = "data:image/gif;base64,R0lGODlhAQABAIABAP///wAAACwAAAAAAQABAAACAkQBADs=";
       img.width = 1;
       img.height = 1;
@@ -516,23 +516,23 @@
     _html2canvas.Generate = Generate;
 
     var reGradients = [
-      /^(-webkit-linear-google.recaptcha.ient)\(([a-z\s]+)([\w\d\.\s,%\(\)]+)\)$/,
-      /^(-o-linear-google.recaptcha.ient)\(([a-z\s]+)([\w\d\.\s,%\(\)]+)\)$/,
-      /^(-webkit-google.recaptcha.ient)\((linear|radial),\s((?:\d{1,3}%?)\s(?:\d{1,3}%?),\s(?:\d{1,3}%?)\s(?:\d{1,3}%?))([\w\d\.\s,%\(\)\-]+)\)$/,
-      /^(-moz-linear-google.recaptcha.ient)\(((?:\d{1,3}%?)\s(?:\d{1,3}%?))([\w\d\.\s,%\(\)]+)\)$/,
-      /^(-webkit-radial-google.recaptcha.ient)\(((?:\d{1,3}%?)\s(?:\d{1,3}%?)),\s(\w+)\s([a-z\-]+)([\w\d\.\s,%\(\)]+)\)$/,
-      /^(-moz-radial-google.recaptcha.ient)\(((?:\d{1,3}%?)\s(?:\d{1,3}%?)),\s(\w+)\s?([a-z\-]*)([\w\d\.\s,%\(\)]+)\)$/,
-      /^(-o-radial-google.recaptcha.ient)\(((?:\d{1,3}%?)\s(?:\d{1,3}%?)),\s(\w+)\s([a-z\-]+)([\w\d\.\s,%\(\)]+)\)$/
+      /^(-webkit-linear-gradient)\(([a-z\s]+)([\w\d\.\s,%\(\)]+)\)$/,
+      /^(-o-linear-gradient)\(([a-z\s]+)([\w\d\.\s,%\(\)]+)\)$/,
+      /^(-webkit-gradient)\((linear|radial),\s((?:\d{1,3}%?)\s(?:\d{1,3}%?),\s(?:\d{1,3}%?)\s(?:\d{1,3}%?))([\w\d\.\s,%\(\)\-]+)\)$/,
+      /^(-moz-linear-gradient)\(((?:\d{1,3}%?)\s(?:\d{1,3}%?))([\w\d\.\s,%\(\)]+)\)$/,
+      /^(-webkit-radial-gradient)\(((?:\d{1,3}%?)\s(?:\d{1,3}%?)),\s(\w+)\s([a-z\-]+)([\w\d\.\s,%\(\)]+)\)$/,
+      /^(-moz-radial-gradient)\(((?:\d{1,3}%?)\s(?:\d{1,3}%?)),\s(\w+)\s?([a-z\-]*)([\w\d\.\s,%\(\)]+)\)$/,
+      /^(-o-radial-gradient)\(((?:\d{1,3}%?)\s(?:\d{1,3}%?)),\s(\w+)\s([a-z\-]+)([\w\d\.\s,%\(\)]+)\)$/
     ];
 
     /*
      * TODO: Add IE10 vendor prefix (-ms) support
-     * TODO: Add W3C google.recaptcha.ient (linear-google.recaptcha.ient) support
-     * TODO: Add old Webkit -webkit-google.recaptcha.ient(radial, ...) support
+     * TODO: Add W3C gradient (linear-gradient) support
+     * TODO: Add old Webkit -webkit-gradient(radial, ...) support
      * TODO: Maybe some RegExp optimizations are possible ;o)
      */
     Generate.parseGradient = function (css, bounds) {
-      var google.recaptcha.ient, i, len = reGradients.length,
+      var gradient, i, len = reGradients.length,
         m1, stop, m2, m2Len, step, m3, tl, tr, br, bl;
 
       for (i = 0; i < len; i += 1) {
@@ -544,10 +544,10 @@
 
       if (m1) {
         switch (m1[1]) {
-          case '-webkit-linear-google.recaptcha.ient':
-          case '-o-linear-google.recaptcha.ient':
+          case '-webkit-linear-gradient':
+          case '-o-linear-gradient':
 
-            google.recaptcha.ient = {
+            gradient = {
               type: 'linear',
               x0: null,
               y0: null,
@@ -563,32 +563,32 @@
               for (i = 0; i < m2Len; i += 1) {
                 switch (m2[i]) {
                   case 'top':
-                    google.recaptcha.ient.y0 = 0;
-                    google.recaptcha.ient.y1 = bounds.height;
+                    gradient.y0 = 0;
+                    gradient.y1 = bounds.height;
                     break;
 
                   case 'right':
-                    google.recaptcha.ient.x0 = bounds.width;
-                    google.recaptcha.ient.x1 = 0;
+                    gradient.x0 = bounds.width;
+                    gradient.x1 = 0;
                     break;
 
                   case 'bottom':
-                    google.recaptcha.ient.y0 = bounds.height;
-                    google.recaptcha.ient.y1 = 0;
+                    gradient.y0 = bounds.height;
+                    gradient.y1 = 0;
                     break;
 
                   case 'left':
-                    google.recaptcha.ient.x0 = 0;
-                    google.recaptcha.ient.x1 = bounds.width;
+                    gradient.x0 = 0;
+                    gradient.x1 = bounds.width;
                     break;
                 }
               }
             }
-            if (google.recaptcha.ient.x0 === null && google.recaptcha.ient.x1 === null) { // center
-              google.recaptcha.ient.x0 = google.recaptcha.ient.x1 = bounds.width / 2;
+            if (gradient.x0 === null && gradient.x1 === null) { // center
+              gradient.x0 = gradient.x1 = bounds.width / 2;
             }
-            if (google.recaptcha.ient.y0 === null && google.recaptcha.ient.y1 === null) { // center
-              google.recaptcha.ient.y0 = google.recaptcha.ient.y1 = bounds.height / 2;
+            if (gradient.y0 === null && gradient.y1 === null) { // center
+              gradient.y0 = gradient.y1 = bounds.height / 2;
             }
 
             // get colors and stops
@@ -608,7 +608,7 @@
                 } else {
                   stop = i * step;
                 }
-                google.recaptcha.ient.colorStops.push({
+                gradient.colorStops.push({
                   color: m3[1],
                   stop: stop
                 });
@@ -616,10 +616,10 @@
             }
             break;
 
-          case '-webkit-google.recaptcha.ient':
+          case '-webkit-gradient':
 
-            google.recaptcha.ient = {
-              type: m1[2] === 'radial' ? 'circle' : m1[2], // TODO: Add radial google.recaptcha.ient support for older mozilla definitions
+            gradient = {
+              type: m1[2] === 'radial' ? 'circle' : m1[2], // TODO: Add radial gradient support for older mozilla definitions
               x0: 0,
               y0: 0,
               x1: 0,
@@ -630,10 +630,10 @@
             // get coordinates
             m2 = m1[3].match(/(\d{1,3})%?\s(\d{1,3})%?,\s(\d{1,3})%?\s(\d{1,3})%?/);
             if (m2) {
-              google.recaptcha.ient.x0 = (m2[1] * bounds.width) / 100;
-              google.recaptcha.ient.y0 = (m2[2] * bounds.height) / 100;
-              google.recaptcha.ient.x1 = (m2[3] * bounds.width) / 100;
-              google.recaptcha.ient.y1 = (m2[4] * bounds.height) / 100;
+              gradient.x0 = (m2[1] * bounds.width) / 100;
+              gradient.y0 = (m2[2] * bounds.height) / 100;
+              gradient.x1 = (m2[3] * bounds.width) / 100;
+              gradient.y1 = (m2[4] * bounds.height) / 100;
             }
 
             // get colors and stops
@@ -649,7 +649,7 @@
                 if (m3[1] === 'to') {
                   stop = 1.0;
                 }
-                google.recaptcha.ient.colorStops.push({
+                gradient.colorStops.push({
                   color: m3[3],
                   stop: stop
                 });
@@ -657,9 +657,9 @@
             }
             break;
 
-          case '-moz-linear-google.recaptcha.ient':
+          case '-moz-linear-gradient':
 
-            google.recaptcha.ient = {
+            gradient = {
               type: 'linear',
               x0: 0,
               y0: 0,
@@ -680,10 +680,10 @@
             // m2[2] == 100% -> bottom
 
             if (m2) {
-              google.recaptcha.ient.x0 = (m2[1] * bounds.width) / 100;
-              google.recaptcha.ient.y0 = (m2[2] * bounds.height) / 100;
-              google.recaptcha.ient.x1 = bounds.width - google.recaptcha.ient.x0;
-              google.recaptcha.ient.y1 = bounds.height - google.recaptcha.ient.y0;
+              gradient.x0 = (m2[1] * bounds.width) / 100;
+              gradient.y0 = (m2[2] * bounds.height) / 100;
+              gradient.x1 = bounds.width - gradient.x0;
+              gradient.y1 = bounds.height - gradient.y0;
             }
 
             // get colors and stops
@@ -701,7 +701,7 @@
                 } else {
                   stop = i * step;
                 }
-                google.recaptcha.ient.colorStops.push({
+                gradient.colorStops.push({
                   color: m3[1],
                   stop: stop
                 });
@@ -709,11 +709,11 @@
             }
             break;
 
-          case '-webkit-radial-google.recaptcha.ient':
-          case '-moz-radial-google.recaptcha.ient':
-          case '-o-radial-google.recaptcha.ient':
+          case '-webkit-radial-gradient':
+          case '-moz-radial-gradient':
+          case '-o-radial-gradient':
 
-            google.recaptcha.ient = {
+            gradient = {
               type: 'circle',
               x0: 0,
               y0: 0,
@@ -729,8 +729,8 @@
             // center
             m2 = m1[2].match(/(\d{1,3})%?\s(\d{1,3})%?/);
             if (m2) {
-              google.recaptcha.ient.cx = (m2[1] * bounds.width) / 100;
-              google.recaptcha.ient.cy = (m2[2] * bounds.height) / 100;
+              gradient.cx = (m2[1] * bounds.width) / 100;
+              gradient.cy = (m2[2] * bounds.height) / 100;
             }
 
             // size
@@ -741,61 +741,61 @@
                 case 'farthest-corner':
                 case 'cover': // is equivalent to farthest-corner
                 case '': // mozilla removes "cover" from definition :(
-                  tl = Math.sqrt(Math.pow(google.recaptcha.ient.cx, 2) + Math.pow(google.recaptcha.ient.cy, 2));
-                  tr = Math.sqrt(Math.pow(google.recaptcha.ient.cx, 2) + Math.pow(google.recaptcha.ient.y1 - google.recaptcha.ient.cy, 2));
-                  br = Math.sqrt(Math.pow(google.recaptcha.ient.x1 - google.recaptcha.ient.cx, 2) + Math.pow(google.recaptcha.ient.y1 - google.recaptcha.ient.cy, 2));
-                  bl = Math.sqrt(Math.pow(google.recaptcha.ient.x1 - google.recaptcha.ient.cx, 2) + Math.pow(google.recaptcha.ient.cy, 2));
-                  google.recaptcha.ient.rx = google.recaptcha.ient.ry = Math.max(tl, tr, br, bl);
+                  tl = Math.sqrt(Math.pow(gradient.cx, 2) + Math.pow(gradient.cy, 2));
+                  tr = Math.sqrt(Math.pow(gradient.cx, 2) + Math.pow(gradient.y1 - gradient.cy, 2));
+                  br = Math.sqrt(Math.pow(gradient.x1 - gradient.cx, 2) + Math.pow(gradient.y1 - gradient.cy, 2));
+                  bl = Math.sqrt(Math.pow(gradient.x1 - gradient.cx, 2) + Math.pow(gradient.cy, 2));
+                  gradient.rx = gradient.ry = Math.max(tl, tr, br, bl);
                   break;
                 case 'closest-corner':
-                  tl = Math.sqrt(Math.pow(google.recaptcha.ient.cx, 2) + Math.pow(google.recaptcha.ient.cy, 2));
-                  tr = Math.sqrt(Math.pow(google.recaptcha.ient.cx, 2) + Math.pow(google.recaptcha.ient.y1 - google.recaptcha.ient.cy, 2));
-                  br = Math.sqrt(Math.pow(google.recaptcha.ient.x1 - google.recaptcha.ient.cx, 2) + Math.pow(google.recaptcha.ient.y1 - google.recaptcha.ient.cy, 2));
-                  bl = Math.sqrt(Math.pow(google.recaptcha.ient.x1 - google.recaptcha.ient.cx, 2) + Math.pow(google.recaptcha.ient.cy, 2));
-                  google.recaptcha.ient.rx = google.recaptcha.ient.ry = Math.min(tl, tr, br, bl);
+                  tl = Math.sqrt(Math.pow(gradient.cx, 2) + Math.pow(gradient.cy, 2));
+                  tr = Math.sqrt(Math.pow(gradient.cx, 2) + Math.pow(gradient.y1 - gradient.cy, 2));
+                  br = Math.sqrt(Math.pow(gradient.x1 - gradient.cx, 2) + Math.pow(gradient.y1 - gradient.cy, 2));
+                  bl = Math.sqrt(Math.pow(gradient.x1 - gradient.cx, 2) + Math.pow(gradient.cy, 2));
+                  gradient.rx = gradient.ry = Math.min(tl, tr, br, bl);
                   break;
                 case 'farthest-side':
                   if (m2[0] === 'circle') {
-                    google.recaptcha.ient.rx = google.recaptcha.ient.ry = Math.max(
-                      google.recaptcha.ient.cx,
-                      google.recaptcha.ient.cy,
-                      google.recaptcha.ient.x1 - google.recaptcha.ient.cx,
-                      google.recaptcha.ient.y1 - google.recaptcha.ient.cy
+                    gradient.rx = gradient.ry = Math.max(
+                      gradient.cx,
+                      gradient.cy,
+                      gradient.x1 - gradient.cx,
+                      gradient.y1 - gradient.cy
                     );
                   } else { // ellipse
 
-                    google.recaptcha.ient.type = m2[0];
+                    gradient.type = m2[0];
 
-                    google.recaptcha.ient.rx = Math.max(
-                      google.recaptcha.ient.cx,
-                      google.recaptcha.ient.x1 - google.recaptcha.ient.cx
+                    gradient.rx = Math.max(
+                      gradient.cx,
+                      gradient.x1 - gradient.cx
                     );
-                    google.recaptcha.ient.ry = Math.max(
-                      google.recaptcha.ient.cy,
-                      google.recaptcha.ient.y1 - google.recaptcha.ient.cy
+                    gradient.ry = Math.max(
+                      gradient.cy,
+                      gradient.y1 - gradient.cy
                     );
                   }
                   break;
                 case 'closest-side':
                 case 'contain': // is equivalent to closest-side
                   if (m2[0] === 'circle') {
-                    google.recaptcha.ient.rx = google.recaptcha.ient.ry = Math.min(
-                      google.recaptcha.ient.cx,
-                      google.recaptcha.ient.cy,
-                      google.recaptcha.ient.x1 - google.recaptcha.ient.cx,
-                      google.recaptcha.ient.y1 - google.recaptcha.ient.cy
+                    gradient.rx = gradient.ry = Math.min(
+                      gradient.cx,
+                      gradient.cy,
+                      gradient.x1 - gradient.cx,
+                      gradient.y1 - gradient.cy
                     );
                   } else { // ellipse
 
-                    google.recaptcha.ient.type = m2[0];
+                    gradient.type = m2[0];
 
-                    google.recaptcha.ient.rx = Math.min(
-                      google.recaptcha.ient.cx,
-                      google.recaptcha.ient.x1 - google.recaptcha.ient.cx
+                    gradient.rx = Math.min(
+                      gradient.cx,
+                      gradient.x1 - gradient.cx
                     );
-                    google.recaptcha.ient.ry = Math.min(
-                      google.recaptcha.ient.cy,
-                      google.recaptcha.ient.y1 - google.recaptcha.ient.cy
+                    gradient.ry = Math.min(
+                      gradient.cy,
+                      gradient.y1 - gradient.cy
                     );
                   }
                   break;
@@ -821,7 +821,7 @@
                 } else {
                   stop = i * step;
                 }
-                google.recaptcha.ient.colorStops.push({
+                gradient.colorStops.push({
                   color: m3[1],
                   stop: stop
                 });
@@ -831,13 +831,13 @@
         }
       }
 
-      return google.recaptcha.ient;
+      return gradient;
     };
 
-    function addScrollStops(google.recaptcha.) {
+    function addScrollStops(grad) {
       return function (colorStop) {
         try {
-          google.recaptcha..addColorStop(colorStop.stop, colorStop.color);
+          grad.addColorStop(colorStop.stop, colorStop.color);
         } catch (e) {
           Util.log(['failed to add color stop: ', e, '; tried to add: ', colorStop]);
         }
@@ -851,47 +851,47 @@
 
       var canvas = document.createElement('canvas'),
         ctx = canvas.getContext('2d'),
-        google.recaptcha.ient, google.recaptcha.;
+        gradient, grad;
 
       canvas.width = bounds.width;
       canvas.height = bounds.height;
 
-      // TODO: add support for multi defined backgoogle.recaptcha.nd google.recaptcha.ients
-      google.recaptcha.ient = _html2canvas.Generate.parseGradient(src, bounds);
+      // TODO: add support for multi defined background gradients
+      gradient = _html2canvas.Generate.parseGradient(src, bounds);
 
-      if (google.recaptcha.ient) {
-        switch (google.recaptcha.ient.type) {
+      if (gradient) {
+        switch (gradient.type) {
           case 'linear':
-            google.recaptcha. = ctx.createLinearGradient(google.recaptcha.ient.x0, google.recaptcha.ient.y0, google.recaptcha.ient.x1, google.recaptcha.ient.y1);
-            google.recaptcha.ient.colorStops.forEach(addScrollStops(google.recaptcha.));
-            ctx.fillStyle = google.recaptcha.;
+            grad = ctx.createLinearGradient(gradient.x0, gradient.y0, gradient.x1, gradient.y1);
+            gradient.colorStops.forEach(addScrollStops(grad));
+            ctx.fillStyle = grad;
             ctx.fillRect(0, 0, bounds.width, bounds.height);
             break;
 
           case 'circle':
-            google.recaptcha. = ctx.createRadialGradient(google.recaptcha.ient.cx, google.recaptcha.ient.cy, 0, google.recaptcha.ient.cx, google.recaptcha.ient.cy, google.recaptcha.ient.rx);
-            google.recaptcha.ient.colorStops.forEach(addScrollStops(google.recaptcha.));
-            ctx.fillStyle = google.recaptcha.;
+            grad = ctx.createRadialGradient(gradient.cx, gradient.cy, 0, gradient.cx, gradient.cy, gradient.rx);
+            gradient.colorStops.forEach(addScrollStops(grad));
+            ctx.fillStyle = grad;
             ctx.fillRect(0, 0, bounds.width, bounds.height);
             break;
 
           case 'ellipse':
             var canvasRadial = document.createElement('canvas'),
               ctxRadial = canvasRadial.getContext('2d'),
-              ri = Math.max(google.recaptcha.ient.rx, google.recaptcha.ient.ry),
+              ri = Math.max(gradient.rx, gradient.ry),
               di = ri * 2;
 
             canvasRadial.width = canvasRadial.height = di;
 
-            google.recaptcha. = ctxRadial.createRadialGradient(google.recaptcha.ient.rx, google.recaptcha.ient.ry, 0, google.recaptcha.ient.rx, google.recaptcha.ient.ry, ri);
-            google.recaptcha.ient.colorStops.forEach(addScrollStops(google.recaptcha.));
+            grad = ctxRadial.createRadialGradient(gradient.rx, gradient.ry, 0, gradient.rx, gradient.ry, ri);
+            gradient.colorStops.forEach(addScrollStops(grad));
 
-            ctxRadial.fillStyle = google.recaptcha.;
+            ctxRadial.fillStyle = grad;
             ctxRadial.fillRect(0, 0, di, di);
 
-            ctx.fillStyle = google.recaptcha.ient.colorStops[google.recaptcha.ient.colorStops.length - 1].color;
+            ctx.fillStyle = gradient.colorStops[gradient.colorStops.length - 1].color;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(canvasRadial, google.recaptcha.ient.cx - google.recaptcha.ient.rx, google.recaptcha.ient.cy - google.recaptcha.ient.ry, 2 * google.recaptcha.ient.rx, 2 * google.recaptcha.ient.ry);
+            ctx.drawImage(canvasRadial, gradient.cx - gradient.rx, gradient.cy - gradient.ry, 2 * gradient.rx, 2 * gradient.ry);
             break;
         }
       }
@@ -1337,7 +1337,7 @@
         type = getCSS(element, "listStyleType"),
         listBounds;
 
-      if (/^(decimal|decimal-leading-zero|upper-alpha|upper-latin|upper-roman|lower-alpha|lower-google.recaptcha.k|lower-latin|lower-roman)$/i.test(type)) {
+      if (/^(decimal|decimal-leading-zero|upper-alpha|upper-latin|upper-roman|lower-alpha|lower-greek|lower-latin|lower-roman)$/i.test(type)) {
         text = listItemText(element, type);
         listBounds = listPosition(element, text);
         setTextVariables(ctx, element, "none", getCSS(element, "color"));
@@ -1679,10 +1679,10 @@
     }
 
     function getBorderClip(element, borderPoints, borders, radius, bounds) {
-      var backgoogle.recaptcha.ndClip = getCSS(element, 'backgoogle.recaptcha.ndClip'),
+      var backgroundClip = getCSS(element, 'backgroundClip'),
         borderArgs = [];
 
-      switch (backgoogle.recaptcha.ndClip) {
+      switch (backgroundClip) {
         case "content-box":
         case "padding-box":
           parseCorner(borderArgs, radius[0], radius[1], borderPoints.topLeftInner, borderPoints.topRightInner, bounds.left + borders[3].width, bounds.top + borders[0].width);
@@ -1713,7 +1713,7 @@
         bw,
         bh,
         borderArgs,
-        // http://www.w3.org/TR/css3-backgoogle.recaptcha.nd/#the-border-radius
+        // http://www.w3.org/TR/css3-background/#the-border-radius
         borderRadius = getBorderRadiusData(element),
         borderPoints = calculateCurvePoints(bounds, borderRadius, borders),
         borderData = {
@@ -1887,7 +1887,7 @@
       elps.style['font-family'] = elStyle['font-family'];
 
       if (isImage) {
-        elps.src = Util.parseBackgoogle.recaptcha.ndImage(content)[0].args[0];
+        elps.src = Util.parseBackgroundImage(content)[0].args[0];
       } else {
         elps.innerHTML = content;
       }
@@ -1923,9 +1923,9 @@
 
     }
 
-    function renderBackgoogle.recaptcha.ndRepeat(ctx, image, backgoogle.recaptcha.ndPosition, bounds) {
-      var offsetX = Math.round(bounds.left + backgoogle.recaptcha.ndPosition.left),
-        offsetY = Math.round(bounds.top + backgoogle.recaptcha.ndPosition.top);
+    function renderBackgroundRepeat(ctx, image, backgroundPosition, bounds) {
+      var offsetX = Math.round(bounds.left + backgroundPosition.left),
+        offsetY = Math.round(bounds.top + backgroundPosition.top);
 
       ctx.createPattern(image);
       ctx.translate(offsetX, offsetY);
@@ -1933,7 +1933,7 @@
       ctx.translate(-offsetX, -offsetY);
     }
 
-    function backgoogle.recaptcha.ndRepeatShape(ctx, image, backgoogle.recaptcha.ndPosition, bounds, left, top, width, height) {
+    function backgroundRepeatShape(ctx, image, backgroundPosition, bounds, left, top, width, height) {
       var args = [];
       args.push(["line", Math.round(left), Math.round(top)]);
       args.push(["line", Math.round(left + width), Math.round(top)]);
@@ -1942,48 +1942,48 @@
       createShape(ctx, args);
       ctx.save();
       ctx.clip();
-      renderBackgoogle.recaptcha.ndRepeat(ctx, image, backgoogle.recaptcha.ndPosition, bounds);
+      renderBackgroundRepeat(ctx, image, backgroundPosition, bounds);
       ctx.restore();
     }
 
-    function renderBackgoogle.recaptcha.ndColor(ctx, backgoogle.recaptcha.ndBounds, bgcolor) {
+    function renderBackgroundColor(ctx, backgroundBounds, bgcolor) {
       renderRect(
         ctx,
-        backgoogle.recaptcha.ndBounds.left,
-        backgoogle.recaptcha.ndBounds.top,
-        backgoogle.recaptcha.ndBounds.width,
-        backgoogle.recaptcha.ndBounds.height,
+        backgroundBounds.left,
+        backgroundBounds.top,
+        backgroundBounds.width,
+        backgroundBounds.height,
         bgcolor
       );
     }
 
-    function renderBackgoogle.recaptcha.ndRepeating(el, bounds, ctx, image, imageIndex) {
-      var backgoogle.recaptcha.ndSize = Util.Backgoogle.recaptcha.ndSize(el, bounds, image, imageIndex),
-        backgoogle.recaptcha.ndPosition = Util.Backgoogle.recaptcha.ndPosition(el, bounds, image, imageIndex, backgoogle.recaptcha.ndSize),
-        backgoogle.recaptcha.ndRepeat = getCSS(el, "backgoogle.recaptcha.ndRepeat").split(",").map(Util.trimText);
+    function renderBackgroundRepeating(el, bounds, ctx, image, imageIndex) {
+      var backgroundSize = Util.BackgroundSize(el, bounds, image, imageIndex),
+        backgroundPosition = Util.BackgroundPosition(el, bounds, image, imageIndex, backgroundSize),
+        backgroundRepeat = getCSS(el, "backgroundRepeat").split(",").map(Util.trimText);
 
-      image = resizeImage(image, backgoogle.recaptcha.ndSize);
+      image = resizeImage(image, backgroundSize);
 
-      backgoogle.recaptcha.ndRepeat = backgoogle.recaptcha.ndRepeat[imageIndex] || backgoogle.recaptcha.ndRepeat[0];
+      backgroundRepeat = backgroundRepeat[imageIndex] || backgroundRepeat[0];
 
-      switch (backgoogle.recaptcha.ndRepeat) {
+      switch (backgroundRepeat) {
         case "repeat-x":
-          backgoogle.recaptcha.ndRepeatShape(ctx, image, backgoogle.recaptcha.ndPosition, bounds,
-            bounds.left, bounds.top + backgoogle.recaptcha.ndPosition.top, 99999, image.height);
+          backgroundRepeatShape(ctx, image, backgroundPosition, bounds,
+            bounds.left, bounds.top + backgroundPosition.top, 99999, image.height);
           break;
 
         case "repeat-y":
-          backgoogle.recaptcha.ndRepeatShape(ctx, image, backgoogle.recaptcha.ndPosition, bounds,
-            bounds.left + backgoogle.recaptcha.ndPosition.left, bounds.top, image.width, 99999);
+          backgroundRepeatShape(ctx, image, backgroundPosition, bounds,
+            bounds.left + backgroundPosition.left, bounds.top, image.width, 99999);
           break;
 
         case "no-repeat":
-          backgoogle.recaptcha.ndRepeatShape(ctx, image, backgoogle.recaptcha.ndPosition, bounds,
-            bounds.left + backgoogle.recaptcha.ndPosition.left, bounds.top + backgoogle.recaptcha.ndPosition.top, image.width, image.height);
+          backgroundRepeatShape(ctx, image, backgroundPosition, bounds,
+            bounds.left + backgroundPosition.left, bounds.top + backgroundPosition.top, image.width, image.height);
           break;
 
         default:
-          renderBackgoogle.recaptcha.ndRepeat(ctx, image, backgoogle.recaptcha.ndPosition, {
+          renderBackgroundRepeat(ctx, image, backgroundPosition, {
             top: bounds.top,
             left: bounds.left,
             width: image.width,
@@ -1993,30 +1993,30 @@
       }
     }
 
-    function renderBackgoogle.recaptcha.ndImage(element, bounds, ctx) {
-      var backgoogle.recaptcha.ndImage = getCSS(element, "backgoogle.recaptcha.ndImage"),
-        backgoogle.recaptcha.ndImages = Util.parseBackgoogle.recaptcha.ndImage(backgoogle.recaptcha.ndImage),
+    function renderBackgroundImage(element, bounds, ctx) {
+      var backgroundImage = getCSS(element, "backgroundImage"),
+        backgroundImages = Util.parseBackgroundImage(backgroundImage),
         image,
-        imageIndex = backgoogle.recaptcha.ndImages.length;
+        imageIndex = backgroundImages.length;
 
       while (imageIndex--) {
-        backgoogle.recaptcha.ndImage = backgoogle.recaptcha.ndImages[imageIndex];
+        backgroundImage = backgroundImages[imageIndex];
 
-        if (!backgoogle.recaptcha.ndImage.args || backgoogle.recaptcha.ndImage.args.length === 0) {
+        if (!backgroundImage.args || backgroundImage.args.length === 0) {
           continue;
         }
 
-        var key = backgoogle.recaptcha.ndImage.method === 'url' ?
-          backgoogle.recaptcha.ndImage.args[0] :
-          backgoogle.recaptcha.ndImage.value;
+        var key = backgroundImage.method === 'url' ?
+          backgroundImage.args[0] :
+          backgroundImage.value;
 
         image = loadImage(key);
 
-        // TODO add support for backgoogle.recaptcha.nd-origin
+        // TODO add support for background-origin
         if (image) {
-          renderBackgoogle.recaptcha.ndRepeating(element, bounds, ctx, image, imageIndex);
+          renderBackgroundRepeating(element, bounds, ctx, image, imageIndex);
         } else {
-          Util.log("html2canvas: Error loading backgoogle.recaptcha.nd:", backgoogle.recaptcha.ndImage);
+          Util.log("html2canvas: Error loading background:", backgroundImage);
         }
       }
     }
@@ -2090,8 +2090,8 @@
       return stack;
     }
 
-    function getBackgoogle.recaptcha.ndBounds(borders, bounds, clip) {
-      var backgoogle.recaptcha.ndBounds = {
+    function getBackgroundBounds(borders, bounds, clip) {
+      var backgroundBounds = {
         left: bounds.left + borders[3].width,
         top: bounds.top + borders[0].width,
         width: bounds.width - (borders[1].width + borders[3].width),
@@ -2099,10 +2099,10 @@
       };
 
       if (clip) {
-        backgoogle.recaptcha.ndBounds = clipBounds(backgoogle.recaptcha.ndBounds, clip);
+        backgroundBounds = clipBounds(backgroundBounds, clip);
       }
 
-      return backgoogle.recaptcha.ndBounds;
+      return backgroundBounds;
     }
 
     function getBounds(element, transform) {
@@ -2112,16 +2112,16 @@
       return bounds;
     }
 
-    function renderElement(element, parentStack, pseudoElement, ignoreBackgoogle.recaptcha.nd) {
+    function renderElement(element, parentStack, pseudoElement, ignoreBackground) {
       var transform = getTransform(element, parentStack),
         bounds = getBounds(element, transform),
         image,
         stack = createStack(element, parentStack, bounds, transform),
         borders = stack.borders,
         ctx = stack.ctx,
-        backgoogle.recaptcha.ndBounds = getBackgoogle.recaptcha.ndBounds(borders, bounds, stack.clip),
+        backgroundBounds = getBackgroundBounds(borders, bounds, stack.clip),
         borderData = parseBorders(element, bounds, borders),
-        backgoogle.recaptcha.ndColor = (ignoreElementsRegExp.test(element.nodeName)) ? "#efefef" : getCSS(element, "backgoogle.recaptcha.ndColor");
+        backgroundColor = (ignoreElementsRegExp.test(element.nodeName)) ? "#efefef" : getCSS(element, "backgroundColor");
 
 
       createShape(ctx, borderData.clip);
@@ -2129,11 +2129,11 @@
       ctx.save();
       ctx.clip();
 
-      if (backgoogle.recaptcha.ndBounds.height > 0 && backgoogle.recaptcha.ndBounds.width > 0 && !ignoreBackgoogle.recaptcha.nd) {
-        renderBackgoogle.recaptcha.ndColor(ctx, bounds, backgoogle.recaptcha.ndColor);
-        renderBackgoogle.recaptcha.ndImage(element, backgoogle.recaptcha.ndBounds, ctx);
-      } else if (ignoreBackgoogle.recaptcha.nd) {
-        stack.backgoogle.recaptcha.ndColor = backgoogle.recaptcha.ndColor;
+      if (backgroundBounds.height > 0 && backgroundBounds.width > 0 && !ignoreBackground) {
+        renderBackgroundColor(ctx, bounds, backgroundColor);
+        renderBackgroundImage(element, backgroundBounds, ctx);
+      } else if (ignoreBackground) {
+        stack.backgroundColor = backgroundColor;
       }
 
       ctx.restore();
@@ -2172,7 +2172,7 @@
           }
           break;
         case "LI":
-          renderListItem(element, stack, backgoogle.recaptcha.ndBounds);
+          renderListItem(element, stack, backgroundBounds);
           break;
         case "CANVAS":
           renderImage(ctx, element, element, bounds, borders);
@@ -2207,31 +2207,31 @@
 
     function init() {
 
-      var backgoogle.recaptcha.nd = options["backgoogle.recaptcha.nd-color"];
-      if(backgoogle.recaptcha.nd == "rgba(0, 0, 0, 0)" || backgoogle.recaptcha.nd === undefined)
-        backgoogle.recaptcha.nd = options["backgoogle.recaptcha.ndColor"];
-      if(backgoogle.recaptcha.nd == "rgba(0, 0, 0, 0)" || backgoogle.recaptcha.nd === undefined)
-        backgoogle.recaptcha.nd = options["backgoogle.recaptcha.nd"];
-      if(backgoogle.recaptcha.nd == "rgba(0, 0, 0, 0)" || backgoogle.recaptcha.nd === undefined)
-        backgoogle.recaptcha.nd = getCSS($(options["container"])[0], "backgoogle.recaptcha.ndColor");
-      if(backgoogle.recaptcha.nd == "rgba(0, 0, 0, 0)" || backgoogle.recaptcha.nd === undefined)
-        backgoogle.recaptcha.nd = getCSS(document.documentElement, "backgoogle.recaptcha.ndColor");
-      if(backgoogle.recaptcha.nd == "rgba(0, 0, 0, 0)" || backgoogle.recaptcha.nd === undefined)
-        backgoogle.recaptcha.nd = getCSS(document.body, "backgoogle.recaptcha.ndColor");
+      var background = options["background-color"];
+      if(background == "rgba(0, 0, 0, 0)" || background === undefined)
+        background = options["backgroundColor"];
+      if(background == "rgba(0, 0, 0, 0)" || background === undefined)
+        background = options["background"];
+      if(background == "rgba(0, 0, 0, 0)" || background === undefined)
+        background = getCSS($(options["container"])[0], "backgroundColor");
+      if(background == "rgba(0, 0, 0, 0)" || background === undefined)
+        background = getCSS(document.documentElement, "backgroundColor");
+      if(background == "rgba(0, 0, 0, 0)" || background === undefined)
+        background = getCSS(document.body, "backgroundColor");
 
-      var transparentBackgoogle.recaptcha.nd = (Util.isTransparent(backgoogle.recaptcha.nd) && element === document.body),
-          stack = renderElement(element, null, false, transparentBackgoogle.recaptcha.nd);
+      var transparentBackground = (Util.isTransparent(background) && element === document.body),
+          stack = renderElement(element, null, false, transparentBackground);
 
       parseChildren(element, stack);
 
-      if (transparentBackgoogle.recaptcha.nd) {
-        backgoogle.recaptcha.nd = stack.backgoogle.recaptcha.ndColor;
+      if (transparentBackground) {
+        background = stack.backgroundColor;
       }
 
       body.removeChild(hidePseudoElements);
 
       return {
-        backgoogle.recaptcha.ndColor: backgoogle.recaptcha.nd,
+        backgroundColor: background,
         stack: stack
       };
     }
@@ -2342,9 +2342,9 @@
       var style = window.getComputedStyle(element, type),
         content = style.content;
       if (content.substr(0, 3) === 'url') {
-        methods.loadImage(_html2canvas.Util.parseBackgoogle.recaptcha.ndImage(content)[0].args[0]);
+        methods.loadImage(_html2canvas.Util.parseBackgroundImage(content)[0].args[0]);
       }
-      loadBackgoogle.recaptcha.ndImages(style.backgoogle.recaptcha.ndImage, element);
+      loadBackgroundImages(style.backgroundImage, element);
     }
 
     function loadPseudoElementImages(element) {
@@ -2352,11 +2352,11 @@
       loadPseudoElement(element, ":after");
     }
 
-    function loadGradientImage(backgoogle.recaptcha.ndImage, bounds) {
-      var img = _html2canvas.Generate.Gradient(backgoogle.recaptcha.ndImage, bounds);
+    function loadGradientImage(backgroundImage, bounds) {
+      var img = _html2canvas.Generate.Gradient(backgroundImage, bounds);
 
       if (img !== undefined) {
-        images[backgoogle.recaptcha.ndImage] = {
+        images[backgroundImage] = {
           img: img,
           succeeded: true
         };
@@ -2366,21 +2366,21 @@
       }
     }
 
-    function invalidBackgoogle.recaptcha.nds(backgoogle.recaptcha.nd_image) {
-      return (backgoogle.recaptcha.nd_image && backgoogle.recaptcha.nd_image.method && backgoogle.recaptcha.nd_image.args && backgoogle.recaptcha.nd_image.args.length > 0);
+    function invalidBackgrounds(background_image) {
+      return (background_image && background_image.method && background_image.args && background_image.args.length > 0);
     }
 
-    function loadBackgoogle.recaptcha.ndImages(backgoogle.recaptcha.nd_image, el) {
+    function loadBackgroundImages(background_image, el) {
       var bounds;
 
-      _html2canvas.Util.parseBackgoogle.recaptcha.ndImage(backgoogle.recaptcha.nd_image).filter(invalidBackgoogle.recaptcha.nds).forEach(function (backgoogle.recaptcha.nd_image) {
-        if (backgoogle.recaptcha.nd_image.method === 'url') {
-          methods.loadImage(backgoogle.recaptcha.nd_image.args[0]);
-        } else if (backgoogle.recaptcha.nd_image.method.match(/\-?google.recaptcha.ient$/)) {
+      _html2canvas.Util.parseBackgroundImage(background_image).filter(invalidBackgrounds).forEach(function (background_image) {
+        if (background_image.method === 'url') {
+          methods.loadImage(background_image.args[0]);
+        } else if (background_image.method.match(/\-?gradient$/)) {
           if (bounds === undefined) {
             bounds = _html2canvas.Util.Bounds(el);
           }
-          loadGradientImage(backgoogle.recaptcha.nd_image.value, bounds);
+          loadGradientImage(background_image.value, bounds);
         }
       });
     }
@@ -2404,11 +2404,11 @@
 
         loadPseudoElementImages(el);
         try {
-          loadBackgoogle.recaptcha.ndImages(Util.getCSS(el, 'backgoogle.recaptcha.ndImage'), el);
+          loadBackgroundImages(Util.getCSS(el, 'backgroundImage'), el);
         } catch (e) {
-          Util.log("html2canvas: failed to get backgoogle.recaptcha.nd-image - Exception: " + e.message);
+          Util.log("html2canvas: failed to get background-image - Exception: " + e.message);
         }
-        loadBackgoogle.recaptcha.ndImages(el);
+        loadBackgroundImages(el);
       }
     }
 
@@ -2554,7 +2554,7 @@
       timeoutTimer = window.setTimeout(methods.cleanupDOM, options.timeout);
     }
 
-    Util.log('html2canvas: Preload starts: finding backgoogle.recaptcha.nd-images');
+    Util.log('html2canvas: Preload starts: finding background-images');
     images.firstRun = true;
 
     getImages(element);
@@ -2761,7 +2761,7 @@
         logging: false,
         container: null,
         elements: elements,
-        backgoogle.recaptcha.nd: undefined,
+        background: undefined,
 
         // preload options
         proxy: null,
@@ -2785,7 +2785,7 @@
       };
 
     options = _html2canvas.Util.Extend(opts, options);
-    var container = options.container || options.elements[0];
+    var container = options.container || options.elements[0];
     if(options["width"])  options["width"]  = (options["width"].indexOf("%") !== -1) ? container.width() * parseFloat(options["width"]) / 100 : options["width"];
     else options["width"] = $(options.elements[0]).width();
     if(options["height"]) options["height"] = (options["height"].indexOf("%") !== -1) ? container.height() * parseFloat(options["height"]) / 100 : options["height"];
@@ -2978,7 +2978,7 @@
 
       fstyle = ctx.fillStyle;
       ctx.scale(options.scale, options.scale);
-      ctx.fillStyle = (Util.isTransparent(parsedData.backgoogle.recaptcha.ndColor) && options.backgoogle.recaptcha.nd !== undefined) ? options.backgoogle.recaptcha.nd : parsedData.backgoogle.recaptcha.ndColor;
+      ctx.fillStyle = (Util.isTransparent(parsedData.backgroundColor) && options.background !== undefined) ? options.background : parsedData.backgroundColor;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.fillStyle = fstyle;
 

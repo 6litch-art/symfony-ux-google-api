@@ -152,8 +152,6 @@ class GmBuilder implements GmBuilderInterface
         // Get variables
         //
         $this->enable        = $kernel->getContainer()->getParameter("google.maps.enable");
-        $this->html2canvas   = $kernel->getContainer()->getParameter("google.maps.html2canvas");
-        $this->tilemap       = $kernel->getContainer()->getParameter("google.maps.tilemap");
         $this->cacheDir      = $kernel->getContainer()->getParameter("google.maps.cache");
         $this->cachePool     = $kernel->getContainer()->getParameter("google.maps.cache_pool");
         $this->cacheLifetime = $kernel->getContainer()->getParameter("google.maps.cache_lifetime");
@@ -413,8 +411,7 @@ class GmBuilder implements GmBuilderInterface
     {
         if (!$this->enable) return;
 
-        $javascripts  = "<script src='" . $this->getAsset($this->html2canvas) . "'></script>" . PHP_EOL;
-        $javascripts .= "<script src='" . $this->getAsset($this->tilemap)     . "'></script>";
+        $javascripts  = "<script src='" . $this->getAsset("/bundles/google/maps.js") . "'></script>" . PHP_EOL;
         $this->twig->addGlobal("google_maps", array_merge(
             $this->twig->getGlobals()["google_maps"] ?? [],
             ["html2canvas" => ($this->twig->getGlobals()["google_maps"]["html2canvas"] ?? "") . $javascripts]

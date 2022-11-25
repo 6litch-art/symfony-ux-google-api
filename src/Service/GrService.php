@@ -42,7 +42,7 @@ class GrService
 
         $this->twig    = $twig;
         if($this->getLoader()) {
-            $this->getLoader()->prependPath($kernel->getProjectDir()."/vendor/glitchr/google-api/templates/form");
+            $this->getLoader()->prependPath($kernel->getProjectDir()."/vendor/glitchr/ux-google/templates/form");
             $this->getLoader()->prependPath($kernel->getProjectDir()."/vendor/symfony/twig-bridge/Resources/views", "Twig");
         }
     }

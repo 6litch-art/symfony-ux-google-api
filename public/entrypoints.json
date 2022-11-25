@@ -1,23 +1,23 @@
 {
   "entrypoints": {
-    "google.maps": {
+    "maps": {
       "js": [
-        "/bundles/google-api/google.maps.js"
+        "/bundles/google-api/maps.js"
       ]
     },
-    "google.analytics": {
+    "analytics": {
       "js": [
-        "/bundles/google-api/google.analytics.js"
+        "/bundles/google-api/analytics.js"
       ]
     },
-    "google.recaptcha": {
+    "recaptcha": {
       "js": [
-        "/bundles/google-api/google.recaptcha.js"
+        "/bundles/google-api/recaptcha.js"
       ]
     },
-    "google.tag_manager": {
+    "tag_manager": {
       "js": [
-        "/bundles/google-api/google.tag_manager.js"
+        "/bundles/google-api/tag_manager.js"
       ]
     }
   }
