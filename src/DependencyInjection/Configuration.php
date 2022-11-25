@@ -52,7 +52,7 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('form_themes')
                     ->addDefaultChildrenIfNoneSet()
                         ->prototype('scalar')
-                        ->defaultValue('@Gr/form/form_div_layout.html.twig')
+                        ->defaultValue('@Google/form/form_div_layout.html.twig')
                         ->end()
                     ->end()
                 ->arrayNode('apiv2')

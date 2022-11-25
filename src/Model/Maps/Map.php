@@ -51,7 +51,7 @@ class Map extends GmObject
         return $this->getOption("mapId");
     }
 
-    public function addMarker($google.maps.uilder, $opts = []): self
+    public function addMarker($gmBuilder, $opts = []): self
     {
         if (!$this->getId())
             throw new Exception("Map not yet added to builder.. cannot add marker");
@@ -60,11 +60,11 @@ class Map extends GmObject
         $marker->addOption("map", $this->getId());
         $marker->setParent($this);
 
-        $google.maps.uilder->addMarker("marker_" . md5(uniqid(rand(), true)), $marker);
+        $gmBuilder->addMarker("marker_" . md5(uniqid(rand(), true)), $marker);
         return $this;
     }
 
-    public function addMapStyle($google.maps.uilder, $name, $featureTypes = [])
+    public function addMapStyle($gmBuilder, $name, $featureTypes = [])
     {
         if (!$this->getId())
             throw new Exception("Map not yet added to builder.. cannot add a map type style");
@@ -75,7 +75,7 @@ class Map extends GmObject
         $id = $this->getId();
         $mapStyleId = "mapTypeStyle_" . md5(uniqid(rand(), true));
 
-        $google.maps.uilder->addMapStyle($mapStyleId, $mapStyle);
+        $gmBuilder->addMapStyle($mapStyleId, $mapStyle);
         $this->addEntry($id . ".mapTypes.set(" . $mapStyle->getName() . ", " . $mapStyleId . ");");
 
         $this->mapStyleList[$mapStyle->getName()] = $mapStyle;
