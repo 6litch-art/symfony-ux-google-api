@@ -20,7 +20,7 @@ class DataCollector extends AbstractDataCollector
 
     public function getName(): string { return 'gtm'; }
 
-    public static function getTemplate(): ?string { return '@Gtm/inspector/data_collector.html.twig'; }
+    public static function getTemplate(): ?string { return '@Google/inspector/data_collector.html.twig'; }
 
     public function getData(): array { return $this->data; }
     public function getDataBundle(string $bundle): ?array

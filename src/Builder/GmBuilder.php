@@ -338,7 +338,7 @@ class GmBuilder implements GmBuilderInterface
                 $cacheEnabled = $object->cacheEnabled();
                 $cacheExists  = $object->cacheExists() || $object->parentCacheExists();
                 $cacheOnly    = GmBuilder::getInstance()->cacheOnly;
-
+                
                 // Display Google API in the following cases
                 $caseA = !$cacheEnabled;
                 $caseB = !$cacheOnly && !$cacheExists;

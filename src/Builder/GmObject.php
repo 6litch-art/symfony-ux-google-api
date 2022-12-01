@@ -299,7 +299,7 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
             if($isGranted) {
 
                 $csrfToken = GmBuilder::getInstance()->tokenManager->getToken('html2canvas-suppress')->getValue();
-                $routeSuppress = GmBuilder::getInstance()->router->generate("google.maps.suppress", ["signature" => $this->getSignatureWithOptions()]);
+                $routeSuppress = GmBuilder::getInstance()->router->generate("gm_suppress", ["signature" => $this->getSignatureWithOptions()]);
 
                 return  "<script>".
                         "function " . $this->getId() . "_html2canvas_suppress(that){" . PHP_EOL .
@@ -311,7 +311,7 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
                         "            url: url," . PHP_EOL .
                         "            dataType: 'text'," . PHP_EOL .
                         "            data: {" . PHP_EOL .
-                        "                google.maps.csrf_token : \"" . $csrfToken . "\"" . PHP_EOL .
+                        "                gm_csrf_token : \"" . $csrfToken . "\"" . PHP_EOL .
                         "            }, success: function(response) {".PHP_EOL.
                         "                   var status = (JSON.parse(response)['status'] == '".GmBuilder::STATUS_OK."');".PHP_EOL.
                         "                   if(status) $(that).css('color', '#9ce62a99');".
@@ -335,7 +335,7 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
         $isGranted = GmBuilder::getInstance()->isGranted();
         $cacheEnabled = $this->cacheEnabled();
 
-        $routeExport = GmBuilder::getInstance()->router->generate("google.maps.export", ["signature" => $this->getSignatureWithOptions()]);
+        $routeExport = GmBuilder::getInstance()->router->generate("gm_export", ["signature" => $this->getSignatureWithOptions()]);
         $csrfToken = GmBuilder::getInstance()->tokenManager->getToken('html2canvas-export')->getValue();
 
         if ($cacheEnabled && $isGranted)
@@ -496,7 +496,7 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
         $signature = hash_hmac("sha1", $str, $decodedKey,  true);
 
         //dump($privateKey, $decodedKey, $signature, self::base64_encode($signature));
-        return self::base64_encode($signature);
+        return str_replace("=", "", self::base64_encode($signature));
     }
 
     public static function check($str, $signature): bool

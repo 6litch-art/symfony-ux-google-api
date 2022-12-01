@@ -2,7 +2,7 @@
 
 {% block toolbar %}
         {% set icon %}
-            {{ include('@Gtm/inspector/icon.svg.twig', { fill_color: '#AAA', height: '24' }) }}
+            {{ include('@Google/inspector/icon.svg.twig', { fill_color: '#AAA', height: '24' }) }}
         {% endset %}
 
         {%- set text -%}
@@ -28,7 +28,7 @@
 
 {% block menu %}
     <span class="label {#{ not collector.isEasyAdminRequest ? 'disabled' }#}">
-        <span class="icon">{{ include('@Gtm/inspector/icon.svg.twig', { fill_color: '#AAA', height: '24' }) }}</span>
+        <span class="icon">{{ include('@Google/inspector/icon.svg.twig', { fill_color: '#AAA', height: '24' }) }}</span>
         <strong>Google Tag Manager</strong>
     </span>
 {% endblock %}

@@ -75,7 +75,7 @@ class GmController extends AbstractController
 
     /**
      * Display cache image
-     * @Route("/{signature}", name="gm.show_metadata")
+     * @Route("/{signature}", name="gm_show_metadata")
      */
     public function ShowMetadata(string $signature)
     {
@@ -85,7 +85,7 @@ class GmController extends AbstractController
 
     /**
      * Export using html2canvas
-     * @Route("/{signature}/export", name="gm.export")
+     * @Route("/{signature}/export", name="gm_export")
      */
     public function Export(string $signature, Request $request)
     {
@@ -180,7 +180,7 @@ class GmController extends AbstractController
 
     /**
      * Suppress a cache image
-     * @Route("/{signature}/suppress", name="gm.suppress")
+     * @Route("/{signature}/suppress", name="gm_suppress")
      * */
     public function Suppress(string $signature)
     {
@@ -195,7 +195,7 @@ class GmController extends AbstractController
 
     /**
      * Display cache image
-     * @Route("/{signature}/{tile}", name="gm.show")
+     * @Route("/{signature}/{tile}", name="gm_show")
      */
     public function Show(string $signature, int $tile = 0)
     {
