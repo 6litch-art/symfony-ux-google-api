@@ -23,8 +23,6 @@ class GrService
 
     protected $enable;
     protected $bag;
-    
-    protected $baseService = null;
 
     /**
      * @var CacheInterface
@@ -41,7 +39,7 @@ class GrService
         $this->onLoadMethod = $this->container->getParameter("google.recaptcha.onload");
 
         $this->twig    = $twig;
-        if($this->getLoader()) {
+        if ($this->getLoader()) {
             $this->getLoader()->prependPath($kernel->getProjectDir()."/vendor/glitchr/ux-google/templates/form");
             $this->getLoader()->prependPath($kernel->getProjectDir()."/vendor/symfony/twig-bridge/Resources/views", "Twig");
         }
@@ -88,11 +86,11 @@ class GrService
     {
         if(!$this->enable) return;
 
-        $javascripts  = "<script src='".$this->getAsset("bundles/google.recaptcha.js")."' defer></script>" . PHP_EOL;
+        $javascripts  = "<script src='".$this->getAsset("bundles/google/recaptcha.js")."' defer></script>" . PHP_EOL;
         $javascripts .= "<script src='https://www.google.com/recaptcha/api.js?onload=".$this->onLoadMethod."&render=explicit'></script>";
-        $this->twig->addGlobal("google.recaptcha", array_merge(
+        $this->twig->addGlobal("google_recaptcha", array_merge(
             $this->twig->getGlobals()["google_recaptcha"] ?? [],
-            ["javascripts" => ($this->twig->getGlobals()["google.recaptcha"]["javascripts"] ?? "") . $javascripts]
+            ["javascripts" => ($this->twig->getGlobals()["google_recaptcha"]["javascripts"] ?? "") . $javascripts]
         ));
     }
 
@@ -103,7 +101,7 @@ class GrService
 
             case self::APIV2:
             case self::APIV3:
-                return $this->container->getParameter("google.recaptcha.api.secret");
+                return $this->container->getParameter("google.recaptcha.".$api.".secret");
 
             default:
                 throw new Exception("Invalid API version provided.");
@@ -149,11 +147,11 @@ class GrService
 
     public function hasTriggeredMinimumAttempts(FormInterface $form, array $options)
     {
-        return $this->getFailedAttempts($form->getName()) >= $this->getMinimumAttempts($options['captcha_api']);
+        return $this->getFailedAttempts($form->getName()) >= $this->getMinimumAttempts($options);
     }
 
-    public function getMinimumAttempts() { return $this->container->getParameter("google.recaptcha.".self::APIV2.".min_attempts")    ?? 0; }
-    public function getScoreThreshold()  { return $this->container->getParameter("google.recaptcha.".self::APIV3.".score_threshold") ?? 0; }
+    public function getMinimumAttempts(array $options = []) { return $options['captcha_min_attempts']    ?? 0; }
+    public function getScoreThreshold(array $options = [])  { return $options['captcha_score_threshold'] ?? 0; }
 
     public function getSiteKey(string $api)
     {
@@ -161,7 +159,7 @@ class GrService
 
             case self::APIV2:
             case self::APIV3:
-                return $this->container->getParameter("google.recaptcha.api.sitekey");
+                return $this->container->getParameter("google.recaptcha.".$api.".sitekey");
 
             default:
                 throw new Exception("Invalid API version provided.");

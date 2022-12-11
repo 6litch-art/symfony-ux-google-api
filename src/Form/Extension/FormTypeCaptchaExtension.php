@@ -54,7 +54,10 @@ class FormTypeCaptchaExtension extends AbstractTypeExtension
             'captcha_protection' => $this->defaultEnabled && ($this->easyadminContext === null),
             'captcha_api' => GrService::APIV2,
             'captcha_type' => "checkbox",
-            'captcha_field_name' => "_captcha"
+            'captcha_field_name' => "_captcha",
+            "captcha_reset_on_success" => true,
+            "captcha_min_attempts" => 5,
+            "captcha_score_threshold" => 0
         ]);
     }
 
@@ -104,7 +107,7 @@ class FormTypeCaptchaExtension extends AbstractTypeExtension
 
             if(!$this->grService->hasTriggeredMinimumAttempts($form, $options)) return;
             if($this->grService->findCaptchaType($form)) return;
-
+            
             $factory = $form->getConfig()->getFormFactory();
             $captchaForm = $factory->createNamed($options['captcha_field_name'], $this->grService->getType($options["captcha_api"]), null, [
                 'mapped' => false,

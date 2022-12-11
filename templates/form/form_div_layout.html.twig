@@ -2,14 +2,14 @@
 
 {% block recaptchaV2_widget %}
 {% if enable %}
-<div class="form-google.recaptcha.p captcha" id="{{ id }}_widget" data-api="{{api}}" data-toggle="recaptcha" data-name="{{name}}" data-id="{{id}}" data-type="{{ type }}" data-sitekey="{{ sitekey }}"></div>
-<input type="hidden" {{ block('widget_attributes') }}/>
+<div class="captcha-response" style="height:0; overflow:hidden;margin-bottom: -1.5em; margin-top: 1.5em;"><input type="text" {{ block('widget_attributes') }} required="required"/></div>
+<div class="form-group captcha" id="{{ id }}_widget" data-api="{{api}}" data-toggle="recaptcha" data-name="{{name}}" data-id="{{id}}" data-type="{{ type }}" data-sitekey="{{ sitekey }}"></div>
 {% endif %} 
 {% endblock %}
 
 {% block recaptchaV3_widget %}
 {% if enable %}
-<input type="hidden" data-api="{{api}}" data-toggle="recaptcha" data-name="{{name}}" data-id="{{id}}" data-type="{{ type }}" data-sitekey="{{ sitekey }}"  {{ block('widget_attributes') }}/>
+<div class="captcha-response" style="height:0; overflow:hidden;margin-bottom: -1.5em; margin-top: 1.5em;"><input type="text" data-api="{{api}}" data-toggle="recaptcha" required="required" data-name="{{name}}" data-id="{{id}}" data-type="{{ type }}" data-sitekey="{{ sitekey }}"  {{ block('widget_attributes') }}/><div>
 {% endif %} 
 {% endblock %}
 

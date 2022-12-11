@@ -71,6 +71,7 @@ class GrListener
         $this->enable = $this->parameterBag->get("google.recaptcha.enable");
         $this->enableOnAdmin = $this->parameterBag->get("google.recaptcha.enable_on_admin");
         $this->autoAppend = $this->parameterBag->get("google.recaptcha.autoappend");
+
         if (!$this->allowRender($event)) return false;
 
         $response = $event->getResponse();

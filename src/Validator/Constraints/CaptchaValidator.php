@@ -40,7 +40,6 @@ final class CaptchaValidator extends ConstraintValidator
         $request = Request::createFromGlobals();
         $reCaptcha = new ReCaptcha($this->grService->getSecret($constraint->getVersion()));
 
-
         $response = $reCaptcha->verify($value, $request->getClientIp());
         $this->responses[] = $response;
 

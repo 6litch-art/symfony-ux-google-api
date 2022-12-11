@@ -6,6 +6,7 @@ use Google\Service\GrService;
 use Google\Validator\Constraints\Captcha;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -27,22 +28,15 @@ class ReCaptchaV3Type extends AbstractType
     {
         $resolver
             ->setDefault('constraints', new Captcha(["api" => GrService::APIV3]))
-            ->setDefault('sitekey', null)
-            ->setDefault('score_threshold', 0.5);
+            ->setDefault('sitekey', null);
     }
 
-    public function getParent(): string
-    {
-        return HiddenType::class;
-    }
+    public function getParent(): string { return HiddenType::class; }
 
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix() : string
-    {
-        return 'recaptchaV3';
-    }
+    public function getBlockPrefix() : string { return 'recaptchaV3'; }
 
     /**
      * @inheritDoc
@@ -55,7 +49,6 @@ class ReCaptchaV3Type extends AbstractType
         $view->vars["api"] = GrService::APIV3;
         $view->vars["type"] = "invisible";
         $view->vars["sitekey"] = $options['sitekey'] ?? $this->grService->getSiteKey(GrService::APIV3);
-
         $this->grService->initJs();
     }
 }

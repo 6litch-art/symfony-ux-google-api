@@ -6,6 +6,7 @@ use Google\Service\GrService;
 use Google\Validator\Constraints\Captcha;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -27,9 +28,9 @@ class ReCaptchaV2Type extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver
-            ->setDefault('constraints', new Captcha(["api" => GrService::APIV2]))
             ->setDefault('sitekey', null)
             ->setDefault('type', 'checkbox')
+            ->setDefault('constraints', new Captcha(["api" => GrService::APIV2]))
             ->setAllowedValues('type', ['checkbox', 'invisible']);
     }
 

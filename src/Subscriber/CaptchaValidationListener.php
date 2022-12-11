@@ -2,7 +2,6 @@
 
 namespace Google\Subscriber;
 
-use Google\Exception\InvalidCaptchaException;
 use Google\Service\GrService;
 use Google\Validator\Constraints\Captcha;
 use Google\Validator\Constraints\CaptchaValidator;
@@ -11,14 +10,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Util\ServerParams;
-use Symfony\Component\HttpKernel\Event\ResponseEvent;
-use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\Security\Csrf\CsrfToken;
-use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
-use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 use Symfony\Component\Validator\Context\ExecutionContextFactory;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -54,7 +46,7 @@ class CaptchaValidationListener implements EventSubscriberInterface
     {
         $form = $event->getForm();
 
-        if($form->isSubmitted() && $form->isValid()) $this->grService->resetFailedAttempt($form->getName());
+        if($form->isSubmitted() && $form->isValid() && $form->getConfig()->getOption("captcha_reset_on_success")) $this->grService->resetFailedAttempt($form->getName());
         else $this->grService->addFailedAttempt($form->getName());
     }
 
@@ -73,7 +65,7 @@ class CaptchaValidationListener implements EventSubscriberInterface
 
             $data = $event->getData();
             $value = $data[$this->fieldName] ?? null;
-            
+ 
             $executionContextFactory = new ExecutionContextFactory($this->translator, $this->translationDomain);
             $context = $executionContextFactory->createContext($this->validator, $value);
 
