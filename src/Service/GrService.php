@@ -5,6 +5,7 @@ namespace Google\Service;
 use Exception;
 use Google\Form\Type\ReCaptchaV2Type;
 use Google\Form\Type\ReCaptchaV3Type;
+use LogicException;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\SubmitButton;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -88,10 +89,13 @@ class GrService
 
         $javascripts  = "<script src='".$this->getAsset("bundles/google/recaptcha.js")."' defer></script>" . PHP_EOL;
         $javascripts .= "<script src='https://www.google.com/recaptcha/api.js?onload=".$this->onLoadMethod."&render=explicit'></script>";
-        $this->twig->addGlobal("google_recaptcha", array_merge(
-            $this->twig->getGlobals()["google_recaptcha"] ?? [],
-            ["javascripts" => ($this->twig->getGlobals()["google_recaptcha"]["javascripts"] ?? "") . $javascripts]
-        ));
+
+        try { 
+            $this->twig->addGlobal("google_recaptcha", array_merge(
+                $this->twig->getGlobals()["google_recaptcha"] ?? [],
+                ["javascripts" => ($this->twig->getGlobals()["google_recaptcha"]["javascripts"] ?? "") . $javascripts]
+            ));
+        } catch(LogicException $e) { }
     }
 
     public function isEnabled() { return $this->enable; }

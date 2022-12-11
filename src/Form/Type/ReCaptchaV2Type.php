@@ -16,7 +16,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ReCaptchaV2Type extends AbstractType
 {
-
     public function __construct(GrService $grService)
     {
         $this->grService = $grService;
