@@ -349,6 +349,7 @@ class GmBuilder implements GmBuilderInterface
             }
         }
 
+        $javascripts = preg_replace("/^(?: )*\/\/.*\n/s", "", $javascripts);
         $javascripts = trim($javascripts);
         if (empty($javascripts)) return false;
 
