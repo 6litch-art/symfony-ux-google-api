@@ -400,6 +400,7 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
 
             $cacheImage .= PHP_EOL;
             $cacheImage .= "<div ".
+                "class='google-tilemap'".
                 "id='".$this->getId(). "_html2canvas' " .
                 "data-src='".GmBuilder::getInstance()->getAsset(GmBuilder::getInstance()->cachePublic)."' " .
                 "data-signature='".$signature. "' ".
@@ -408,7 +409,6 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
                 "data-missing='".GmBuilder::getInstance()->getAsset($noimage)."' ".
                 "width='" . $imagewidth . "'  height='" . $imageheight . "'></div>" . PHP_EOL;
 
-            $cacheImage .= "<script>gm_tilemap('#" . $this->getId() . "_html2canvas'); </script>" .PHP_EOL;
         }
 
         return "<div " . $options . ">".$cacheImage."</div>" . PHP_EOL;

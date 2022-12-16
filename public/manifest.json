@@ -1,6 +1,6 @@
 {
-  "./maps.js": "/bundles/google-api/maps.2eaab474.js",
-  "./analytics.js": "/bundles/google-api/analytics.bce2f5d2.js",
-  "./recaptcha.js": "/bundles/google-api/recaptcha.3c74a66e.js",
-  "./tag_manager.js": "/bundles/google-api/tag_manager.bce2f5d2.js"
+  "./maps.js": "/bundles/google-api/maps.js",
+  "./analytics.js": "/bundles/google-api/analytics.js",
+  "./recaptcha.js": "/bundles/google-api/recaptcha.js",
+  "./tag_manager.js": "/bundles/google-api/tag_manager.js"
 }

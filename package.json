@@ -12,8 +12,7 @@
   "private": true,
   "scripts": {
     "dev-server": "encore dev-server",
-    "dev": "encore dev",
-    "watch": "encore dev --watch",
+    "dev": "encore dev --watch",
     "prod": "encore production --progress"
   },
   "repository": {

@@ -18,7 +18,7 @@ Encore
     .disableSingleRuntimeChunk()
 
     // uncomment if you're having problems with a jQuery plugin
-    .autoProvidejQuery()
+    // .autoProvidejQuery()
 
     .addEntry('maps', './assets/maps.js')
     .addEntry('analytics', './assets/analytics.js')
