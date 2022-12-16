@@ -323,7 +323,7 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
                         "    });" . PHP_EOL .
                         "}" . PHP_EOL.
                         "</script>".PHP_EOL.
-                        "<a " . $this->parseArgs($attributes) . " onclick='" . $this->getId() . "_html2canvas_suppress(this)'>" . $contents . "</a> ";
+                        "<button " . $this->parseArgs($attributes) . " onclick='" . $this->getId() . "_html2canvas_suppress(this)'>" . $contents . "</button>";
             }
         }
 
@@ -364,7 +364,7 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
                         "    });" . PHP_EOL .
                         "}" . PHP_EOL .
                         "</script>" . PHP_EOL .
-                        "<a ". $this->parseArgs($attributes)." onclick='" . $this->getId() . "_html2canvas_export(this)'>" . $contents . "</a> ";
+                        "<button ". $this->parseArgs($attributes)." onclick='" . $this->getId() . "_html2canvas_export(this)'>" . $contents . "</button> ";
 
         return "";
     }
