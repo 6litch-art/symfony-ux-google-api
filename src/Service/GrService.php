@@ -22,13 +22,31 @@ class GrService
 
     const SEPARATOR = "_";
 
-    protected $enable;
-    protected $bag;
+    /** @var bool */
+    protected bool $enable;
+
+    /**
+     * @var Request
+     */
+    protected $request;
+
+    /**
+     * @var Environment
+     */
+    protected $twig;
 
     /**
      * @var CacheInterface
      */
-    protected $cache = null;
+    protected $cache ;
+
+    /**
+     * @var ContainerInterface
+     */
+    protected $container;
+
+    /** * @var string */
+    protected string $onLoadMethod;
 
     public function __construct(KernelInterface $kernel, Environment $twig, RequestStack $requestStack, CacheInterface $cache)
     {

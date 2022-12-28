@@ -25,7 +25,29 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FormTypeCaptchaExtension extends AbstractTypeExtension
 {
-    private $defaultEnabled;
+    /** @var bool */
+    protected bool $defaultEnabled;
+
+    /**
+     * @var GrService
+     */
+    protected $grService;
+
+    /**
+     * @var ValidatorInterface
+     */
+    protected $validator;
+
+    /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
+
+    /**
+     * @var AdminContextProvider
+     */
+    protected $easyadminContext;
+
 
     public function __construct(GrService $grService, ValidatorInterface $validator, TranslatorInterface $translator, AdminContextProvider $adminContextProvider, bool $defaultEnabled = true)
     {

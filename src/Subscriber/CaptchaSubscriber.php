@@ -21,7 +21,27 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CaptchaSubscriber implements EventSubscriberInterface
 {
-    public function __construct(GrService $grService, ValidatorInterface $validator, TranslatorInterface $translator, string $translationDomain = null) 
+    /**
+     * @var GrService
+     */
+    protected $grService;
+
+    /**
+     * @var ValidatorInterface
+     */
+    protected $validator;
+
+    /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
+
+    /**
+     * @var string
+     */
+    protected ?string $translationDomain;
+
+    public function __construct(GrService $grService, ValidatorInterface $validator, TranslatorInterface $translator, ?string $translationDomain = null) 
     {
         $this->validator         = $validator;
         $this->grService         = $grService;

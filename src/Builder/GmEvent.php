@@ -4,7 +4,11 @@ namespace Google\Builder;
 
 class GmEvent extends GmObject implements GmEventInterface
 {
+    /** @var string */
+    protected string $action;
+    /** @var string */
     protected string $event;
+    /** @var string */
     protected string $callback;
 
     public function __construct(GmObjectInterface $parent, string $event, string $callback)

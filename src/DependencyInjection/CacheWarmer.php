@@ -7,7 +7,13 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
 class CacheWarmer implements CacheWarmerInterface
 {
-    protected $shellVerbosity = 0; 
+    protected int $shellVerbosity = 0; 
+
+    /**
+     * @var GaService
+     */
+    protected $gaService;
+
     public function __construct(GaService $gaService)
     {
         $this->shellVerbosity = getenv("SHELL_VERBOSITY");

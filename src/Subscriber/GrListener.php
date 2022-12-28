@@ -11,7 +11,27 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 class GrListener
 {
-    private $twig;
+    /** @var bool */
+    protected ?bool $enable;
+    /** @var bool */
+    protected ?bool $enableOnAdmin;
+    /** @var bool */
+    protected ?bool $autoAppend;
+
+    /**
+     * @var Environment
+     */
+    protected $twig;
+
+    /**
+     * @var ParameterBagInterface
+     */
+    protected $parameterBag;
+
+    /**
+     * @var RequestStack
+     */
+    protected $requestStack;
 
     public function __construct(RequestStack $requestStack, ParameterBagInterface $parameterBag, Environment $twig)
     {

@@ -14,13 +14,35 @@ use Symfony\Component\Validator\Context\ExecutionContextFactory;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * @author Bernhard Schussek <bschussek@google.maps.il.com>
- */
 class CaptchaValidationListener implements EventSubscriberInterface
 {
+    /**
+     * @var GrService
+     */
+    protected $grService;
+
+    /** @var string */
     private $fieldName;
+
+    /** @var string */
     private $api;
+
+    /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
+
+    /**
+     * @var string
+     */
+    protected string $translationDomain;
+
+    /**
+     * @var ValidatorInterface
+     */
+    protected $validator;
+
+    /** @var ServerParams */
     private $serverParams;
 
     public static function getSubscribedEvents(): array

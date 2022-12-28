@@ -5,8 +5,6 @@ namespace Google\Builder;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Contracts\Cache\CacheInterface;
 
-use Symfony\Component\Security\Core\Security;
-
 use Twig\Environment;
 
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -31,6 +29,7 @@ use Google\Model\Maps\Overlay\MapTypeStyle;
 
 use Google\Model\Maps\Overlay\Marker;
 use League\FlysystemBundle\Lazy\LazyFactory;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -49,33 +48,25 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class GmBuilder implements GmBuilderInterface
 {
+
+    /** @var bool */
+    protected bool $enable;
+
+    /**
+     * @var Environment
+     */
+    /**
+     * @var RequestStack
+     */
+    public $requestStack;
+
     public const STATUS_OK       = "OK";
     public const STATUS_BAD    = "BAD";
     public const STATUS_NOCLIENT = "NOCLIENT";
 
-    public $twig;
-
     public $callback;
     public $libraries;
     public $version;
-
-    /**
-     * @var boolean
-     */
-    public $enable;
-    public function isEnabled() { return $this->enable; }
-
-    public $keyClient;
-    public function getClientKey()     { return $this->keyClient; }
-    public function setClientKey($key) { $this->keyClient = $key; }
-
-    public $keyServer;
-    public function getServerKey()           { return $this->keyServer;       }
-    public function setServerKey($keyServer) { $this->keyServer = $keyServer; }
-
-    public $secret;
-    public function getSecret()        { return $this->secret;    }
-    public function setSecret($secret) { $this->secret = $secret; }
 
     public $client;
     public $cache;
@@ -90,37 +81,27 @@ class GmBuilder implements GmBuilderInterface
     public $cacheTilesize;
     public $filesystem;
     public $html2canvas;
-    public $tokenManager;
-    public $environment;
-    public $requestStack;
-    public $router;
-
     public $tilemap;
 
-    private static $_instance = null;
-    private static array $_instanceId  = [];
-    public static function getInstance(string $id = null)
-    {
-        if ($id == null)
-            return self::$_instance;
-
-        return self::$_instanceId[$id] ?? null;
-    }
-
-    public static function alreadyExists(string $id): bool
-    {
-        return array_key_exists($id, self::$_instanceId);
-    }
+    /**
+     * @var TokenManager
+     */
+    public $tokenManager;
 
     /**
-     * @var Security
+     * @var Environment
      */
-    public $security;
+    public $environment;
 
-    public function isReady()
-    {
-        return self::$_instance != null;
-    }
+    /**
+     * @var Router
+     */
+    public $router;
+
+    /**
+     * @var Environment
+     */
+    public $twig;
 
     /**
      * construct
@@ -176,6 +157,48 @@ class GmBuilder implements GmBuilderInterface
         $this->filesystem    = $lazyFactory->createStorage($this->cacheDir, "google.maps");
 
         $this->twig = $twig;
+    }
+
+    /**
+     * @var boolean
+     */
+    public function isEnabled() { return $this->enable; }
+
+    public $keyClient;
+    public function getClientKey()     { return $this->keyClient; }
+    public function setClientKey($key) { $this->keyClient = $key; }
+
+    public $keyServer;
+    public function getServerKey()           { return $this->keyServer;       }
+    public function setServerKey($keyServer) { $this->keyServer = $keyServer; }
+
+    public $secret;
+    public function getSecret()        { return $this->secret;    }
+    public function setSecret($secret) { $this->secret = $secret; }
+
+    private static $_instance = null;
+    private static array $_instanceId  = [];
+    public static function getInstance(string $id = null)
+    {
+        if ($id == null)
+            return self::$_instance;
+
+        return self::$_instanceId[$id] ?? null;
+    }
+
+    public static function alreadyExists(string $id): bool
+    {
+        return array_key_exists($id, self::$_instanceId);
+    }
+
+    /**
+     * @var Security
+     */
+    public $security;
+
+    public function isReady()
+    {
+        return self::$_instance != null;
     }
 
     public static function getPublicDirectory(): string

@@ -12,6 +12,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class DataCollector extends AbstractDataCollector
 {
+    /**
+     * @var ParameterBag
+     */
+    protected $parameterBag;
+
     public array $dataBundles = [];
     public function __construct(ParameterBagInterface $parameterBag)
     {
