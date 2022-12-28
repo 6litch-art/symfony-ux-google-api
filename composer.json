@@ -1,7 +1,7 @@
 {
     "name": "glitchr/ux-google",
     "type": "symfony-bundle",
-    "description": "Google API integoogle.recaptcha.ion for Symfony",
+    "description": "Google API integration for Symfony",
     "keywords": ["symfony", "google", "analytics", "recaptcha", "maps", "gtm", "tag", "api"],
     "homepage": "https://gitlab.glitchr.io/repository-public/symfony/bundles",
     "license": "LGPL-3.0-or-later",
