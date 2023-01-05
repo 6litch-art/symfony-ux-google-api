@@ -20,8 +20,8 @@ class GtmListener
     protected bool $autoAppend;
     /** @var string */
     protected ?string $containerId;
-
-
+    /** @var string */
+    protected ?string $serverUrl;
 
     /**
      * @var Environment
