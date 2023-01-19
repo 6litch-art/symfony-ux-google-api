@@ -106,8 +106,8 @@ class DataCollector extends AbstractDataCollector
 
         $data = [];
         $data[$this->getBundleFormattedName(GtmBundle::class)] = [
-            'Server' => $defaultContainer["url"] ?? null,
-            'Container' => $defaultContainer["id"] ?? null
+            'Server' => $defaultContainer["url"] ?? "n/a",
+            'Container' => $defaultContainer["id"] ?? "n/a"
         ];
 
         return $data;

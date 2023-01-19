@@ -24,6 +24,8 @@
         {%- endset -%}
 
         {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { 'link': true }) }}
+        <span class="sf-toolbar-block sf-toolbar-block-base sf-toolbar-status-normal sf-toolbar-block-spacer"></span>
+
 {% endblock %}
 
 {% block menu %}
@@ -35,7 +37,7 @@
 
 {% block panel %}
 
-    {% for title, data in collector.data %}
+   {% for title, data in collector.data %}
         {% if not (title starts with '_') %}
             <h2>{{ title|raw }}</h2>
             {% if data is not iterable or data is empty %}
