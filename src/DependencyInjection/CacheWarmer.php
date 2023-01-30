@@ -19,7 +19,7 @@ class CacheWarmer implements CacheWarmerInterface
         $this->shellVerbosity = getenv("SHELL_VERBOSITY");
         $this->gaService = $gaService;
     }
-    public function isOptional():bool { return false; }
+    public function isOptional():bool { return true; }
     public function warmUp($cacheDir): array
     {
         if($this->shellVerbosity > 0 && php_sapi_name() == "cli") echo " // Warming up cache... Google Analytics Basics".PHP_EOL.PHP_EOL;
