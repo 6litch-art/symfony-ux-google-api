@@ -11,7 +11,8 @@ use Google\Service\GaService;
 class GaController extends AbstractController
 {
     private $gaService;
-    public function __construct(GaService $gaService) {
+    public function __construct(GaService $gaService)
+    {
         $this->gaService = $gaService;
     }
 

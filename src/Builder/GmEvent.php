@@ -21,16 +21,18 @@ class GmEvent extends GmObject implements GmEventInterface
         $this->action = "addListener";
     }
 
-    public function getEvent() {
+    public function getEvent()
+    {
         return $this->event;
     }
 
-    public function getCallback() {
+    public function getCallback()
+    {
         return $this->callback;
     }
 
-    public function setOnce() {
-
+    public function setOnce()
+    {
         $this->action = "addListenerOnce";
     }
 
@@ -40,15 +42,17 @@ class GmEvent extends GmObject implements GmEventInterface
         $callback = $this->callback;
         $parentCacheExists = $this->parentCacheExists();
 
-        if(GmBuilder::getInstance()->cacheOnly) {
+        if (GmBuilder::getInstance()->cacheOnly) {
             $isGranted = GmBuilder::getInstance()->isGranted();
-            if($this->parentCacheEnabled() && (!$isGranted || $parentCacheExists))
+            if ($this->parentCacheEnabled() && (!$isGranted || $parentCacheExists)) {
                 return "";
+            }
         }
 
-        if($parentCacheExists) {
-
-            if (GmBuilder::getInstance()->environment == "dev") return "";
+        if ($parentCacheExists) {
+            if (GmBuilder::getInstance()->environment == "dev") {
+                return "";
+            }
 
             $commentTag  = "//";
             $callback = str_replace("\n", "\n//", $callback);

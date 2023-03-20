@@ -69,14 +69,15 @@ class MapTypeStyle extends GmObject
         $featureType = [];
         $featureType["featureType"] = "'".$featureTypeName."'";
 
-        if ($elementType)
+        if ($elementType) {
             $featureType["elementType"] = "'".$elementType."'";
+        }
 
         if ($stylers && !empty($stylers)) {
-
             $featureType["stylers"] = [];
-            foreach($stylers as $key => $styler)
+            foreach ($stylers as $key => $styler) {
                 $featureType["stylers"][] = [$key => "'".$styler."'"];
+            }
         }
 
         $this->featureTypes[] = $featureType;
@@ -85,14 +86,16 @@ class MapTypeStyle extends GmObject
     public function hideEquatorAndIntlDateLine()
     {
         $this->addFeatureType(
-            "administrative", "geometry.fill",
+            "administrative",
+            "geometry.fill",
             ["visibility" => "off"]
         );
     }
     public function showEquatorAndIntlDateLine()
     {
         $this->addFeatureType(
-            "administrative", "geometry.fill",
+            "administrative",
+            "geometry.fill",
             ["visibility" => "on"]
         );
     }
@@ -100,14 +103,16 @@ class MapTypeStyle extends GmObject
     public function hideCountryLabels()
     {
         $this->addFeatureType(
-            "all", "labels",
+            "all",
+            "labels",
             ["visibility" => "off"]
         );
     }
     public function showCountryLabels()
     {
         $this->addFeatureType(
-            "all", "labels",
+            "all",
+            "labels",
             ["visibility" => "on"]
         );
     }

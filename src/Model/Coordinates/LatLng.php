@@ -57,20 +57,30 @@ class LatLng extends GmObject
     }
 
 
-    public function getLat(): float { return $this->lat(); }
-    public function getLatitude(): float { return $this->lat(); }
+    public function getLat(): float
+    {
+        return $this->lat();
+    }
+    public function getLatitude(): float
+    {
+        return $this->lat();
+    }
     public function lat(): float
     {
-        if ($this->noWrap) return $this->lat;
+        if ($this->noWrap) {
+            return $this->lat;
+        }
 
-        return ($this->lat >  90 ?  90 :
+        return ($this->lat >  90 ? 90 :
                ($this->lat < -90 ? -90 :
                 $this->lat));
     }
 
     public function setLat($lat = null): self
     {
-        if ($this->lat) $this->lat = $lat;
+        if ($this->lat) {
+            $this->lat = $lat;
+        }
         return $this;
     }
     public function setLatitude($lat = null): self
@@ -78,20 +88,30 @@ class LatLng extends GmObject
         return $this->setLat($lat);
     }
 
-    public function getLng(): float { return $this->lng(); }
-    public function getLongitude(): float { return $this->lng(); }
+    public function getLng(): float
+    {
+        return $this->lng();
+    }
+    public function getLongitude(): float
+    {
+        return $this->lng();
+    }
     public function lng(): float
     {
-        if ($this->noWrap) return $this->lng;
+        if ($this->noWrap) {
+            return $this->lng;
+        }
 
-        return ($this->lng >  180 ? $this->lng - 180 * ceil($this->lng / 180)  :
+        return ($this->lng >  180 ? $this->lng - 180 * ceil($this->lng / 180) :
                ($this->lng < -180 ? $this->lng - 180 * floor($this->lng / 180) :
                 $this->lng));
     }
 
     public function setLng($lng = null): self
     {
-        if ($this->lng) $this->lng = $lng;
+        if ($this->lng) {
+            $this->lng = $lng;
+        }
         return $this;
     }
     public function setLongitude($lng = null): self

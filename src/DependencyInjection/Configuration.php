@@ -12,7 +12,7 @@ class Configuration implements ConfigurationInterface
     /**
      * @inheritdoc
      */
-    public function getConfigTreeBuilder() : TreeBuilder
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $this->treeBuilder = new TreeBuilder('google');
 
@@ -26,7 +26,10 @@ class Configuration implements ConfigurationInterface
     }
 
     private $treeBuilder;
-    public function getTreeBuilder() : TreeBuilder { return $this->treeBuilder; }
+    public function getTreeBuilder(): TreeBuilder
+    {
+        return $this->treeBuilder;
+    }
 
     private function addRecaptchaOptions(ArrayNodeDefinition $rootNode)
     {
@@ -35,15 +38,15 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->booleanNode('enable')
                     ->info('Enable feature')
-                    ->defaultValue(True)
+                    ->defaultValue(true)
                     ->end()
                 ->booleanNode('enable_on_admin')
                     ->info('Enable feature')
-                    ->defaultValue(False)
+                    ->defaultValue(false)
                     ->end()
                 ->booleanNode('autoappend')
                     ->info('Auto-append required dependencies into HTML page')
-                    ->defaultValue(True)
+                    ->defaultValue(true)
                     ->end()
                 ->scalarNode('onload')
                     ->info('On load function called when recaptche required')
@@ -103,15 +106,15 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->booleanNode('enable')
                     ->info('Enable feature')
-                    ->defaultValue(True)
+                    ->defaultValue(true)
                     ->end()
                 ->booleanNode('enable_on_admin')
                     ->info('Enable feature')
-                    ->defaultValue(False)
+                    ->defaultValue(false)
                     ->end()
                 ->booleanNode('autoappend')
                     ->info('Auto-append required dependencies into HTML page')
-                    ->defaultValue(True)
+                    ->defaultValue(true)
                     ->end()
                 ->scalarNode('cache_quality')
                     ->info('Cache quality (works for JPEG and WEBP)')
@@ -194,15 +197,15 @@ class Configuration implements ConfigurationInterface
                 ->children()
                     ->booleanNode('enable')
                         ->info('Enable feature')
-                        ->defaultValue(True)
+                        ->defaultValue(true)
                         ->end()
                     ->booleanNode('enable_on_admin')
                         ->info('Enable feature')
-                        ->defaultValue(False)
+                        ->defaultValue(false)
                         ->end()
                     ->booleanNode('autoappend')
                         ->info('Auto-append required dependencies into HTML page')
-                        ->defaultValue(True)
+                        ->defaultValue(true)
                         ->end()
                     ->scalarNode('json')
                         ->info('JSON key location')
@@ -229,15 +232,15 @@ class Configuration implements ConfigurationInterface
                 ->children()
                     ->booleanNode('enable')
                         ->info('Enable feature')
-                        ->defaultValue(True)
+                        ->defaultValue(true)
                     ->end()
                     ->booleanNode('enable_on_admin')
                         ->info('Enable feature')
-                        ->defaultValue(False)
+                        ->defaultValue(false)
                     ->end()
                     ->booleanNode('autoappend')
                         ->info('Auto-append required dependencies into HTML page')
-                        ->defaultValue(True)
+                        ->defaultValue(true)
                         ->end()
 
                     ->arrayNode('containers')

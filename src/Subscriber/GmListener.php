@@ -31,7 +31,7 @@ class GmListener
      * @var RequestStack
      */
     protected $requestStack;
-    
+
     public function __construct(ParameterBagInterface $parameterBag, Environment $twig, RequestStack $requestStack)
     {
         $this->twig       = $twig;
@@ -42,7 +42,9 @@ class GmListener
     public function isEasyAdmin()
     {
         $request = $this->requestStack->getCurrentRequest();
-        if($request == null) return false;
+        if ($request == null) {
+            return false;
+        }
 
         $controllerAttr = $request->attributes->get("_controller") ?? "";
         $array = is_array($controllerAttr) ? $controllerAttr : explode("::", $controllerAttr);
@@ -51,10 +53,11 @@ class GmListener
         $parents = [];
         $parent = $controller;
 
-        while(class_exists($parent) && ( $parent = get_parent_class($parent)))
+        while (class_exists($parent) && ($parent = get_parent_class($parent))) {
             $parents[] = $parent;
+        }
 
-        $eaParents = array_filter($parents, fn($c) => str_starts_with($c, "EasyCorp\Bundle\EasyAdminBundle"));
+        $eaParents = array_filter($parents, fn ($c) => str_starts_with($c, "EasyCorp\Bundle\EasyAdminBundle"));
         return !empty($eaParents);
     }
 
@@ -66,28 +69,35 @@ class GmListener
 
     private function allowRender(ResponseEvent $event)
     {
-        if (!$this->enable)
+        if (!$this->enable) {
             return false;
+        }
 
         $builder = GmBuilder::getInstance();
-        if (!$builder)
+        if (!$builder) {
             return false;
-            
-        if (!$builder->isEnabled())
-            return false;
+        }
 
-        if (!$this->autoAppend)
+        if (!$builder->isEnabled()) {
             return false;
-            
-        if($this->isEasyAdmin() && !$this->enableOnAdmin)
+        }
+
+        if (!$this->autoAppend) {
             return false;
+        }
+
+        if ($this->isEasyAdmin() && !$this->enableOnAdmin) {
+            return false;
+        }
 
         $contentType = $event->getResponse()->headers->get('content-type');
-        if ($contentType && !str_contains($contentType, "text/html"))
+        if ($contentType && !str_contains($contentType, "text/html")) {
             return false;
+        }
 
-        if (!$event->isMainRequest())
+        if (!$event->isMainRequest()) {
             return false;
+        }
 
         return !$this->isProfiler($event);
     }
@@ -98,7 +108,9 @@ class GmListener
         $this->enableOnAdmin = $this->parameterBag->get("google.maps.enable_on_admin");
         $this->autoAppend = $this->parameterBag->get("google.maps.autoappend");
 
-        if (!$this->allowRender($event)) return false;
+        if (!$this->allowRender($event)) {
+            return false;
+        }
 
         $response    = $event->getResponse();
         $api         = $this->twig->getGlobals()["google_maps"]["api"] ?? "";
@@ -113,7 +125,7 @@ class GmListener
             $api."$0",
             $html2canvas."$0",
             $initMap."$0",
-            
+
         ], $response->getContent(), 1);
         $response->setContent($content);
 

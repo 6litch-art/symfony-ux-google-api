@@ -23,25 +23,40 @@ class DataCollector extends AbstractDataCollector
         $this->parameterBag = $parameterBag;
     }
 
-    public function getName(): string { return 'gtm'; }
+    public function getName(): string
+    {
+        return 'gtm';
+    }
 
-    public static function getTemplate(): ?string { return '@Google/inspector/data_collector.html.twig'; }
+    public static function getTemplate(): ?string
+    {
+        return '@Google/inspector/data_collector.html.twig';
+    }
 
-    public function getData(): array { return $this->data; }
+    public function getData(): array
+    {
+        return $this->data;
+    }
     public function getDataBundle(string $bundle): ?array
     {
-        if(!array_key_exists($bundle, $this->dataBundles))
+        if (!array_key_exists($bundle, $this->dataBundles)) {
             $this->collectDataBundle($bundle);
+        }
 
         return $this->dataBundles[$bundle] ?? null;
     }
 
-    public function getMethod() { return $this->data['method']; }
+    public function getMethod()
+    {
+        return $this->data['method'];
+    }
 
     public function collectDataBundle(string $bundle, ?string $bundleSuffix = null)
     {
         $bundleIdentifier = $this->getBundleIdentifier($bundle);
-       if(!$bundleIdentifier) return false;
+        if (!$bundleIdentifier) {
+            return false;
+        }
 
         $bundleLocation = \Composer\InstalledVersions::getRootPackage($bundleIdentifier)["install_path"];
         $bundleLocation = realpath($bundleLocation."vendor/".$bundleIdentifier);
@@ -65,28 +80,30 @@ class DataCollector extends AbstractDataCollector
     {
         $this->collectDataBundle(GtmBundle::class);
 
-        $this->data = array_map_recursive(fn($v) => $this->cloneVar($v), $this->collectData());
+        $this->data = array_map_recursive(fn ($v) => $this->cloneVar($v), $this->collectData());
         $this->data["_bundles"] = $this->dataBundles;
     }
 
-    protected function getBundleIdentifier(string $bundle) {
-
-        if(!class_exists($bundle))
+    protected function getBundleIdentifier(string $bundle)
+    {
+        if (!class_exists($bundle)) {
             return null;
+        }
 
-        if(array_key_exists($bundle, $this->dataBundles))
+        if (array_key_exists($bundle, $this->dataBundles)) {
             return $this->dataBundles[$bundle]["identifier"];
+        }
 
         $reflector = new \ReflectionClass($bundle);
         $bundleRoot = dirname($reflector->getFileName());
 
-        foreach(\Composer\InstalledVersions::getInstalledPackages() as $bundleIdentifier) {
-
+        foreach (\Composer\InstalledVersions::getInstalledPackages() as $bundleIdentifier) {
             $bundleLocation = \Composer\InstalledVersions::getRootPackage($bundleIdentifier)["install_path"];
             $bundleLocation = realpath($bundleLocation."vendor/".$bundleIdentifier);
 
-            if($bundleLocation && str_starts_with($bundleRoot, $bundleLocation))
+            if ($bundleLocation && str_starts_with($bundleRoot, $bundleLocation)) {
                 return $bundleIdentifier;
+            }
         }
 
         return null;

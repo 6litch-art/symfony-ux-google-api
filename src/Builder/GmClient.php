@@ -20,8 +20,9 @@ abstract class GmClient extends GmObject implements GmClientInterface
     public function __construct(?HttpClientInterface $client, $opts = [])
     {
         parent::__construct($opts);
-        if (!$client && !GmBuilder::isReady())
+        if (!$client && !GmBuilder::isReady()) {
             throw new Exception("Missing HttpClientInterface parameter and GmBuilder not initialized");
+        }
 
         $this->client = $client;
     }
@@ -73,21 +74,35 @@ abstract class GmClient extends GmObject implements GmClientInterface
         return $this;
     }
 
-    public function getParameters(): mixed { return $this->getOpts(self::JsonEncoding); }
+    public function getParameters(): mixed
+    {
+        return $this->getOpts(self::JsonEncoding);
+    }
     public function getRequest(string $baseUrl = "", array $opts = []): string
     {
-        if (empty($baseUrl)) $baseUrl = $this->baseUrl;
-        if (empty($baseUrl)) throw new Exception("No URL defined.");
+        if (empty($baseUrl)) {
+            $baseUrl = $this->baseUrl;
+        }
+        if (empty($baseUrl)) {
+            throw new Exception("No URL defined.");
+        }
 
-        $opts = array_filter($opts, static function($var) { return $var !== null; });
+        $opts = array_filter($opts, static function ($var) {
+            return $var !== null;
+        });
         $opts = array_merge($this->getOpts(), $opts);
 
         $parameters = "key=".$this->key;
-        foreach($opts as $name => $value) {
-            if (!$value) continue;
+        foreach ($opts as $name => $value) {
+            if (!$value) {
+                continue;
+            }
 
-            if (class_exists($value) && method_exists($value, "toUrlValue")) $parameters .= "&" . $name . "=" . $value->toUrlValue();
-            else $parameters .= "&".$name."=".$value;
+            if (class_exists($value) && method_exists($value, "toUrlValue")) {
+                $parameters .= "&" . $name . "=" . $value->toUrlValue();
+            } else {
+                $parameters .= "&".$name."=".$value;
+            }
         }
 
         return rtrim($baseUrl, '/') . ($this->outputFormat ? "/" . $this->outputFormat : "") . "?" . $parameters;
@@ -96,50 +111,57 @@ abstract class GmClient extends GmObject implements GmClientInterface
     private const EnableCache = true;
     public function send(string $baseUrl = "", array $opts = [], int $expiration = 30*86400)
     {
-        if (!$this->client)
+        if (!$this->client) {
             return ["status" => GmBuilder::STATUS_NOCLIENT];
+        }
 
         $request  = $this->getRequest($baseUrl, $opts);
         $request  = $this->signUrl($request);
 
-        if(php_sapi_name() == "cli") $response = $this->getResponse($request);
-        else {
-            $response = GmBuilder::getInstance()->cache->get(md5($request),
-            function (ItemInterface $item) use ($request, $expiration) {
+        if (php_sapi_name() == "cli") {
+            $response = $this->getResponse($request);
+        } else {
+            $response = GmBuilder::getInstance()->cache->get(
+                md5($request),
+                function (ItemInterface $item) use ($request, $expiration) {
+                    $content = $this->getResponse($request);
+                    if ($content["status"] == GmBuilder::STATUS_OK) {
+                        $item->expiresAfter((self::EnableCache) ? $expiration : 0);
+                    }
 
-                $content = $this->getResponse($request);
-                if($content["status"] == GmBuilder::STATUS_OK)
-                    $item->expiresAfter((self::EnableCache) ? $expiration : 0);
-
-                return $content;
-            });
+                    return $content;
+                }
+            );
         }
 
         return $response;
     }
 
 
-    function getResponse($request): array
+    public function getResponse($request): array
     {
-        if (!($response = $this->client->request('GET', $request)))
+        if (!($response = $this->client->request('GET', $request))) {
             throw new Exception("Empty response received from: \"" . $request . "\"");
+        }
 
-        if (($statusCode = $response->getStatusCode()) != 200)
+        if (($statusCode = $response->getStatusCode()) != 200) {
             throw new Exception("Unexpected status code " . $statusCode . " returned from: \"$request\"");
+        }
 
         if ($this->getOutputFormat() != self::NoEncoding) {
-
             $contentType         = explode("; ", $response->getHeaders()['content-type'][0])[0];
             $expectedContentType = "application/" . $this->getOutputFormat();
-            if ($contentType != $expectedContentType)
+            if ($contentType != $expectedContentType) {
                 throw new Exception("Unexpected content-type received: \"" . $contentType . "\" returned from: \"$request\"");
+            }
         }
 
         // Disable cache if not invalid response
         $responseArray = json_decode($response->getContent(), true);
         $status = $responseArray["status"] ?? GmBuilder::STATUS_OK;
-        if ($status == "REQUEST_DENIED")
-        throw new Exception(($responseArray["error_message"] ?? "Unknown error") . "\n\nHTTP Request: " . $request);
+        if ($status == "REQUEST_DENIED") {
+            throw new Exception(($responseArray["error_message"] ?? "Unknown error") . "\n\nHTTP Request: " . $request);
+        }
 
         // Return result
         return $responseArray ?? ["status" => GmBuilder::STATUS_BAD];
@@ -155,8 +177,9 @@ abstract class GmClient extends GmObject implements GmClientInterface
             'height' => $this->pop("height") ?? ""
         ]);
 
-        if (!$this->cacheExists())
+        if (!$this->cacheExists()) {
             GmBuilder::getInstance()->filesystem->uploadCache($this->getCachePath(), $this->send());
+        }
 
         return "<img ".$options. " src='" . $this->getCacheUrl()."'>" . PHP_EOL;
     }
@@ -169,14 +192,15 @@ abstract class GmClient extends GmObject implements GmClientInterface
 
         // Get reference signature
         if ($signature == null) {
-
             $url = parse_url($url);
 
             $get = [];
             parse_str($url["query"] ?? "", $get);
             $signature = $get["signature"];
 
-            if ($signature == null) throw new Exception("No signature found.");
+            if ($signature == null) {
+                throw new Exception("No signature found.");
+            }
         }
 
         return $this->signUrl($urlWithoutSignature) == $signature;
@@ -189,8 +213,8 @@ abstract class GmClient extends GmObject implements GmClientInterface
         return $url . "&signature=" . $this->getSignatureUrl($url, $privateKey);
     }
 
-    public function getSignatureUrl($url, $privateKey = null) {
-
+    public function getSignatureUrl($url, $privateKey = null)
+    {
         $parseUrl = parse_url($url);
         $urlPartToSign = $parseUrl['path'] . "?" . $parseUrl['query'];
 

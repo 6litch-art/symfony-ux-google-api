@@ -14,8 +14,8 @@ use Google\Model\Maps\Overlay\MapTypeStyle;
  */
 class Map extends GmObject
 {
-    public function __construct(array $opts = []) {
-
+    public function __construct(array $opts = [])
+    {
         parent::__construct($opts);
 
         $this->addListener("tilesloaded", "function(){ window.dispatchEvent(new Event('tilesloaded')); }");
@@ -53,8 +53,9 @@ class Map extends GmObject
 
     public function addMarker($gmBuilder, $opts = []): self
     {
-        if (!$this->getId())
+        if (!$this->getId()) {
             throw new Exception("Map not yet added to builder.. cannot add marker");
+        }
 
         $marker = ($opts instanceof Marker ? $opts : new Marker($opts));
         $marker->addOption("map", $this->getId());
@@ -66,11 +67,14 @@ class Map extends GmObject
 
     public function addMapStyle($gmBuilder, $name, $featureTypes = [])
     {
-        if (!$this->getId())
+        if (!$this->getId()) {
             throw new Exception("Map not yet added to builder.. cannot add a map type style");
+        }
 
         $mapStyle = ($name instanceof MapTypeStyle ? $name : new MapTypeStyle($name, $featureTypes));
-        if (array_key_exists($mapStyle->getName(), $this->mapStyleList)) return $this;
+        if (array_key_exists($mapStyle->getName(), $this->mapStyleList)) {
+            return $this;
+        }
 
         $id = $this->getId();
         $mapStyleId = "mapTypeStyle_" . md5(uniqid(rand(), true));
@@ -90,18 +94,20 @@ class Map extends GmObject
 
     public function setMapStyle($mapStyle, array $zStopList = [])
     {
-        if (!$this->getId())
+        if (!$this->getId()) {
             throw new Exception("Map not yet added to builder.. cannot add a map type style");
+        }
 
-        if ($this->getMapId())
+        if ($this->getMapId()) {
             throw new Exception("Custom Map ID already set.. This might conflict with MapTypeStyle");
+        }
 
-        if (!array_key_exists($mapStyle->getName(), $this->mapStyleList))
+        if (!array_key_exists($mapStyle->getName(), $this->mapStyleList)) {
             throw new Exception("MapTypeStyle ".$mapStyle->getName()." is not in the list of the mapTypes for \"".$this->getId()."\"");
+        }
 
         // No zStop position then just set the display style
-        if(empty($zStopList)) {
-
+        if (empty($zStopList)) {
             $this->addEntry($this->getId() . ".setMapTypeId(" . $mapStyle->getName() . ");");
             return $this;
         }
@@ -110,14 +116,17 @@ class Map extends GmObject
         // e.g. z < zStop => "mapStyle[zStop]"
         $zStopFunction = "function() { ";
 
-        $i = 0; $N = count($zStopList);
-        foreach($zStopList as $zStop => $mapStyle2) {
-
+        $i = 0;
+        $N = count($zStopList);
+        foreach ($zStopList as $zStop => $mapStyle2) {
             $zStop = intval($zStop);
-            if(!$mapStyle2 instanceof MapTypeStyle)
+            if (!$mapStyle2 instanceof MapTypeStyle) {
                 throw new Exception("MapTypeStyle " . $mapStyle2->getName() . " is not an instance of MapTypeStyle for \"" . $this->getId() . "\"");
+            }
 
-            if($i++ > 0) $zStopFunction .= " else ";
+            if ($i++ > 0) {
+                $zStopFunction .= " else ";
+            }
 
             $condition    = $this->getId() . ".getZoom() < " . $zStop;
             $setMapTypeId = $this->getId() . ".setMapTypeId(" . $mapStyle2->getName() . "); ".PHP_EOL;

@@ -11,7 +11,8 @@ use Symfony\Component\Config\Definition\Exception\Exception;
  */
 class PlacesService extends GmObject
 {
-    public function __construct(array $opts = []) {
+    public function __construct(array $opts = [])
+    {
         parent::__construct($opts);
     }
 

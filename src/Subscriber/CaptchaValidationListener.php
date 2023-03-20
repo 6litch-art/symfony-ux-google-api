@@ -68,8 +68,11 @@ class CaptchaValidationListener implements EventSubscriberInterface
     {
         $form = $event->getForm();
 
-        if($form->isSubmitted() && $form->isValid() && $form->getConfig()->getOption("captcha_reset_on_success")) $this->grService->resetFailedAttempt($form->getName());
-        else $this->grService->addFailedAttempt($form->getName());
+        if ($form->isSubmitted() && $form->isValid() && $form->getConfig()->getOption("captcha_reset_on_success")) {
+            $this->grService->resetFailedAttempt($form->getName());
+        } else {
+            $this->grService->addFailedAttempt($form->getName());
+        }
     }
 
     public function onPreSubmit(FormEvent $event)
@@ -78,16 +81,21 @@ class CaptchaValidationListener implements EventSubscriberInterface
 
         $postRequestSizeExceeded = 'POST' === $form->getConfig()->getMethod() && $this->serverParams->hasPostMaxSizeBeenExceeded();
 
-        if (!$form->getConfig()->getOption('captcha_protection')) return;
-        if (!$this->grService->hasTriggeredMinimumAttempts($form, $form->getConfig()->getOptions())) return;
-        
-        if($this->grService->findCaptchaType($form)) return;
-        
-        if ($form->isRoot() && $form->getConfig()->getOption('compound') && !$postRequestSizeExceeded) {
+        if (!$form->getConfig()->getOption('captcha_protection')) {
+            return;
+        }
+        if (!$this->grService->hasTriggeredMinimumAttempts($form, $form->getConfig()->getOptions())) {
+            return;
+        }
 
+        if ($this->grService->findCaptchaType($form)) {
+            return;
+        }
+
+        if ($form->isRoot() && $form->getConfig()->getOption('compound') && !$postRequestSizeExceeded) {
             $data = $event->getData();
             $value = $data[$this->fieldName] ?? null;
- 
+
             $executionContextFactory = new ExecutionContextFactory($this->translator, $this->translationDomain);
             $context = $executionContextFactory->createContext($this->validator, $value);
 
@@ -95,8 +103,9 @@ class CaptchaValidationListener implements EventSubscriberInterface
             $constraintValidator->initialize($context);
 
             $violations = $this->validator->validate($value ?? " ", new Captcha(["api" => $this->api]));
-            foreach($violations as $violation)
+            foreach ($violations as $violation) {
                 $form->addError(new FormError($violation->getMessage()));
+            }
 
             if (\is_array($data)) {
                 unset($data[$this->fieldName]);
