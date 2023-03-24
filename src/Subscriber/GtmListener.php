@@ -13,7 +13,7 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 class GtmListener
 {
     /** @var bool */
-    protected bool $enable;
+    protected bool $enable = false;
     /** @var bool */
     protected bool $enableOnAdmin;
     /** @var bool */
