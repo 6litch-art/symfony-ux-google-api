@@ -19,7 +19,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class GmController extends AbstractController
 {
-    private $gmBuilder;
+    protected $gmBuilder;
     public function __construct(GmBuilderInterface $gmBuilder) {
         $this->gmBuilder = $gmBuilder;
     }
@@ -99,8 +99,8 @@ class GmController extends AbstractController
         $data = $request->request->get('gm_base64data') ?? null;
         if(!$data) throw new Exception("No base64 data provided");
 
-        $tilesize = $request->request->get('gm_tilesize') ?? null;
-        if(!$tilesize) {
+        $idsize = $request->request->get('gm_tilesize') ?? null;
+        if(!$idsize) {
 
             list($width, $height) = getimagesizefromstring(base64_decode(explode('base64,', $data)[1]));
             $nx = 1; $ny = 1;
@@ -119,26 +119,26 @@ class GmController extends AbstractController
 
             $width = imagesx($im);
             $height = imagesy($im);
-            $nx = ceil($width  / $tilesize);
-            $ny = ceil($height / $tilesize);
+            $nx = ceil($width  / $idsize);
+            $ny = ceil($height / $idsize);
 
             for ($iy = 0; $iy < $ny; $iy++) {
                 for ($ix = 0; $ix < $nx; $ix++) {
 
-                    $tileindex  = $iy*$nx + $ix;
-                    $tilewidth  = ($ix == $nx - 1 ? $width  - $ix * $tilesize : $tilesize);
-                    $tileheight = ($iy == $ny - 1 ? $height - $iy * $tilesize : $tilesize);
+                    $idindex  = $iy*$nx + $ix;
+                    $idwidth  = ($ix == $nx - 1 ? $width  - $ix * $idsize : $idsize);
+                    $idheight = ($iy == $ny - 1 ? $height - $iy * $idsize : $idsize);
 
                     // Crop image and keep its transparency
-                    $imcrop = imagecreatetruecolor($tilesize, $tilesize);
+                    $imcrop = imagecreatetruecolor($idsize, $idsize);
                     $transparentColor = imagecolorallocatealpha($imcrop, 0, 0, 0, 127);
                     imagefill($imcrop, 0, 0, $transparentColor);
                     imagealphablending($imcrop, false);
                     imagesavealpha($imcrop, true);
                     imagecopyresampled(
                         $imcrop, $im,
-                        0, 0, $tilesize*$ix, $tilesize*$iy,
-                        $tilewidth, $tileheight, $tilewidth, $tileheight
+                        0, 0, $idsize*$ix, $idsize*$iy,
+                        $idwidth, $idheight, $idwidth, $idheight
                     );
 
                     ob_start(); // Let's start output buffering.
@@ -158,7 +158,7 @@ class GmController extends AbstractController
 
                     // Upload tiled pictures
                     $this->gmBuilder->uploadCache(
-                        $this->gmBuilder->getCachePath($signature, $tileindex),
+                        $this->gmBuilder->getCachePath($signature, $idindex),
                         $contents
                     );
 
@@ -170,7 +170,7 @@ class GmController extends AbstractController
         $array["image_width"]  = $width;
         $array["image_height"] = $height;
 
-        $array["image_tilesize"] = $tilesize;
+        $array["image_tilesize"] = $idsize;
         $array["image_xtiles"] = $nx;
         $array["image_ytiles"] = $ny;
         $this->gmBuilder->setCacheMetadata($signature, $array);
@@ -195,14 +195,14 @@ class GmController extends AbstractController
 
     /**
      * Display cache image
-     * @Route("/{signature}/{tile}", name="gm_show")
+     * @Route("/{signature}/{id}", name="gm_show")
      */
-    public function Show(string $signature, int $tile = 0)
+    public function Show(string $signature, int $id = 0): Response
     {
-        if ($this->gmBuilder->cacheExists($signature, ["tile" => $tile])) {
+        if ($this->gmBuilder->cacheExists($signature, ["id" => $id])) {
 
             $response = new Response();
-            $response->setContent($this->gmBuilder->getCache($signature, ["tile" => $tile]));
+            $response->setContent($this->gmBuilder->getCache($signature, ["id" => $id]));
 
             $response->setPublic();
             $response->setMaxAge($this->gmBuilder->cacheLifetime);

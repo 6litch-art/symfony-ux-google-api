@@ -17,6 +17,7 @@ interface GmBuilderInterface
     public function addListener($object, ?string $event = null, ?string $callback = null): GmBuilder;
     public function addEntry   (string $cmd): GmBuilder;
 
+    public function isGranted($subject = null): bool;
     public function build(): bool;
     public function bind(string $id, GmObjectInterface $object): bool;
     public function unbind(GmObjectInterface $object): bool;
@@ -26,7 +27,6 @@ interface GmBuilderInterface
 
     public static function getInstance(string $id);
     public static function getPublicDirectory(): ?string;
-    public function getCacheDirectory(): ?string;
 
     public function uploadCache(string $path, string $contents, array $config = []);
     public function getCache(string $file);

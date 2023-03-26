@@ -133,7 +133,6 @@ class GmBuilder implements GmBuilderInterface
         // Get variables
         //
         $this->enable        = $kernel->getContainer()->getParameter("google.maps.enable");
-        $this->cacheDir      = $kernel->getContainer()->getParameter("google.maps.cache");
         $this->cachePool     = $kernel->getContainer()->getParameter("google.maps.cache_pool");
         $this->cacheLifetime = $kernel->getContainer()->getParameter("google.maps.cache_lifetime");
         $this->cacheOnly     = $kernel->getContainer()->getParameter("google.maps.cache_only");
@@ -154,7 +153,10 @@ class GmBuilder implements GmBuilderInterface
         $this->libraries     = $kernel->getContainer()->getParameter("google.maps.libraries");
         $this->version       = $kernel->getContainer()->getParameter("google.maps.version");
 
-        $this->filesystem    = $lazyFactory->createStorage($this->cacheDir, "google.maps");
+        $this->filesystem    = $lazyFactory->createStorage(
+            $kernel->getContainer()->getParameter("google.maps.cache"), 
+            "google.maps"
+        );
 
         $this->twig = $twig;
     }
@@ -517,9 +519,9 @@ class GmBuilder implements GmBuilderInterface
 
         try {
 
-            $tile  = $opts["tile"] ?? 0;
+            $id  = $opts["id"] ?? 0;
 
-            $file = $this->getCachePath($signature, $tile);
+            $file = $this->getCachePath($signature, $id);
             $contents = GmBuilder::getInstance()->filesystem->read($file);
 
             $width  = $opts["width"] ?? 0;
@@ -547,19 +549,19 @@ class GmBuilder implements GmBuilderInterface
         }
     }
 
-    public function getCachePath(string $signature, int $index = 0): string
+    public function getCachePath(string $signature, int $id = 0): string
     {
-        if($index < 0)
+        if($id < 0)
             return $this->getCacheDirectory() . "/" . $signature . "/metadata.txt";
 
-        return $this->getCacheDirectory() . "/" . $signature ."/image-" . $index. ".".$this->cacheFormat;
+        return $this->getCacheDirectory() . "/" . str_replace(["{signature}", "{id}"], [$signature, $id], $this->cachePublic).".".$this->cacheFormat;
     }
 
-    public function getCacheUrl($signature): string
+    public function getCacheUrl($signature, $id = null): string
     {
-        $url = (GmBuilder::getInstance()->router ? GmBuilder::getInstance()->router->generate("google.maps.show", ["signature" => $signature]) : null);
+        $url = (GmBuilder::getInstance()->router ? GmBuilder::getInstance()->router->generate("gm_show", ["signature" => $signature, "id" => $id]) : null);
         if (!$url)
-            throw new Exception("\"google.maps.show\" route not properly configured..");
+            throw new Exception("\"gm_show\" route not properly configured..");
 
         return $url;
     }
@@ -600,14 +602,15 @@ class GmBuilder implements GmBuilderInterface
     {
         try {
 
-            $tile  = $opts["tile"] ?? -1;
+            $id  = $opts["id"] ?? -1;
 
-            if($tile < 0) $path = $this->getCacheDirectory() . "/" . $signature . "/metadata.txt";
-            else $path = $this->getCachePath($signature, $tile);
+            if($id < 0) $path = $this->getCacheDirectory() . "/" . $signature . "/metadata.txt";
+            else $path = $this->getCachePath($signature, $id);
 
             return GmBuilder::getInstance()->filesystem->fileExists($path);
 
         } catch (FilesystemError | UnableToRetrieveMetadata $exception) {
+
             throw new Exception("Unable to retrieve file \"$path\" from cache..");
             return null;
         }

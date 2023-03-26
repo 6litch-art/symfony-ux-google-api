@@ -104,7 +104,8 @@ window.addEventListener('DOMContentLoaded', function () {
 
               elTile[index] = document.createElement("span");
 
-              var tmp_src = src;
+              var tmp_src = decodeURI(src);
+              
               if(tmp_src.indexOf("{signature}")) tmp_src = tmp_src.replaceAll("{signature}", signature);
               else tmp_src += "/" + signature;
               if(tmp_src.indexOf("{id}")) tmp_src = tmp_src.replaceAll("{id}", index);

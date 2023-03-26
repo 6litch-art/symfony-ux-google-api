@@ -402,7 +402,7 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
             $cacheImage .= "<div ".
                 "class='google-tilemap'".
                 "id='".$this->getId(). "_html2canvas' " .
-                "data-src='".GmBuilder::getInstance()->getAsset(GmBuilder::getInstance()->cachePublic)."' " .
+                "data-src='".GmBuilder::getInstance()->router->generate("gm_show", ["signature" => "{signature}", "id" => "{id}"])."' " .
                 "data-signature='".$signature. "' ".
                 "data-tilesize='" . $tilesize . "' " .
                 "data-xtiles='" . $xtiles . "'  data-ytiles='" . $ytiles . "' ".
