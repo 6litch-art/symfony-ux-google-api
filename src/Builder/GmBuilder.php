@@ -611,7 +611,6 @@ class GmBuilder implements GmBuilderInterface
     {
         if($id < 0)
             return $this->getCacheDirectory() . "/" . $signature . "/metadata.txt";
-        }
 
         return $this->getCacheDirectory() . "/" . str_replace(["{signature}", "{id}"], [$signature, $id], $this->cachePublic).".".$this->cacheFormat;
     }

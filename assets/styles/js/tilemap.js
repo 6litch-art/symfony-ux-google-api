@@ -114,7 +114,7 @@ window.addEventListener('DOMContentLoaded', function () {
               elTile[index].setAttribute("id", el.getAttribute("id")+"_"+index);
               elTile[index].setAttribute("data-background-image", tmp_src); //url('"+missing+"')
               elTile[index].style.opacity   = "0";
-              elTile[index].style.transition   = "opacity 0.5s ease";
+              elTile[index].style.transition   = "opacity 0.4s ease";
               el.append(elTile[index]);
           }
 
