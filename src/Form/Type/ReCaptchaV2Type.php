@@ -33,8 +33,14 @@ class ReCaptchaV2Type extends AbstractType
             ->setAllowedValues('type', ['checkbox', 'invisible']);
     }
 
-    public function getParent(): string { return HiddenType::class; }
-    public function getBlockPrefix() : string { return 'recaptchaV2'; }
+    public function getParent(): string
+    {
+        return HiddenType::class;
+    }
+    public function getBlockPrefix(): string
+    {
+        return 'recaptchaV2';
+    }
 
     /**
      * @inheritDoc
@@ -42,7 +48,9 @@ class ReCaptchaV2Type extends AbstractType
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars["enable"] = $this->grService->isEnabled();
-        if(!$this->grService->isEnabled()) return;
+        if (!$this->grService->isEnabled()) {
+            return;
+        }
 
         $view->vars["api"] = GrService::APIV2;
         $view->vars['type'] = $options['type'];

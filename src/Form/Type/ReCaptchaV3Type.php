@@ -31,12 +31,18 @@ class ReCaptchaV3Type extends AbstractType
             ->setDefault('sitekey', null);
     }
 
-    public function getParent(): string { return HiddenType::class; }
+    public function getParent(): string
+    {
+        return HiddenType::class;
+    }
 
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix() : string { return 'recaptchaV3'; }
+    public function getBlockPrefix(): string
+    {
+        return 'recaptchaV3';
+    }
 
     /**
      * @inheritDoc
@@ -44,7 +50,9 @@ class ReCaptchaV3Type extends AbstractType
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars["enable"] = $this->grService->isEnabled();
-        if(!$this->grService->isEnabled()) return;
+        if (!$this->grService->isEnabled()) {
+            return;
+        }
 
         $view->vars["api"] = GrService::APIV3;
         $view->vars["type"] = "invisible";

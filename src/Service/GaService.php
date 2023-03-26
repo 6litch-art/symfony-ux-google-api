@@ -57,8 +57,7 @@ class GaService
 
         $this->cache = $cache;
 
-        if($this->enable) {
-            
+        if ($this->enable) {
             $this->client = new Google_Client();
             $this->client->setApplicationName("GoogleAnalytics");
             $this->client->setScopes(['https://www.googleapis.com/auth/analytics.readonly']);
@@ -71,29 +70,31 @@ class GaService
     /**
      * @return Google_Service_AnalyticsReporting
      */
-    public function getAnalytics() {
-
+    public function getAnalytics()
+    {
         return $this->analytics;
     }
 
     /**
      * @return Google_Client
      */
-    public function getClient() {
-
+    public function getClient()
+    {
         return $this->client;
-
     }
 
-    public function setViewId($viewId) {
+    public function setViewId($viewId)
+    {
         $this->viewId = $viewId;
     }
 
-    public function getViewId() {
+    public function getViewId()
+    {
         return $this->viewId;
     }
 
-    public function setJsonLocation($jsonLocation) {
+    public function setJsonLocation($jsonLocation)
+    {
         $this->jsonLocation = $jsonLocation;
     }
 
@@ -116,12 +117,13 @@ class GaService
      */
     private const EnableCache = true;
     private const GoogleStartTime = "2005-01-01";
-    private function getDataDateRange($metric, $expiration = 0, $dateStart = self::GoogleStartTime, $dateEnd = "today") {
-
-        if(!$this->isEnabled()) return -1;
+    private function getDataDateRange($metric, $expiration = 0, $dateStart = self::GoogleStartTime, $dateEnd = "today")
+    {
+        if (!$this->isEnabled()) {
+            return -1;
+        }
 
         return $this->cache->get($metric.".".$dateStart.".".$dateEnd, function (ItemInterface $item) use ($metric, $expiration, $dateStart, $dateEnd) {
-
             $item->expiresAfter(self::EnableCache ? $expiration : 0);
 
             // Create the DateRange object
@@ -135,17 +137,14 @@ class GaService
             $sessions->setAlias("$metric");
 
             if (isset($dimensions) && is_array($dimensions)) {
-
                 $this->reportingDimensions = [];
 
                 foreach ($dimensions as $dimension) {
-
                     // Create the segoogle.maps.nt dimension.
                     $reportingDimensions = new Google_Service_AnalyticsReporting_Dimension();
                     $reportingDimensions->setName("ga:$dimension");
 
                     $this->reportingDimensions[] = $reportingDimensions;
-
                 }
             }
 
@@ -155,16 +154,20 @@ class GaService
             $request->setDateRanges($dateRange);
 
             // add dimensions
-            if (isset($this->reportingDimensions) && is_array($this->reportingDimensions))
+            if (isset($this->reportingDimensions) && is_array($this->reportingDimensions)) {
                 $request->setDimensions($this->reportingDimensions);
+            }
 
             $request->setMetrics([$sessions]);
 
             $body = new Google_Service_AnalyticsReporting_GetReportsRequest();
             $body->setReportRequests([$request]);
 
-            try { $report = $this->analytics->reports->batchGet($body); }
-            catch (Exception $e) { $report = null; }
+            try {
+                $report = $this->analytics->reports->batchGet($body);
+            } catch (Exception $e) {
+                $report = null;
+            }
 
             $result = $report ? $report->getReports()[0]->getData()->getTotals()[0]->getValues()[0] : null;
             return (string) $result;
@@ -176,7 +179,8 @@ class GaService
      * @param $dateEnd
      * @return mixed
      */
-    public function getSessionsDateRange($expiration = 0, $dateStart = self::GoogleStartTime, $dateEnd = "today") {
+    public function getSessionsDateRange($expiration = 0, $dateStart = self::GoogleStartTime, $dateEnd = "today")
+    {
         return $this->getDataDateRange('sessions', $expiration, $dateStart, $dateEnd);
     }
 
@@ -185,8 +189,9 @@ class GaService
      * @param $dateEnd
      * @return mixed
      */
-    public function getBounceRateDateRange($expiration = 0, $dateStart = self::GoogleStartTime, $dateEnd = "today") {
-        return $this->getDataDateRange('bounceRate', $expiration, $dateStart,$dateEnd);
+    public function getBounceRateDateRange($expiration = 0, $dateStart = self::GoogleStartTime, $dateEnd = "today")
+    {
+        return $this->getDataDateRange('bounceRate', $expiration, $dateStart, $dateEnd);
     }
 
     /**
@@ -194,8 +199,9 @@ class GaService
      * @param $dateEnd
      * @return mixed
      */
-    public function getAvgTimeOnPageDateRange($expiration = 0, $dateStart = self::GoogleStartTime, $dateEnd = "today") {
-        return $this->getDataDateRange('avgTimeOnPage', $expiration, $dateStart,$dateEnd);
+    public function getAvgTimeOnPageDateRange($expiration = 0, $dateStart = self::GoogleStartTime, $dateEnd = "today")
+    {
+        return $this->getDataDateRange('avgTimeOnPage', $expiration, $dateStart, $dateEnd);
     }
 
     /**
@@ -203,7 +209,8 @@ class GaService
      * @param $dateEnd
      * @return mixed
      */
-    public function getPageviewsPerSessionDateRange($expiration = 0, $dateStart = self::GoogleStartTime,$dateEnd = "today") {
+    public function getPageviewsPerSessionDateRange($expiration = 0, $dateStart = self::GoogleStartTime, $dateEnd = "today")
+    {
         return $this->getDataDateRange('pageviewsPerSession', $expiration, $dateStart, $dateEnd);
     }
 
@@ -212,8 +219,9 @@ class GaService
      * @param $dateEnd
      * @return mixed
      */
-    public function getPercentNewUsersDateRange($expiration = 0, $dateStart = self::GoogleStartTime, $dateEnd = "today") {
-        return $this->getDataDateRange('percentNewUsers', $expiration, $dateStart,$dateEnd);
+    public function getPercentNewUsersDateRange($expiration = 0, $dateStart = self::GoogleStartTime, $dateEnd = "today")
+    {
+        return $this->getDataDateRange('percentNewUsers', $expiration, $dateStart, $dateEnd);
     }
 
     /**
@@ -268,7 +276,9 @@ class GaService
 
     public function getBasics()
     {
-        if (!$this->isEnabled()) return [];
+        if (!$this->isEnabled()) {
+            return [];
+        }
 
         return [
             'sessions'      => $this->getSessionsDateRange(3600, '30daysAgo'),
@@ -283,7 +293,9 @@ class GaService
 
     public function getAdvanced()
     {
-        if (!$this->isEnabled()) return [];
+        if (!$this->isEnabled()) {
+            return [];
+        }
 
         return [];
     }

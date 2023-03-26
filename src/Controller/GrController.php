@@ -21,9 +21,11 @@ class GrController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted()) {
-
-            if($form->isValid()) $this->addFlash('success', 'The form is valid.');
-            else $this->addFlash('error', 'The form is invalid.');
+            if ($form->isValid()) {
+                $this->addFlash('success', 'The form is valid.');
+            } else {
+                $this->addFlash('error', 'The form is invalid.');
+            }
         }
 
         return $this->render('@Gr/index.html.twig', [

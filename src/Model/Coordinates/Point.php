@@ -15,15 +15,27 @@ class Point
      * @var float
      */
     private $x;
-    public function getX() { return $this->x; }
-    public function setX($x) { $this->x = $x; }
+    public function getX()
+    {
+        return $this->x;
+    }
+    public function setX($x)
+    {
+        $this->x = $x;
+    }
 
     /**
      * @var float
      */
     private $y;
-    public function getY() { return $this->y; }
-    public function setY($y) { $this->y = $y; }
+    public function getY()
+    {
+        return $this->y;
+    }
+    public function setY($y)
+    {
+        $this->y = $y;
+    }
 
     /**
      * @param float $x

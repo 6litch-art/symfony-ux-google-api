@@ -11,11 +11,11 @@ use Google\Model\Maps\Overlay\Marker;
  */
 interface GmBuilderInterface
 {
-    public function addMap     (string $id, Map $map): GmBuilder;
-    public function addMarker  (string $id, Marker $marker): GmBuilder;
-    public function addLatLng  (string $id, LatLng $latLng): GmBuilder;
+    public function addMap(string $id, Map $map): GmBuilder;
+    public function addMarker(string $id, Marker $marker): GmBuilder;
+    public function addLatLng(string $id, LatLng $latLng): GmBuilder;
     public function addListener($object, ?string $event = null, ?string $callback = null): GmBuilder;
-    public function addEntry   (string $cmd): GmBuilder;
+    public function addEntry(string $cmd): GmBuilder;
 
     public function isGranted($subject = null): bool;
     public function build(): bool;

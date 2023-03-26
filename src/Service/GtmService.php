@@ -25,8 +25,17 @@ class GtmService
         $this->id     = $parameterBag->get("google.tag_manager.id");
     }
 
-    public function getId() { return $this->id; }
-    public function setId($id) { $this->id = $id; }
+    public function getId()
+    {
+        return $this->id;
+    }
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
 
-    public function isEnabled() { return $this->enable; }
+    public function isEnabled()
+    {
+        return $this->enable;
+    }
 }

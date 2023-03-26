@@ -43,7 +43,9 @@ class GrListener
     public function isEasyAdmin()
     {
         $request = $this->requestStack->getCurrentRequest();
-        if($request == null) return false;
+        if ($request == null) {
+            return false;
+        }
 
         $controllerAttr = $request->attributes->get("_controller") ?? "";
         $array = is_array($controllerAttr) ? $controllerAttr : explode("::", $controllerAttr);
@@ -52,10 +54,11 @@ class GrListener
         $parents = [];
         $parent = $controller;
 
-        while(class_exists($parent) && ( $parent = get_parent_class($parent)))
+        while (class_exists($parent) && ($parent = get_parent_class($parent))) {
             $parents[] = $parent;
+        }
 
-        $eaParents = array_filter($parents, fn($c) => str_starts_with($c, "EasyCorp\Bundle\EasyAdminBundle"));
+        $eaParents = array_filter($parents, fn ($c) => str_starts_with($c, "EasyCorp\Bundle\EasyAdminBundle"));
         return !empty($eaParents);
     }
 
@@ -67,21 +70,26 @@ class GrListener
 
     private function allowRender(ResponseEvent $event)
     {
-        if (!$event->isMainRequest())
-                return false;
+        if (!$event->isMainRequest()) {
+            return false;
+        }
 
-        if (!$this->enable)
-                return false;
+        if (!$this->enable) {
+            return false;
+        }
 
-        if (!$this->autoAppend)
-                return false;
+        if (!$this->autoAppend) {
+            return false;
+        }
 
-        if($this->isEasyAdmin() && !$this->enableOnAdmin)
-                return false;
+        if ($this->isEasyAdmin() && !$this->enableOnAdmin) {
+            return false;
+        }
 
         $contentType = $event->getResponse()->headers->get('content-type');
-        if ($contentType && !str_contains($contentType, "text/html"))
-                return false;
+        if ($contentType && !str_contains($contentType, "text/html")) {
+            return false;
+        }
 
         return !$this->isProfiler($event);
     }
@@ -92,7 +100,9 @@ class GrListener
         $this->enableOnAdmin = $this->parameterBag->get("google.recaptcha.enable_on_admin");
         $this->autoAppend = $this->parameterBag->get("google.recaptcha.autoappend");
 
-        if (!$this->allowRender($event)) return false;
+        if (!$this->allowRender($event)) {
+            return false;
+        }
 
         $response = $event->getResponse();
         $javascripts = $this->twig->getGlobals()["google_recaptcha"]["javascripts"] ?? "";
@@ -107,8 +117,9 @@ class GrListener
 
         ], $response->getContent(), 1);
 
-        if(!is_instanceof($response, [StreamedResponse::class, BinaryFileResponse::class]))
+        if (!is_instanceof($response, [StreamedResponse::class, BinaryFileResponse::class])) {
             $response->setContent($content);
+        }
 
         return true;
     }

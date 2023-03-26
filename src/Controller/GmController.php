@@ -30,8 +30,7 @@ class GmController extends AbstractController
      */
     public function Main(): Response
     {
-        if (!$this->gmBuilder->alreadyExists("myMap"))
-        {
+        if (!$this->gmBuilder->alreadyExists("myMap")) {
             $sidney  = new Place("ChIJN1t_tDeuEmsRUsoyG83frY4");
             $url = "https://maps.googleapis.com/maps/api/staticmap?center=40.714%2c%20-73.998&zoom=12&size=400x400&key=AIzaSyDtqB9Vqs9nj2Yu5sQLMyqwK9pGWEbSltA";
 
@@ -44,7 +43,7 @@ class GmController extends AbstractController
             $myMap = new Map([
                 "zoom" => 8,
                 "center" => $sidney->getLatLng(),
-                "html2canvas" => True
+                "html2canvas" => true
             ]);
 
             $myMap->setDefaultUI(0);
@@ -53,8 +52,10 @@ class GmController extends AbstractController
             $this->gmBuilder
                 ->addMap("myMap", $myMap)
                 ->addMarker("myMarker", $myMarker)
-                ->addListener("myMap", "click",
-                "function placeMarker(location) {
+                ->addListener(
+                    "myMap",
+                    "click",
+                    "function placeMarker(location) {
 
                     console.log(location);
                     if (myMarker != null) myMarker.setPosition(location.latLng);
@@ -65,7 +66,8 @@ class GmController extends AbstractController
                             map: myMap
                         });
                     }
-                }")
+                }"
+                )
             ->build();
         }
 
@@ -89,56 +91,61 @@ class GmController extends AbstractController
      */
     public function Export(string $signature, Request $request)
     {
-        if (!$this->gmBuilder->isGranted())
+        if (!$this->gmBuilder->isGranted()) {
             throw new AccessDeniedException('Access denied.');
+        }
 
         $submittedToken = $request->request->get('gm_csrf_token');
-        if (!$this->isCsrfTokenValid('html2canvas-export', $submittedToken))
+        if (!$this->isCsrfTokenValid('html2canvas-export', $submittedToken)) {
             throw new Exception("Invalid CSRF token.");
+        }
 
         $data = $request->request->get('gm_base64data') ?? null;
-        if(!$data) throw new Exception("No base64 data provided");
+        if (!$data) {
+            throw new Exception("No base64 data provided");
+        }
 
-        $idsize = $request->request->get('gm_tilesize') ?? null;
-        if(!$idsize) {
+        $tilesize = $request->request->get('gm_tilesize') ?? null;
+        if(!$tilesize) {
 
             list($width, $height) = getimagesizefromstring(base64_decode(explode('base64,', $data)[1]));
-            $nx = 1; $ny = 1;
+            $nx = 1;
+            $ny = 1;
 
             // Upload picture
             $this->gmBuilder->uploadCache(
                 $this->gmBuilder->getCachePath($signature),
                 base64_decode(explode('base64,', $data)[1])
             );
-
         } else {
-
             // Subdivide picture
             $im = imagecreatefromstring(base64_decode(explode('base64,', $data)[1]));
-            if ($im === false) throw new Exception("Failed to compute a valid image from base64 input");
+            if ($im === false) {
+                throw new Exception("Failed to compute a valid image from base64 input");
+            }
 
             $width = imagesx($im);
             $height = imagesy($im);
-            $nx = ceil($width  / $idsize);
-            $ny = ceil($height / $idsize);
+            $nx = ceil($width  / $tilesize);
+            $ny = ceil($height / $tilesize);
 
             for ($iy = 0; $iy < $ny; $iy++) {
                 for ($ix = 0; $ix < $nx; $ix++) {
 
-                    $idindex  = $iy*$nx + $ix;
-                    $idwidth  = ($ix == $nx - 1 ? $width  - $ix * $idsize : $idsize);
-                    $idheight = ($iy == $ny - 1 ? $height - $iy * $idsize : $idsize);
+                    $tileindex  = $iy*$nx + $ix;
+                    $tilewidth  = ($ix == $nx - 1 ? $width  - $ix * $tilesize : $tilesize);
+                    $tileheight = ($iy == $ny - 1 ? $height - $iy * $tilesize : $tilesize);
 
                     // Crop image and keep its transparency
-                    $imcrop = imagecreatetruecolor($idsize, $idsize);
+                    $imcrop = imagecreatetruecolor($tilesize, $tilesize);
                     $transparentColor = imagecolorallocatealpha($imcrop, 0, 0, 0, 127);
                     imagefill($imcrop, 0, 0, $transparentColor);
                     imagealphablending($imcrop, false);
                     imagesavealpha($imcrop, true);
                     imagecopyresampled(
                         $imcrop, $im,
-                        0, 0, $idsize*$ix, $idsize*$iy,
-                        $idwidth, $idheight, $idwidth, $idheight
+                        0, 0, $tilesize*$ix, $tilesize*$iy,
+                        $tilewidth, $tileheight, $tilewidth, $tileheight
                     );
 
                     ob_start(); // Let's start output buffering.
@@ -158,10 +165,9 @@ class GmController extends AbstractController
 
                     // Upload tiled pictures
                     $this->gmBuilder->uploadCache(
-                        $this->gmBuilder->getCachePath($signature, $idindex),
+                        $this->gmBuilder->getCachePath($signature, $tileindex),
                         $contents
                     );
-
                 }
             }
         }
@@ -170,7 +176,7 @@ class GmController extends AbstractController
         $array["image_width"]  = $width;
         $array["image_height"] = $height;
 
-        $array["image_tilesize"] = $idsize;
+        $array["image_tilesize"] = $tilesize;
         $array["image_xtiles"] = $nx;
         $array["image_ytiles"] = $ny;
         $this->gmBuilder->setCacheMetadata($signature, $array);
@@ -184,11 +190,13 @@ class GmController extends AbstractController
      * */
     public function Suppress(string $signature)
     {
-        if (!$this->gmBuilder->isGranted())
+        if (!$this->gmBuilder->isGranted()) {
             throw new AccessDeniedException('Access denied.');
+        }
 
-        if($this->gmBuilder->deleteCache($signature))
+        if ($this->gmBuilder->deleteCache($signature)) {
             return JsonResponse::fromJsonString(json_encode(["status" => GmBuilder::STATUS_OK]));
+        }
 
         return JsonResponse::fromJsonString(json_encode(["status" => GmBuilder::STATUS_BAD]));
     }

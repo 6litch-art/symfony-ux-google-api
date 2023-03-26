@@ -85,8 +85,12 @@ class FormTypeCaptchaExtension extends AbstractTypeExtension
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        if (!$options["captcha_protection"]) return;
-        if (!$builder->getForm()->isRoot()) return;
+        if (!$options["captcha_protection"]) {
+            return;
+        }
+        if (!$builder->getForm()->isRoot()) {
+            return;
+        }
 
         $builder->addEventSubscriber(new CaptchaValidationListener(
             $this->grService,
@@ -106,7 +110,7 @@ class FormTypeCaptchaExtension extends AbstractTypeExtension
      *
      * @return array
      */
-    function arrayInject( array $input, array $items, int $position ): array
+    public function arrayInject(array $input, array $items, int $position): array
     {
         if (0 >= $position) {
             return array_merge($items, $input);
@@ -124,26 +128,28 @@ class FormTypeCaptchaExtension extends AbstractTypeExtension
 
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
-        if (!$options['captcha_protection']) return;
+        if (!$options['captcha_protection']) {
+            return;
+        }
         if (!$view->parent && $options['compound']) {
+            if (!$this->grService->hasTriggeredMinimumAttempts($form, $options)) {
+                return;
+            }
+            if ($this->grService->findCaptchaType($form)) {
+                return;
+            }
 
-            if(!$this->grService->hasTriggeredMinimumAttempts($form, $options)) return;
-            if($this->grService->findCaptchaType($form)) return;
-            
             $factory = $form->getConfig()->getFormFactory();
             $captchaForm = $factory->createNamed($options['captcha_field_name'], $this->grService->getType($options["captcha_api"]), null, [
                 'mapped' => false,
             ]);
 
-            if( ($submitButton = $this->grService->findSubmitButton($form)) ) {
-
+            if (($submitButton = $this->grService->findSubmitButton($form))) {
                 $keys = array_keys($view->children);
                 $submitIndex = array_search($submitButton->getName(), $keys);
 
                 $view->children = $this->arrayInject($view->children, [$options['captcha_field_name'] => $captchaForm->createView($view)], $submitIndex);
-
             } else {
-
                 $view->children[$options['captcha_field_name']] = $captchaForm->createView($view);
             }
         }

@@ -16,11 +16,11 @@ use Twig\Loader\ChainLoader;
 
 class GrService
 {
-    const CACHE_DURATION = 24*3600;
-    const APIV2 = "apiv2";
-    const APIV3 = "apiv3";
+    public const CACHE_DURATION = 24*3600;
+    public const APIV2 = "apiv2";
+    public const APIV3 = "apiv3";
 
-    const SEPARATOR = "_";
+    public const SEPARATOR = "_";
 
     /** @var bool */
     protected bool $enable;
@@ -53,7 +53,7 @@ class GrService
         $this->container    = $kernel->getContainer();
         $this->cache        = $cache;
         $this->request      = $requestStack->getCurrentRequest();
-        
+
         $this->enable       = $this->container->getParameter("google.recaptcha.enable");
         $this->onLoadMethod = $this->container->getParameter("google.recaptcha.onload");
 
@@ -67,8 +67,9 @@ class GrService
     public function getLoader()
     {
         $loader = $this->twig->getLoader();
-        if($loader instanceof ChainLoader)
+        if ($loader instanceof ChainLoader) {
             $loader = $loader->getLoaders()[0] ?? null;
+        }
 
         return $loader;
     }
@@ -77,12 +78,14 @@ class GrService
     {
         $url = trim($url);
         $parseUrl = parse_url($url);
-        if($parseUrl["scheme"] ?? false)
+        if ($parseUrl["scheme"] ?? false) {
             return $url;
+        }
 
         $path = $parseUrl["path"];
-        if(!str_starts_with($path, "/"))
+        if (!str_starts_with($path, "/")) {
             $path = $this->request->getBasePath()."/".$path;
+        }
 
         return $path;
     }
@@ -90,7 +93,6 @@ class GrService
     public static function getType(string $api)
     {
         switch($api) {
-
             case self::APIV2:
                 return ReCaptchaV2Type::class;
             case self::APIV3:
@@ -103,24 +105,29 @@ class GrService
 
     public function initJs()
     {
-        if(!$this->enable) return;
+        if (!$this->enable) {
+            return;
+        }
 
         $javascripts  = "<script src='".$this->getAsset("bundles/google/recaptcha.js")."' defer></script>" . PHP_EOL;
         $javascripts .= "<script src='https://www.google.com/recaptcha/api.js?onload=".$this->onLoadMethod."&render=explicit'></script>";
 
-        try { 
+        try {
             $this->twig->addGlobal("google_recaptcha", array_merge(
                 $this->twig->getGlobals()["google_recaptcha"] ?? [],
                 ["javascripts" => ($this->twig->getGlobals()["google_recaptcha"]["javascripts"] ?? "") . $javascripts]
             ));
-        } catch(LogicException $e) { }
+        } catch(LogicException $e) {
+        }
     }
 
-    public function isEnabled() { return $this->enable; }
+    public function isEnabled()
+    {
+        return $this->enable;
+    }
     public function getSecret(string $api)
     {
         switch($api) {
-
             case self::APIV2:
             case self::APIV3:
                 return $this->container->getParameter("google.recaptcha.".$api.".secret");
@@ -136,8 +143,11 @@ class GrService
         $key = $formName.self::SEPARATOR."failedAttempts".self::SEPARATOR.$normalizedIp;
         $cacheItem = $this->cache->getItem($key);
 
-        if(!$cacheItem->isHit()) $failedAttempts = 0;
-        else $failedAttempts = $cacheItem->get() ?? 0;
+        if (!$cacheItem->isHit()) {
+            $failedAttempts = 0;
+        } else {
+            $failedAttempts = $cacheItem->get() ?? 0;
+        }
 
         return $failedAttempts;
     }
@@ -157,8 +167,11 @@ class GrService
         $key = $formName.self::SEPARATOR."failedAttempts".self::SEPARATOR.$normalizedIp;
         $cacheItem = $this->cache->getItem($key);
 
-        if(!$cacheItem->isHit()) $failedAttempts = 0;
-        else $failedAttempts = $cacheItem->get() ?? 0;
+        if (!$cacheItem->isHit()) {
+            $failedAttempts = 0;
+        } else {
+            $failedAttempts = $cacheItem->get() ?? 0;
+        }
 
         $cacheItem->set(++$failedAttempts);
         $cacheItem->expiresAfter($expiresAfter);
@@ -172,13 +185,18 @@ class GrService
         return $this->getFailedAttempts($form->getName()) >= $this->getMinimumAttempts($options);
     }
 
-    public function getMinimumAttempts(array $options = []) { return $options['captcha_min_attempts']    ?? 0; }
-    public function getScoreThreshold(array $options = [])  { return $options['captcha_score_threshold'] ?? 0; }
+    public function getMinimumAttempts(array $options = [])
+    {
+        return $options['captcha_min_attempts']    ?? 0;
+    }
+    public function getScoreThreshold(array $options = [])
+    {
+        return $options['captcha_score_threshold'] ?? 0;
+    }
 
     public function getSiteKey(string $api)
     {
         switch($api) {
-
             case self::APIV2:
             case self::APIV3:
                 return $this->container->getParameter("google.recaptcha.".$api.".sitekey");
@@ -188,23 +206,27 @@ class GrService
         }
     }
 
-    public function findSubmitButton(FormInterface $form): ?SubmitButton {
-
-        foreach($form->getIterator() as $child) {
-
-            if($child instanceof SubmitButton) return $child;
+    public function findSubmitButton(FormInterface $form): ?SubmitButton
+    {
+        foreach ($form->getIterator() as $child) {
+            if ($child instanceof SubmitButton) {
+                return $child;
+            }
         }
 
         return null;
     }
 
-    public function findCaptchaType(FormInterface $form){
-
-        foreach($form->getIterator() as $child) {
-
+    public function findCaptchaType(FormInterface $form)
+    {
+        foreach ($form->getIterator() as $child) {
             $innerType = $child->getConfig()->getType()->getInnerType();
-            if($innerType instanceof ReCaptchaV2Type) return $child;
-            if($innerType instanceof ReCaptchaV3Type) return $child;
+            if ($innerType instanceof ReCaptchaV2Type) {
+                return $child;
+            }
+            if ($innerType instanceof ReCaptchaV3Type) {
+                return $child;
+            }
         }
 
         return null;

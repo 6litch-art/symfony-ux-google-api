@@ -23,27 +23,23 @@ class MapStatic extends GmClient
         $this->setBaseUrl("https://maps.googleapis.com/maps/api/staticmap");
 
         $size = $this->pop("size");
-        if($size instanceof Size) {
-
+        if ($size instanceof Size) {
             $width = $size->getWidth();
             $width = $size->getHeight();
-
-        } else if(is_string($size)) {
-
+        } elseif (is_string($size)) {
             $size = explode("x", $size);
             $width = $size[0] ?? null;
             $height = $size[1] ?? null;
-
         } else {
-
             $width  = $this->pop("width");
             $height = $this->pop("height");
         }
 
         $width  = $width0  ?? $width;
         $height = $height0 ?? $height;
-        if($width == null || $height == null)
+        if ($width == null || $height == null) {
             throw new Exception("Unknown dimension size");
+        }
 
         $this->addOption("size", new Size((float) $width, (float) $height));
     }
@@ -67,11 +63,16 @@ class MapStatic extends GmClient
 
     public function setSize($width, int $height = null)
     {
-        if ($width instanceof Size) $size = $width;
-        if (!$size && $height == null || $size && $height != null)
+        if ($width instanceof Size) {
+            $size = $width;
+        }
+        if (!$size && $height == null || $size && $height != null) {
             throw new Exception("Ambiguious size provided");
+        }
 
-        if (!$size) $size = new Size($width, $height);
+        if (!$size) {
+            $size = new Size($width, $height);
+        }
         $this->addOption("size", $size);
 
         return $this;

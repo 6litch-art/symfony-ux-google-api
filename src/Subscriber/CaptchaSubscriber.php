@@ -41,7 +41,7 @@ class CaptchaSubscriber implements EventSubscriberInterface
      */
     protected ?string $translationDomain;
 
-    public function __construct(GrService $grService, ValidatorInterface $validator, TranslatorInterface $translator, ?string $translationDomain = null) 
+    public function __construct(GrService $grService, ValidatorInterface $validator, TranslatorInterface $translator, ?string $translationDomain = null)
     {
         $this->validator         = $validator;
         $this->grService         = $grService;
@@ -82,7 +82,7 @@ class CaptchaSubscriber implements EventSubscriberInterface
         if (!$passport->hasBadge(CaptchaBadge::class)) {
             return;
         }
-       
+
         /** @var CaptchaBadge $badge */
         $badge = $passport->getBadge(CaptchaBadge::class);
         if ($badge->isResolved()) {
@@ -92,7 +92,7 @@ class CaptchaSubscriber implements EventSubscriberInterface
         $value = explode(" ", \is_string($badge->getValue() ?? null) ? $badge->getValue() : "");
         $api   = $value[1] ?? GrService::APIV2;
         $value = $value[0] ?? "";
-        
+
         $executionContextFactory = new ExecutionContextFactory($this->translator, $this->translationDomain);
         $context = $executionContextFactory->createContext($this->validator, $value);
 
@@ -100,8 +100,9 @@ class CaptchaSubscriber implements EventSubscriberInterface
         $constraintValidator->initialize($context);
 
         $violations = $this->validator->validate($value, new Captcha(["api" => $api]));
-        if ( $violations->count() > 0 )
+        if ($violations->count() > 0) {
             throw new InvalidCaptchaException($violations[0]->getMessage());
+        }
 
         $badge->markResolved();
     }
