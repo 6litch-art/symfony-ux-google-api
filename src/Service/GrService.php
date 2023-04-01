@@ -2,6 +2,7 @@
 
 namespace Google\Service;
 
+use Base\Service\ParameterBagInterface;
 use Exception;
 use Google\Form\Type\ReCaptchaV2Type;
 use Google\Form\Type\ReCaptchaV3Type;
@@ -48,14 +49,15 @@ class GrService
     /** * @var string */
     protected string $onLoadMethod;
 
-    public function __construct(KernelInterface $kernel, Environment $twig, RequestStack $requestStack, CacheInterface $cache)
+    public function __construct(KernelInterface $kernel, Environment $twig, ParameterBagInterface $parameterBag, RequestStack $requestStack, CacheInterface $cache)
     {
+        $this->parameterBag = $parameterBag;
         $this->container    = $kernel->getContainer();
         $this->cache        = $cache;
         $this->request      = $requestStack->getCurrentRequest();
 
-        $this->enable       = $this->container->getParameter("google.recaptcha.enable");
-        $this->onLoadMethod = $this->container->getParameter("google.recaptcha.onload");
+        $this->enable       = $this->parameterBag->get("google.recaptcha.enable");
+        $this->onLoadMethod = $this->parameterBag->get("google.recaptcha.onload");
 
         $this->twig    = $twig;
         if ($this->getLoader()) {
@@ -134,7 +136,7 @@ class GrService
         switch($api) {
             case self::APIV2:
             case self::APIV3:
-                return $this->container->getParameter("google.recaptcha.".$api.".secret");
+                return $this->parameterBag->get("google.recaptcha.".$api.".secret");
 
             default:
                 throw new Exception("Invalid API version provided.");
@@ -203,7 +205,7 @@ class GrService
         switch($api) {
             case self::APIV2:
             case self::APIV3:
-                return $this->container->getParameter("google.recaptcha.".$api.".sitekey");
+                return $this->parameterBag->get("google.recaptcha.".$api.".sitekey");
 
             default:
                 throw new Exception("Invalid API version provided.");

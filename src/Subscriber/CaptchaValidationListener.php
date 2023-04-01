@@ -85,7 +85,7 @@ class CaptchaValidationListener implements EventSubscriberInterface
             return;
         }
 
-        if (!$this->grService->hasTriggeredMinimumAttempts($form, $form->getConfig()->getOptions())) {
+         if ($form->getConfig()->getOptions()["captcha_api"] == GrService::APIV2 && !$this->grService->hasTriggeredMinimumAttempts($form, $form->getConfig()->getOptions())) {
             return;
         }
 

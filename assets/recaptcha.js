@@ -62,6 +62,7 @@ function renderReCaptcha(widget) {
         'api': widgetApi
     };
 
+    console.log(widgetParameters);
     widgetParameters['callback'] = function (token) {
         document.getElementById(widgetParameters["id"]).value = (token + " " + widgetApi).trim();
     };

@@ -151,7 +151,6 @@ class FormTypeCaptchaExtension extends AbstractTypeExtension
                 $submitIndex = array_search($submitButton->getName(), $keys);
 
                 $view->children = $this->arrayInject($view->children, [$options['captcha_field_name'] => $captchaForm->createView($view)], $submitIndex);
-
             } else {
                 $view->children[$options['captcha_field_name']] = $captchaForm->createView($view);
             }
