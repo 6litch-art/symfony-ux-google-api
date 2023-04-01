@@ -18,7 +18,7 @@ class GaController extends AbstractController
 
     /**
      * Controller example
-     * @Route("/", name="analytics")
+     * @Route("/analytics", name="analytics", priority=2)
      */
     public function Main(): Response
     {

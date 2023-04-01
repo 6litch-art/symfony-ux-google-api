@@ -9,6 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\SubmitButton;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -16,6 +17,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ReCaptchaV3Type extends AbstractType
 {
+    protected $grService;
     public function __construct(GrService $grService)
     {
         $this->grService = $grService;

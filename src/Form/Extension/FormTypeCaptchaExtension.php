@@ -12,6 +12,7 @@
 namespace Google\Form\Extension;
 
 use EasyCorp\Bundle\EasyAdminBundle\Provider\AdminContextProvider;
+use Google\Form\Type\ReCaptchaV3Type;
 use Google\Service\GrService;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -132,7 +133,7 @@ class FormTypeCaptchaExtension extends AbstractTypeExtension
             return;
         }
         if (!$view->parent && $options['compound']) {
-            if (!$this->grService->hasTriggeredMinimumAttempts($form, $options)) {
+            if ($options["captcha_api"] == GrService::APIV2 && !$this->grService->hasTriggeredMinimumAttempts($form, $options)) {
                 return;
             }
             if ($this->grService->findCaptchaType($form)) {
@@ -145,10 +146,12 @@ class FormTypeCaptchaExtension extends AbstractTypeExtension
             ]);
 
             if (($submitButton = $this->grService->findSubmitButton($form))) {
+
                 $keys = array_keys($view->children);
                 $submitIndex = array_search($submitButton->getName(), $keys);
 
                 $view->children = $this->arrayInject($view->children, [$options['captcha_field_name'] => $captchaForm->createView($view)], $submitIndex);
+
             } else {
                 $view->children[$options['captcha_field_name']] = $captchaForm->createView($view);
             }

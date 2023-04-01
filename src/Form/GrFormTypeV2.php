@@ -21,8 +21,6 @@ class GrFormType extends AbstractType
         ]);
 
         $builder->add('captcha', ReCaptchaV2Type::class, ["type" => "checkbox"]);
-        // $builder->add('captcha', ReCaptchaV2Type::class, ["type" => "invisible"]);
-        // $builder->add('captcha', ReCaptchaV3Type::class);
         $builder->add('valid', SubmitType::class);
     }
 

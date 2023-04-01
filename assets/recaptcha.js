@@ -48,10 +48,10 @@ var gRecaptchaReady = false;
 function renderReCaptcha(widget) {
 
     var form = widget.closest('form');
+    var submit = form.querySelectorAll('[type="submit"]');
 
-    var widgetType = widget.getAttribute('data-type') || "";
-    var widgetApi = widget.getAttribute('data-api');
-    
+    var widgetApi  = widget.getAttribute('data-api');
+    var widgetType = widget.getAttribute('data-type') || "";
     var widgetName = widget.getAttribute('data-name').replace("[", "_").replace("]", "_");
     var widgetParameters = {
         'id': widget.getAttribute('data-id'),
@@ -63,7 +63,7 @@ function renderReCaptcha(widget) {
     };
 
     widgetParameters['callback'] = function (token) {
-            document.getElementById(widgetParameters["id"]).value = (token + " " + widgetApi).trim();
+        document.getElementById(widgetParameters["id"]).value = (token + " " + widgetApi).trim();
     };
 
     if (widgetType == 'invisible') {
@@ -79,9 +79,18 @@ function renderReCaptcha(widget) {
     if(!gRecaptchaReady) return;
 
     widget.innerHTML = ""; // Avoid issue in case of re-rendering
-    var widgetRender = grecaptcha.render(widget, widgetParameters);
-    if (widgetType == 'invisible')
-        bindChallengeToSubmitButtons(form, widgetRender, widgetParameters);
+
+    if (widgetType == 'invisible') {
+        submit.forEach(function(el) {
+
+            var widgetRender = grecaptcha.render(el, widgetParameters);
+            if (widgetType == 'invisible')
+                bindChallengeToSubmitButtons(form, widgetRender, widgetParameters);
+        });
+
+    } else {
+        grecaptcha.render(widget, widgetParameters);
+    }
 }
 
 var alreadyRendered = false, onHold = false;

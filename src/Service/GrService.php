@@ -109,16 +109,20 @@ class GrService
             return;
         }
 
-        $javascripts  = "<script src='".$this->getAsset("bundles/google/recaptcha.js")."' defer></script>" . PHP_EOL;
+        if(!empty($this->twig->getGlobals()["google_recaptcha"] ?? null))
+            return;
+
+        $javascripts  = "<script src='".$this->getAsset("bundles/google/recaptcha.js")."'></script>" . PHP_EOL;
         $javascripts .= "<script src='https://www.google.com/recaptcha/api.js?onload=".$this->onLoadMethod."&render=explicit'></script>";
 
         try {
+
             $this->twig->addGlobal("google_recaptcha", array_merge(
                 $this->twig->getGlobals()["google_recaptcha"] ?? [],
                 ["javascripts" => ($this->twig->getGlobals()["google_recaptcha"]["javascripts"] ?? "") . $javascripts]
             ));
-        } catch(LogicException $e) {
-        }
+
+        } catch(LogicException $e) {}
     }
 
     public function isEnabled()
@@ -206,15 +210,18 @@ class GrService
         }
     }
 
-    public function findSubmitButton(FormInterface $form): ?SubmitButton
+    public function findSubmitButton(FormInterface $form)
     {
-        foreach ($form->getIterator() as $child) {
+        $submitButton = null;
+        foreach ($form->all() as $child) {
+
             if ($child instanceof SubmitButton) {
-                return $child;
+                $submitButton = $child;
+                break;
             }
         }
 
-        return null;
+        return $submitButton;
     }
 
     public function findCaptchaType(FormInterface $form)
