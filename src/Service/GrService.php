@@ -49,6 +49,8 @@ class GrService
     /** * @var string */
     protected string $onLoadMethod;
 
+    protected $parameterBag;
+
     public function __construct(KernelInterface $kernel, Environment $twig, ParameterBagInterface $parameterBag, RequestStack $requestStack, CacheInterface $cache)
     {
         $this->parameterBag = $parameterBag;
