@@ -93,7 +93,7 @@ class Place extends GmClient
             throw new Exception("No input information provided.");
         }
 
-        return $this->send("https://maps.googleapis.com/maps/api/place/findplacefromtext", $opts);
+        return $this->send("https://maps.googleapis.com/maps/api/place/findplacefromtext", $opts) ?? [];
     }
 
     public function NearbySearch(LatLng $location = null, int $radius = null /* meter */, array $opts = [])
