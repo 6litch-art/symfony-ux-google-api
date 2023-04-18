@@ -10,9 +10,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Google\Builder\GmBuilder;
 use Google\Builder\GmBuilderInterface;
-use Google\Model\Places\Place;
-use Google\Model\Maps\Map;
-use Google\Model\Maps\Overlay\Marker;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -24,60 +21,59 @@ class GmController extends AbstractController
         $this->gmBuilder = $gmBuilder;
     }
 
-    /**
-     * Controller example
-     * @Route("/", name="gm")
-     */
-    public function Main(): Response
-    {
-        if (!$this->gmBuilder->alreadyExists("myMap")) {
-            $sidney  = new Place("ChIJN1t_tDeuEmsRUsoyG83frY4");
-            $url = "https://maps.googleapis.com/maps/api/staticmap?center=40.714%2c%20-73.998&zoom=12&size=400x400&key=AIzaSyDtqB9Vqs9nj2Yu5sQLMyqwK9pGWEbSltA";
+    // /**
+    //  * Controller example
+    //  * @Route("/google/maps", name="gm_example")
+    //  */
+    // public function Example(): Response
+    // {
+    //     if (!$this->gmBuilder->alreadyExists("myMap")) {
+    //         $sidney  = new Place("ChIJN1t_tDeuEmsRUsoyG83frY4");
+    //         $url = "https://maps.googleapis.com/maps/api/staticmap?center=40.714%2c%20-73.998&zoom=12&size=400x400&key=AIzaSyDtqB9Vqs9nj2Yu5sQLMyqwK9pGWEbSltA";
 
-            $myMarker = new Marker([
-                "map" => "myMap",
-                "position" => $sidney->getLatLng(),
-                "title" => "\"Sidney !\""
-            ]);
+    //         $myMarker = new Marker([
+    //             "map" => "myMap",
+    //             "position" => $sidney->getLatLng(),
+    //             "title" => "\"Sidney !\""
+    //         ]);
 
-            $myMap = new Map([
-                "zoom" => 8,
-                "center" => $sidney->getLatLng(),
-                "html2canvas" => true
-            ]);
+    //         $myMap = new Map([
+    //             "zoom" => 8,
+    //             "center" => $sidney->getLatLng(),
+    //             "html2canvas" => true
+    //         ]);
 
-            $myMap->setDefaultUI(0);
-            $myMarker->setParent($myMap);
+    //         $myMap->setDefaultUI(0);
+    //         $myMarker->setParent($myMap);
 
-            $this->gmBuilder
-                ->addMap("myMap", $myMap)
-                ->addMarker("myMarker", $myMarker)
-                ->addListener(
-                    "myMap",
-                    "click",
-                    "function placeMarker(location) {
+    //         $this->gmBuilder
+    //             ->addMap("myMap", $myMap)
+    //             ->addMarker("myMarker", $myMarker)
+    //             ->addListener(
+    //                 "myMap",
+    //                 "click",
+    //                 "function placeMarker(location) {
 
-                    console.log(location);
-                    if (myMarker != null) myMarker.setPosition(location.latLng);
-                    else {
+    //                 console.log(location);
+    //                 if (myMarker != null) myMarker.setPosition(location.latLng);
+    //                 else {
 
-                        myMarker = new google.maps.Marker({
-                            position: location,
-                            map: myMap
-                        });
-                    }
-                }"
-                )
-            ->build();
-        }
+    //                     myMarker = new google.maps.Marker({
+    //                         position: location,
+    //                         map: myMap
+    //                     });
+    //                 }
+    //             }"
+    //             )
+    //         ->build();
+    //     }
 
-        return $this->render("@Gm/index.html.twig");
-    }
-
+    //     return $this->render("@Gm/index.html.twig");
+    // }
 
     /**
      * Display cache image
-     * @Route("/{signature}", name="gm_show_metadata")
+     * @Route("/google/maps/{signature}", name="gm_show_metadata")
      */
     public function ShowMetadata(string $signature)
     {
@@ -87,7 +83,7 @@ class GmController extends AbstractController
 
     /**
      * Export using html2canvas
-     * @Route("/{signature}/export", name="gm_export")
+     * @Route("/google/maps/{signature}/export", name="gm_export")
      */
     public function Export(string $signature, Request $request)
     {
@@ -186,7 +182,7 @@ class GmController extends AbstractController
 
     /**
      * Suppress a cache image
-     * @Route("/{signature}/suppress", name="gm_suppress")
+     * @Route("/google/maps/{signature}/suppress", name="gm_suppress")
      * */
     public function Suppress(string $signature)
     {
@@ -203,7 +199,7 @@ class GmController extends AbstractController
 
     /**
      * Display cache image
-     * @Route("/{signature}/{id}", name="gm_show")
+     * @Route("/google/maps/{signature}/{id}", name="gm_show")
      */
     public function Show(string $signature, int $id = 0): Response
     {
