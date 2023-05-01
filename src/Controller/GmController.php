@@ -13,6 +13,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
+/**
+ *
+ */
 class GmController extends AbstractController
 {
     protected GmBuilderInterface $gmBuilder;
@@ -215,14 +218,14 @@ class GmController extends AbstractController
             $response->setMaxAge($this->gmBuilder->cacheLifetime);
 
             $response->headers->addCacheControlDirective('must-revalidate');
-            $response->headers->set('Content-Type', 'image/'.$this->gmBuilder->cacheFormat);
+            $response->headers->set('Content-Type', 'image/' . $this->gmBuilder->cacheFormat);
 
             $response->setEtag(md5($response->getContent()));
 
             return $response;
         }
 
-        $file = $this->gmBuilder->getPublicDirectory().'/no-image.png';
+        $file = $this->gmBuilder->getPublicDirectory() . '/no-image.png';
 
         return new BinaryFileResponse($file);
     }

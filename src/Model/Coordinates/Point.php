@@ -9,15 +9,25 @@ Complete documentation:
 
 */
 
+/**
+ *
+ */
 class Point
 {
     private float $x;
 
+    /**
+     * @return float
+     */
     public function getX()
     {
         return $this->x;
     }
 
+    /**
+     * @param $x
+     * @return void
+     */
     public function setX($x)
     {
         $this->x = $x;
@@ -25,11 +35,18 @@ class Point
 
     private float $y;
 
+    /**
+     * @return float
+     */
     public function getY()
     {
         return $this->y;
     }
 
+    /**
+     * @param $y
+     * @return void
+     */
     public function setY($y)
     {
         $this->y = $y;
@@ -41,6 +58,10 @@ class Point
         $this->setY($y);
     }
 
+    /**
+     * @param LatLng $that
+     * @return bool
+     */
     public function equals(LatLng $that)
     {
         return $this == $that;
@@ -48,6 +69,6 @@ class Point
 
     public function __toString(): string
     {
-        return 'new google.maps.Size('.$this->x.', '.$this->y.')';
+        return 'new google.maps.Size(' . $this->x . ', ' . $this->y . ')';
     }
 }

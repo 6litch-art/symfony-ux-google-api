@@ -31,12 +31,15 @@ use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Twig\Environment;
 
+/**
+ *
+ */
 class GmBuilder implements GmBuilderInterface
 {
     protected bool $enable;
 
     /**
-     * @var Environment
+     * @var RequestStack
      */
     public RequestStack $requestStack;
 
@@ -135,7 +138,7 @@ class GmBuilder implements GmBuilderInterface
     }
 
     /**
-     * @var bool
+     * @return bool
      */
     public function isEnabled()
     {
@@ -144,11 +147,18 @@ class GmBuilder implements GmBuilderInterface
 
     public ?string $keyClient;
 
+    /**
+     * @return array|bool|float|int|string|\UnitEnum|null
+     */
     public function getClientKey()
     {
         return $this->keyClient;
     }
 
+    /**
+     * @param $key
+     * @return void
+     */
     public function setClientKey($key)
     {
         $this->keyClient = $key;
@@ -156,11 +166,18 @@ class GmBuilder implements GmBuilderInterface
 
     public ?string $keyServer;
 
+    /**
+     * @return array|bool|float|int|string|\UnitEnum|null
+     */
     public function getServerKey()
     {
         return $this->keyServer;
     }
 
+    /**
+     * @param $keyServer
+     * @return void
+     */
     public function setServerKey($keyServer)
     {
         $this->keyServer = $keyServer;
@@ -168,11 +185,18 @@ class GmBuilder implements GmBuilderInterface
 
     public ?string $secret;
 
+    /**
+     * @return array|bool|float|int|string|\UnitEnum|null
+     */
     public function getSecret()
     {
         return $this->secret;
     }
 
+    /**
+     * @param $secret
+     * @return void
+     */
     public function setSecret($secret)
     {
         $this->secret = $secret;
@@ -181,6 +205,10 @@ class GmBuilder implements GmBuilderInterface
     private static $_instance = null;
     private static array $_instanceId = [];
 
+    /**
+     * @param string|null $id
+     * @return GmBuilder|mixed|null
+     */
     public static function getInstance(string $id = null)
     {
         if (null == $id) {
@@ -197,6 +225,9 @@ class GmBuilder implements GmBuilderInterface
 
     public Security $security;
 
+    /**
+     * @return bool
+     */
     public static function isReady()
     {
         return null != self::$_instance;
@@ -212,6 +243,18 @@ class GmBuilder implements GmBuilderInterface
         return $this->getAsset($this->cachePool ?? null);
     }
 
+    /**
+     * @param $object
+     * @param string|null $event
+     * @param string|null $callback
+     * @return $this
+     */
+    /**
+     * @param $object
+     * @param string|null $event
+     * @param string|null $callback
+     * @return $this
+     */
     public function addListener($object, ?string $event = null, ?string $callback = null): self
     {
         if (is_string($object)) {
@@ -250,6 +293,14 @@ class GmBuilder implements GmBuilderInterface
         return $this;
     }
 
+    /**
+     * @param $entry
+     * @return $this
+     */
+    /**
+     * @param $entry
+     * @return $this
+     */
     public function addEntry($entry): self
     {
         if (is_string($entry)) {
@@ -271,6 +322,11 @@ class GmBuilder implements GmBuilderInterface
 
     public array $rules = [];
 
+    /**
+     * @param $rule
+     * @param array $visitedRules
+     * @return array|null
+     */
     public function findOneRuleLoop($rule = null, array $visitedRules = [])
     {
         // Initialization
@@ -307,6 +363,10 @@ class GmBuilder implements GmBuilderInterface
         return $this->findOneRuleLoop($parent, $visitedRules);
     }
 
+    /**
+     * @param $rule
+     * @return int
+     */
     public function getAncestorHeight($rule)
     {
         if ($loop = $this->findOneRuleLoop()) {
@@ -327,6 +387,9 @@ class GmBuilder implements GmBuilderInterface
         return $i;
     }
 
+    /**
+     * @return array
+     */
     public function sortRules()
     {
         $rules = $this->rules;
@@ -408,6 +471,10 @@ class GmBuilder implements GmBuilderInterface
         return true;
     }
 
+    /**
+     * @param $subject
+     * @return bool
+     */
     public function isGranted($subject = null): bool
     {
         if (null === $this->security->getToken()) {
@@ -527,6 +594,10 @@ class GmBuilder implements GmBuilderInterface
         return true;
     }
 
+    /**
+     * @param $objectId
+     * @return bool
+     */
     public function unbind($objectId): bool
     {
         foreach (self::$_instanceId as $objectId0 => $object0) {
@@ -554,6 +625,11 @@ class GmBuilder implements GmBuilderInterface
         return $path;
     }
 
+    /**
+     * @param string $signature
+     * @param array $opts
+     * @return false|string
+     */
     public function getCache(string $signature, array $opts = [])
     {
         try {
@@ -599,6 +675,11 @@ class GmBuilder implements GmBuilderInterface
         return $this->getCacheDirectory() . '/' . str_replace(['{signature}', '{id}'], [$signature, $id], $this->cachePublic) . '.' . $this->cacheFormat;
     }
 
+    /**
+     * @param $signature
+     * @param $id
+     * @return string
+     */
     public function getCacheUrl($signature, $id = null): string
     {
         $url = (GmBuilder::getInstance()->router ? GmBuilder::getInstance()->router->generate('gm_show', ['signature' => $signature, 'id' => $id]) : null);
@@ -625,6 +706,10 @@ class GmBuilder implements GmBuilderInterface
         return $path;
     }
 
+    /**
+     * @param $signature
+     * @return mixed|string[]
+     */
     public function getCacheMetadata($signature)
     {
         $file = $this->getCacheDirectory() . '/' . $signature . '/metadata.txt';
@@ -642,6 +727,11 @@ class GmBuilder implements GmBuilderInterface
         }
     }
 
+    /**
+     * @param string $signature
+     * @param array|null $opts
+     * @return mixed
+     */
     public function cacheExists(string $signature, ?array $opts = [])
     {
         try {
@@ -654,7 +744,7 @@ class GmBuilder implements GmBuilderInterface
             }
 
             return GmBuilder::getInstance()->filesystem->fileExists($path);
-            
+
         } catch (UnableToRetrieveMetadata $exception) {
 
             throw new Exception("Unable to retrieve file \"$signature\" from cache..");
@@ -662,6 +752,10 @@ class GmBuilder implements GmBuilderInterface
         }
     }
 
+    /**
+     * @param string $signature
+     * @return true
+     */
     public function deleteCache(string $signature)
     {
         try {
@@ -676,6 +770,14 @@ class GmBuilder implements GmBuilderInterface
         }
     }
 
+    /**
+     * @param $image
+     * @param $cropWidth
+     * @param $cropHeight
+     * @param $horizontalAlign
+     * @param $verticalAlign
+     * @return false|\GdImage|resource
+     */
     public function cropAlign($image, $cropWidth, $cropHeight, $horizontalAlign = 'center', $verticalAlign = 'middle')
     {
         $width = imagesx($image);
@@ -699,6 +801,12 @@ class GmBuilder implements GmBuilderInterface
         ]);
     }
 
+    /**
+     * @param $imageSize
+     * @param $cropSize
+     * @param $align
+     * @return array
+     */
     public function calculatePixelsForAlign($imageSize, $cropSize, $align)
     {
         return match ($align) {
@@ -712,6 +820,16 @@ class GmBuilder implements GmBuilderInterface
         };
     }
 
+    /**
+     * @param string $id
+     * @param $map
+     * @return $this
+     */
+    /**
+     * @param string $id
+     * @param $map
+     * @return $this
+     */
     public function addMap(string $id, $map): self
     {
         if (!($map instanceof MapStatic ||
@@ -727,6 +845,16 @@ class GmBuilder implements GmBuilderInterface
         return $this;
     }
 
+    /**
+     * @param string $id
+     * @param $opts
+     * @return $this
+     */
+    /**
+     * @param string $id
+     * @param $opts
+     * @return $this
+     */
     public function addPlace(string $id, $opts = []): self
     {
         $place = ($opts instanceof Place ? $opts : new Place(null, $opts));

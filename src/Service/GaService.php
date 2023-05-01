@@ -2,10 +2,14 @@
 
 namespace Google\Service;
 
+use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
+/**
+ *
+ */
 class GaService
 {
     private \Google_Client $client;
@@ -18,7 +22,7 @@ class GaService
     private ?string $viewId;
 
     /**
-     * @var string
+     * @var string|null
      */
     private ?string $jsonLocation;
 
@@ -64,26 +68,43 @@ class GaService
         return $this->client;
     }
 
+    /**
+     * @param $viewId
+     * @return void
+     */
     public function setViewId($viewId)
     {
         $this->viewId = $viewId;
     }
 
+    /**
+     * @return array|bool|float|int|string|\UnitEnum|null
+     */
     public function getViewId()
     {
         return $this->viewId;
     }
 
+    /**
+     * @param $jsonLocation
+     * @return void
+     */
     public function setJsonLocation($jsonLocation)
     {
         $this->jsonLocation = $jsonLocation;
     }
 
+    /**
+     * @return array|bool|float|int|string|\UnitEnum|null
+     */
     public function getJsonLocation()
     {
         return $this->jsonLocation;
     }
 
+    /**
+     * @return array|bool|float|int|string|\UnitEnum
+     */
     public function isEnabled()
     {
         return $this->enable;
@@ -100,6 +121,14 @@ class GaService
     private const EnableCache = true;
     private const GoogleStartTime = '2005-01-01';
 
+    /**
+     * @param $metric
+     * @param $expiration
+     * @param $dateStart
+     * @param $dateEnd
+     * @return int|mixed
+     * @throws InvalidArgumentException
+     */
     private function getDataDateRange($metric, $expiration = 0, $dateStart = self::GoogleStartTime, $dateEnd = 'today')
     {
         if (!$this->isEnabled()) {
@@ -238,6 +267,9 @@ class GaService
         return $this->getDataDateRange('bounces', $expiration, $dateStart, $dateEnd);
     }
 
+    /**
+     * @return array
+     */
     public function getBasics()
     {
         if (!$this->isEnabled()) {
@@ -255,6 +287,9 @@ class GaService
         ];
     }
 
+    /**
+     * @return array
+     */
     public function getAdvanced()
     {
         if (!$this->isEnabled()) {

@@ -11,6 +11,10 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class MapEmbed extends GmClient
 {
+    /**
+     * @param $opts
+     * @param HttpClientInterface|null $client
+     */
     public function __construct($opts = [], HttpClientInterface $client = null)
     {
         parent::__construct($client ?? GmBuilder::getInstance()->client, $opts);

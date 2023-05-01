@@ -9,6 +9,9 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
+/**
+ *
+ */
 final class CaptchaValidator extends ConstraintValidator
 {
     private array $responses = [];
@@ -19,6 +22,12 @@ final class CaptchaValidator extends ConstraintValidator
         $this->grService = $grService;
     }
 
+    /**
+     * @param $value
+     * @param Constraint $constraint
+     * @return void
+     * @throws \Exception
+     */
     public function validate($value, Constraint $constraint): void
     {
         if (!$constraint instanceof Captcha) {

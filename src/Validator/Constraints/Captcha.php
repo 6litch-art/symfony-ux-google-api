@@ -15,11 +15,21 @@ final class Captcha extends Constraint
 
     protected mixed $api;
 
+    /**
+     * @return mixed
+     */
     public function getVersion()
     {
         return $this->api;
     }
 
+    /**
+     * @param array|null $options
+     * @param string|null $message
+     * @param array|null $groups
+     * @param $payload
+     * @throws \Exception
+     */
     public function __construct(array $options = null, string $message = null, array $groups = null, $payload = null)
     {
         parent::__construct($options ?? [], $groups, $payload);

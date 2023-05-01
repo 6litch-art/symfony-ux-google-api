@@ -10,14 +10,17 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ *
+ */
 class GrFormTypeV2 extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-        ->add('title', TextType::class, [
-            'constraints' => [new NotBlank(['message' => 'Blank title.'])],
-        ]);
+            ->add('title', TextType::class, [
+                'constraints' => [new NotBlank(['message' => 'Blank title.'])],
+            ]);
 
         $builder->add('captcha', ReCaptchaV2Type::class, ['type' => 'checkbox']);
         $builder->add('valid', SubmitType::class);

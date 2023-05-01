@@ -4,6 +4,9 @@ namespace Google\Builder;
 
 use Symfony\Component\Config\Definition\Exception\Exception;
 
+/**
+ *
+ */
 abstract class GmObject implements GmObjectInterface, GmEventInterface
 {
     public const NoEncoding = '';
@@ -20,16 +23,26 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
         $this->parent = $parent;
     }
 
+    /**
+     * @return GmObjectInterface|null
+     */
     public function getParent()
     {
         return $this->parent;
     }
 
+    /**
+     * @return string|null
+     */
     public function getParentId()
     {
         return $this->parent->getId();
     }
 
+    /**
+     * @param array|null $opts
+     * @return bool
+     */
     public function parentCacheExists(?array $opts = [])
     {
         $parent = $this; // If it has at least one parent cache, then it needs to be commented..
@@ -42,6 +55,9 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
         return false;
     }
 
+    /**
+     * @return bool
+     */
     public function parentCacheEnabled()
     {
         $parent = $this; // If it has at least one parent cache, then it needs to be commented..
@@ -56,6 +72,10 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
 
     private array $opts = [];
 
+    /**
+     * @param string $encoding
+     * @return array|string
+     */
     public function getOpts(string $encoding = self::NoEncoding)
     {
         return $this->getArgs($this->opts, $encoding);
@@ -73,6 +93,11 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
         return $this->parseArgs($this->opts, $format);
     }
 
+    /**
+     * @param $args
+     * @param string $encoding
+     * @return array|string
+     */
     public function getArgs($args, string $encoding = self::NoEncoding)
     {
         switch ($encoding) {
@@ -88,16 +113,16 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
                     foreach ($args as $key => $arg) {
                         $json .= (empty($json) ? '' : ', ');
                         if ($isAssoc) {
-                            $json .= $key.':'.$this->getArgs($arg, $encoding);
+                            $json .= $key . ':' . $this->getArgs($arg, $encoding);
                         } else {
                             $json .= $this->getArgs($arg, $encoding);
                         }
                     }
 
                     if ($isAssoc) {
-                        return '{'.$json.'}';
+                        return '{' . $json . '}';
                     } else {
-                        return '['.$json.']';
+                        return '[' . $json . ']';
                     }
                 }
 
@@ -115,6 +140,11 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
         }
     }
 
+    /**
+     * @param $args
+     * @param string $format
+     * @return string
+     */
     public function parseArgs($args, string $format = self::UrlFormat): string
     {
         $parse = '';
@@ -126,12 +156,22 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
                 default => throw new Exception("Unexpected format provided \"$format\" to parse args"),
             };
 
-            $parse .= (!empty($arg) ? $chr.$id."='".$arg."'" : '');
+            $parse .= (!empty($arg) ? $chr . $id . "='" . $arg . "'" : '');
         }
 
         return trim($parse);
     }
 
+    /**
+     * @param $key
+     * @param $value
+     * @return $this
+     */
+    /**
+     * @param $key
+     * @param $value
+     * @return $this
+     */
     public function addOption($key, $value = null): self
     {
         if (is_array($key)) {
@@ -166,6 +206,10 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
         return $this->opts[$key] ?? null;
     }
 
+    /**
+     * @param string $key
+     * @return mixed|null
+     */
     public function pop(string $key)
     {
         if (!array_key_exists($key, $this->opts)) {
@@ -183,6 +227,9 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
      */
     protected string $key = '';
 
+    /**
+     * @return string
+     */
     public function getKey()
     {
         return $this->key;
@@ -203,7 +250,7 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
     /**
      * HTML attribut Id (document.getElementById($id)).
      *
-     * @var string
+     * @var string|null
      */
     protected ?string $id = null;
 
@@ -243,9 +290,9 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
         $classname = explode('\\', get_class($this));
         $classname = $classname[count($classname) - 1];
 
-        $elementId = (!empty($this->id) ? "document.getElementById('".$this->id."'), " : '');
+        $elementId = (!empty($this->id) ? "document.getElementById('" . $this->id . "'), " : '');
 
-        return 'new google.maps.'.$classname.'('.$elementId.$this->getOpts(self::JsonEncoding).')';
+        return 'new google.maps.' . $classname . '(' . $elementId . $this->getOpts(self::JsonEncoding) . ')';
     }
 
     protected array $listener = [];
@@ -311,7 +358,7 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
 
     public function cacheEnabled(): bool
     {
-        return (bool) $this->getOption('html2canvas');
+        return (bool)$this->getOption('html2canvas');
     }
 
     public function render_suppress(string $contents, array $attributes = []): string
@@ -329,29 +376,29 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
                 $csrfToken = GmBuilder::getInstance()->tokenManager->getToken('html2canvas-suppress')->getValue();
                 $routeSuppress = GmBuilder::getInstance()->router->generate('gm_suppress', ['signature' => $this->getSignatureWithOptions()]);
 
-                return '<script>'.
-                    'function '.$this->getId().'_html2canvas_suppress(that){'.PHP_EOL.
-                    "$('#".$this->getId()."').html2canvas('#".$this->getId()."', {insert: 'prepend'}, ".PHP_EOL.
-                    '    function(canvas) {'.PHP_EOL.
-                    "        var url = '".$routeSuppress."';".PHP_EOL.
-                    '        $.ajax({'.PHP_EOL.
-                    "            type: 'POST',".PHP_EOL.
-                    '            url: url,'.PHP_EOL.
-                    "            dataType: 'text',".PHP_EOL.
-                    '            data: {'.PHP_EOL.
-                    '                gm_csrf_token : "'.$csrfToken.'"'.PHP_EOL.
-                    '            }, success: function(response) {'.PHP_EOL.
-                    "                   var status = (JSON.parse(response)['status'] == '".GmBuilder::STATUS_OK."');".PHP_EOL.
-                    "                   if(status) $(that).css('color', '#9ce62a99');".
-                    "                   else  $(that).css('color', 'google.recaptcha.');".
-                    '            }, error: function() {'.PHP_EOL.
-                    "                   $(that).css('color', 'google.recaptcha.');".PHP_EOL.
-                    '            }'.PHP_EOL.
-                    '        });'.PHP_EOL.
-                    '    });'.PHP_EOL.
-                    '}'.PHP_EOL.
-                    '</script>'.PHP_EOL.
-                    '<button '.$this->parseArgs($attributes)." onclick='".$this->getId()."_html2canvas_suppress(this)'>".$contents.'</button>';
+                return '<script>' .
+                    'function ' . $this->getId() . '_html2canvas_suppress(that){' . PHP_EOL .
+                    "$('#" . $this->getId() . "').html2canvas('#" . $this->getId() . "', {insert: 'prepend'}, " . PHP_EOL .
+                    '    function(canvas) {' . PHP_EOL .
+                    "        var url = '" . $routeSuppress . "';" . PHP_EOL .
+                    '        $.ajax({' . PHP_EOL .
+                    "            type: 'POST'," . PHP_EOL .
+                    '            url: url,' . PHP_EOL .
+                    "            dataType: 'text'," . PHP_EOL .
+                    '            data: {' . PHP_EOL .
+                    '                gm_csrf_token : "' . $csrfToken . '"' . PHP_EOL .
+                    '            }, success: function(response) {' . PHP_EOL .
+                    "                   var status = (JSON.parse(response)['status'] == '" . GmBuilder::STATUS_OK . "');" . PHP_EOL .
+                    "                   if(status) $(that).css('color', '#9ce62a99');" .
+                    "                   else  $(that).css('color', 'google.recaptcha.');" .
+                    '            }, error: function() {' . PHP_EOL .
+                    "                   $(that).css('color', 'google.recaptcha.');" . PHP_EOL .
+                    '            }' . PHP_EOL .
+                    '        });' . PHP_EOL .
+                    '    });' . PHP_EOL .
+                    '}' . PHP_EOL .
+                    '</script>' . PHP_EOL .
+                    '<button ' . $this->parseArgs($attributes) . " onclick='" . $this->getId() . "_html2canvas_suppress(this)'>" . $contents . '</button>';
             }
         }
 
@@ -367,32 +414,32 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
         $csrfToken = GmBuilder::getInstance()->tokenManager->getToken('html2canvas-export')->getValue();
 
         if ($cacheEnabled && $isGranted) {
-            return '<script>'.
-                'function '.$this->getId().'_html2canvas_export(that){'.PHP_EOL.
-                "$('#".$this->getId()."').html2canvas('#".$this->getId()."', {insert: 'prepend'}, ".PHP_EOL.
-                '    function(canvas) {'.PHP_EOL.
-                "        var imgData = canvas.toDataURL('image/".GmBuilder::getInstance()->cacheFormat."', ".GmBuilder::getInstance()->cacheQuality.');'.PHP_EOL.
-                "        var url = '".$routeExport."';".PHP_EOL.
-                '        $.ajax({'.PHP_EOL.
-                "            type: 'POST',".PHP_EOL.
-                '            url: url,'.PHP_EOL.
-                "            dataType: 'text',".PHP_EOL.
-                '            data: {'.PHP_EOL.
-                '                gm_base64data : imgData,'.PHP_EOL.
-                '                gm_tilesize : '.(GmBuilder::getInstance()->cacheTilesize ?? 'null').','.PHP_EOL.
-                '                gm_csrf_token : "'.$csrfToken.'"'.PHP_EOL.
-                '            }, success: function(response) {'.PHP_EOL.
-                "                   var status = (JSON.parse(response)['status'] == '".GmBuilder::STATUS_OK."');".PHP_EOL.
-                "                   if(status) $(that).css('color', '#9ce62a99');".
-                "                   else  $(that).css('color', 'google.recaptcha.');".
-                '            }, error: function() {'.PHP_EOL.
-                "                   $(that).css('color', 'google.recaptcha.');".
-                '            }'.PHP_EOL.
-                '        });'.PHP_EOL.
-                '    });'.PHP_EOL.
-                '}'.PHP_EOL.
-                '</script>'.PHP_EOL.
-                '<button '.$this->parseArgs($attributes)." onclick='".$this->getId()."_html2canvas_export(this)'>".$contents.'</button> ';
+            return '<script>' .
+                'function ' . $this->getId() . '_html2canvas_export(that){' . PHP_EOL .
+                "$('#" . $this->getId() . "').html2canvas('#" . $this->getId() . "', {insert: 'prepend'}, " . PHP_EOL .
+                '    function(canvas) {' . PHP_EOL .
+                "        var imgData = canvas.toDataURL('image/" . GmBuilder::getInstance()->cacheFormat . "', " . GmBuilder::getInstance()->cacheQuality . ');' . PHP_EOL .
+                "        var url = '" . $routeExport . "';" . PHP_EOL .
+                '        $.ajax({' . PHP_EOL .
+                "            type: 'POST'," . PHP_EOL .
+                '            url: url,' . PHP_EOL .
+                "            dataType: 'text'," . PHP_EOL .
+                '            data: {' . PHP_EOL .
+                '                gm_base64data : imgData,' . PHP_EOL .
+                '                gm_tilesize : ' . (GmBuilder::getInstance()->cacheTilesize ?? 'null') . ',' . PHP_EOL .
+                '                gm_csrf_token : "' . $csrfToken . '"' . PHP_EOL .
+                '            }, success: function(response) {' . PHP_EOL .
+                "                   var status = (JSON.parse(response)['status'] == '" . GmBuilder::STATUS_OK . "');" . PHP_EOL .
+                "                   if(status) $(that).css('color', '#9ce62a99');" .
+                "                   else  $(that).css('color', 'google.recaptcha.');" .
+                '            }, error: function() {' . PHP_EOL .
+                "                   $(that).css('color', 'google.recaptcha.');" .
+                '            }' . PHP_EOL .
+                '        });' . PHP_EOL .
+                '    });' . PHP_EOL .
+                '}' . PHP_EOL .
+                '</script>' . PHP_EOL .
+                '<button ' . $this->parseArgs($attributes) . " onclick='" . $this->getId() . "_html2canvas_export(this)'>" . $contents . '</button> ';
         }
 
         return '';
@@ -427,20 +474,23 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
             $noimage = 'bundles/google/images/no-image.png';
 
             $cacheImage .= PHP_EOL;
-            $cacheImage .= '<div '.
-                "class='google-tilemap'".
-                "id='".$this->getId()."_html2canvas' ".
-                "data-src='".GmBuilder::getInstance()->router->generate('gm_show', ['signature' => '{signature}', 'id' => '{id}'])."' ".
-                "data-signature='".$signature."' ".
-                "data-tilesize='".$tilesize."' ".
-                "data-xtiles='".$xtiles."'  data-ytiles='".$ytiles."' ".
-                "data-missing='".GmBuilder::getInstance()->getAsset($noimage)."' ".
-                "width='".$imagewidth."'  height='".$imageheight."'></div>".PHP_EOL;
+            $cacheImage .= '<div ' .
+                "class='google-tilemap'" .
+                "id='" . $this->getId() . "_html2canvas' " .
+                "data-src='" . GmBuilder::getInstance()->router->generate('gm_show', ['signature' => '{signature}', 'id' => '{id}']) . "' " .
+                "data-signature='" . $signature . "' " .
+                "data-tilesize='" . $tilesize . "' " .
+                "data-xtiles='" . $xtiles . "'  data-ytiles='" . $ytiles . "' " .
+                "data-missing='" . GmBuilder::getInstance()->getAsset($noimage) . "' " .
+                "width='" . $imagewidth . "'  height='" . $imageheight . "'></div>" . PHP_EOL;
         }
 
-        return '<div '.$options.'>'.$cacheImage.'</div>'.PHP_EOL;
+        return '<div ' . $options . '>' . $cacheImage . '</div>' . PHP_EOL;
     }
 
+    /**
+     * @return mixed|string[]
+     */
     public function getCacheMetadata()
     {
         $signature = $this->getSignatureWithOptions();
@@ -448,6 +498,9 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
         return GmBuilder::getInstance()->getCacheMetadata($signature);
     }
 
+    /**
+     * @return false|string
+     */
     public function getCache()
     {
         $signature = $this->getSignatureWithOptions();
@@ -466,7 +519,7 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
     {
         $signature = $this->getSignatureWithOptions();
 
-        return GmBuilder::getInstance()->getCacheDirectory().'/'.$signature.'.'.GmBuilder::getInstance()->cacheFormat;
+        return GmBuilder::getInstance()->getCacheDirectory() . '/' . $signature . '.' . GmBuilder::getInstance()->cacheFormat;
     }
 
     public function getCacheUrl(): string
@@ -481,6 +534,11 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
     }
 
     // Encode a string to URL-safe base64
+
+    /**
+     * @param $value
+     * @return array|string|string[]
+     */
     public static function base64_encode($value)
     {
         return str_replace(
@@ -491,6 +549,11 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
     }
 
     // Decode a string from URL-safe base64
+
+    /**
+     * @param $value
+     * @return false|string
+     */
     public static function base64_decode($value)
     {
         return base64_decode(str_replace(
@@ -500,6 +563,11 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
         ));
     }
 
+    /**
+     * @param $str
+     * @param $privateKey
+     * @return array|string|string[]
+     */
     public static function getSignature($str, $privateKey = null)
     {
         if (empty($privateKey)) {
@@ -509,6 +577,10 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
         return self::sign($str, $privateKey);
     }
 
+    /**
+     * @param $privateKey
+     * @return array|string|string[]
+     */
     public function getSignatureWithOptions($privateKey = null)
     {
         $options = $this->parseArgs(
@@ -525,6 +597,11 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
         return self::sign($options, $privateKey);
     }
 
+    /**
+     * @param $str
+     * @param $privateKey
+     * @return array|string|string[]
+     */
     public static function sign($str, $privateKey = null)
     {
         if (empty($privateKey)) {
@@ -539,6 +616,11 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
         return str_replace('=', '', self::base64_encode($signature));
     }
 
+    /**
+     * @param $str
+     * @param $signature
+     * @return bool
+     */
     public static function check($str, $signature): bool
     {
         return self::sign($str) == $signature;

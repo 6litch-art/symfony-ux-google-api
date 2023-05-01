@@ -8,6 +8,9 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
+/**
+ *
+ */
 class GmListener
 {
     /** @var bool */
@@ -39,6 +42,9 @@ class GmListener
         $this->requestStack = $requestStack;
     }
 
+    /**
+     * @return bool
+     */
     public function isEasyAdmin()
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -61,12 +67,20 @@ class GmListener
         return !empty($eaParents);
     }
 
+    /**
+     * @param $event
+     * @return bool
+     */
     public function isProfiler($event)
     {
         $route = $event->getRequest()->get('_route');
         return str_starts_with($route, "_wdt") || str_starts_with($route, "_profiler");
     }
 
+    /**
+     * @param ResponseEvent $event
+     * @return bool
+     */
     private function allowRender(ResponseEvent $event)
     {
         if (!$this->enable) {
@@ -102,6 +116,10 @@ class GmListener
         return !$this->isProfiler($event);
     }
 
+    /**
+     * @param ResponseEvent $event
+     * @return bool
+     */
     public function onKernelResponse(ResponseEvent $event)
     {
         $this->enable = $this->parameterBag->get("google.maps.enable");

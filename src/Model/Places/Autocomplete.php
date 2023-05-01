@@ -11,6 +11,11 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class Autocomplete extends GmClient
 {
+    /**
+     * @param string|null $input
+     * @param $opts
+     * @param HttpClientInterface|null $client
+     */
     public function __construct(?string $input, $opts = [], HttpClientInterface $client = null)
     {
         parent::__construct($client ?? GmBuilder::getInstance()->client, $opts);

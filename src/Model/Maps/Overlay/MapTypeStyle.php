@@ -32,9 +32,9 @@ class MapTypeStyle extends GmObject
 
     public function __toString(): string
     {
-        return 'new google.maps.StyledMapType('.
-            $this->getArgs($this->featureTypes, self::JsonEncoding).', '.
-            $this->getOpts(self::JsonEncoding).')';
+        return 'new google.maps.StyledMapType(' .
+            $this->getArgs($this->featureTypes, self::JsonEncoding) . ', ' .
+            $this->getOpts(self::JsonEncoding) . ')';
     }
 
     public function getName(): ?string
@@ -42,9 +42,17 @@ class MapTypeStyle extends GmObject
         return $this->getOption('name') ?? null;
     }
 
+    /**
+     * @param string $name
+     * @return $this
+     */
+    /**
+     * @param string $name
+     * @return $this
+     */
     public function setName(string $name)
     {
-        $this->addOption('name', "'".$name."'");
+        $this->addOption('name', "'" . $name . "'");
 
         return $this;
     }
@@ -54,6 +62,14 @@ class MapTypeStyle extends GmObject
         return $this->getOption('name') ?? null;
     }
 
+    /**
+     * @param $baseMapTypeId
+     * @return $this
+     */
+    /**
+     * @param $baseMapTypeId
+     * @return $this
+     */
     public function setBaseMapTypeId($baseMapTypeId)
     {
         $this->addOption('baseMapTypeId', $baseMapTypeId);
@@ -63,6 +79,9 @@ class MapTypeStyle extends GmObject
 
     protected array $featureTypes = [];
 
+    /**
+     * @return array
+     */
     public function getFeatureTypes()
     {
         return $this->featureTypes;
@@ -71,16 +90,16 @@ class MapTypeStyle extends GmObject
     public function addFeatureType(string $featureTypeName, string $elementType = null, array $stylers = [])
     {
         $featureType = [];
-        $featureType['featureType'] = "'".$featureTypeName."'";
+        $featureType['featureType'] = "'" . $featureTypeName . "'";
 
         if ($elementType) {
-            $featureType['elementType'] = "'".$elementType."'";
+            $featureType['elementType'] = "'" . $elementType . "'";
         }
 
         if (!empty($stylers)) {
             $featureType['stylers'] = [];
             foreach ($stylers as $key => $styler) {
-                $featureType['stylers'][] = [$key => "'".$styler."'"];
+                $featureType['stylers'][] = [$key => "'" . $styler . "'"];
             }
         }
 

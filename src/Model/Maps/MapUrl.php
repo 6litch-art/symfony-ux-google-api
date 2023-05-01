@@ -11,22 +11,35 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class MapUrl extends GmClient
 {
+    /**
+     * @param $opts
+     * @param HttpClientInterface|null $client
+     */
     public function __construct($opts = [], HttpClientInterface $client = null)
     {
         parent::__construct($client ?? GmBuilder::getInstance()->client, $opts);
         $this->setKey(1);
     }
 
+    /**
+     * @return array|mixed|string
+     */
     public function Search()
     {
         return $this->send('https://www.google.com/maps/search');
     }
 
+    /**
+     * @return array|mixed|string
+     */
     public function Directions()
     {
         return $this->send('https://www.google.com/maps/dir');
     }
 
+    /**
+     * @return array|mixed|string
+     */
     public function DisplayMap()
     {
         $this->addOption('map_action', 'map');
@@ -37,6 +50,9 @@ class MapUrl extends GmClient
         return $content;
     }
 
+    /**
+     * @return array|mixed|string
+     */
     public function DisplayStreetView()
     {
         $this->addOption('map_action', 'pano');

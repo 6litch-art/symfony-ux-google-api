@@ -10,6 +10,10 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class Elevation extends GmClient
 {
+    /**
+     * @param HttpClientInterface $client
+     * @param $opts
+     */
     public function __construct(HttpClientInterface $client, $opts = [])
     {
         parent::__construct($client, $opts);

@@ -14,6 +14,12 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class MapStatic extends GmClient
 {
+    /**
+     * @param int|null $width0
+     * @param int|null $height0
+     * @param $opts
+     * @param HttpClientInterface|null $client
+     */
     public function __construct(?int $width0, ?int $height0, $opts = [], HttpClientInterface $client = null)
     {
         parent::__construct($client ?? GmBuilder::getInstance()->client, $opts);
@@ -45,6 +51,14 @@ class MapStatic extends GmClient
         $this->addOption('size', new Size((float)$width, (float)$height));
     }
 
+    /**
+     * @param int $value
+     * @return $this
+     */
+    /**
+     * @param int $value
+     * @return $this
+     */
     public function setZoom(int $value)
     {
         $this->addOption('zoom', $value);
@@ -52,6 +66,14 @@ class MapStatic extends GmClient
         return $this;
     }
 
+    /**
+     * @param LatLng $center
+     * @return $this
+     */
+    /**
+     * @param LatLng $center
+     * @return $this
+     */
     public function setCenter(LatLng $center)
     {
         $this->addOption('center', $center);
@@ -59,11 +81,24 @@ class MapStatic extends GmClient
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getSize()
     {
         return $this->getOption('size');
     }
 
+    /**
+     * @param $width
+     * @param int|null $height
+     * @return $this
+     */
+    /**
+     * @param $width
+     * @param int|null $height
+     * @return $this
+     */
     public function setSize($width, int $height = null)
     {
         $sizde = null;
@@ -82,11 +117,17 @@ class MapStatic extends GmClient
         return $this;
     }
 
+    /**
+     * @return null
+     */
     public function getWidth()
     {
         return $this->getOption('size') ? $this->getOption('size')->getWidth() : null;
     }
 
+    /**
+     * @return null
+     */
     public function getHeight()
     {
         return $this->getOption('size') ? $this->getOption('size')->getHeight() : null;

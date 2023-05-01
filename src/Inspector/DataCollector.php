@@ -9,6 +9,9 @@ use Symfony\Bundle\FrameworkBundle\DataCollector\AbstractDataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ *
+ */
 class DataCollector extends AbstractDataCollector
 {
     protected ParameterBagInterface $parameterBag;
@@ -44,11 +47,19 @@ class DataCollector extends AbstractDataCollector
         return $this->dataBundles[$bundle] ?? null;
     }
 
+    /**
+     * @return mixed
+     */
     public function getMethod()
     {
         return $this->data['method'];
     }
 
+    /**
+     * @param string $bundle
+     * @param string|null $bundleSuffix
+     * @return bool
+     */
     public function collectDataBundle(string $bundle, ?string $bundleSuffix = null)
     {
         $bundleIdentifier = $this->getBundleIdentifier($bundle);
@@ -57,31 +68,41 @@ class DataCollector extends AbstractDataCollector
         }
 
         $bundleLocation = InstalledVersions::getRootPackage()['install_path'];
-        $bundleLocation = realpath($bundleLocation.'vendor/'.$bundleIdentifier);
+        $bundleLocation = realpath($bundleLocation . 'vendor/' . $bundleIdentifier);
 
         $bundleVersion = InstalledVersions::getPrettyVersion($bundleIdentifier);
         $bundleDevRequirements = !InstalledVersions::isInstalled($bundleIdentifier, false);
-        $bundleSuffix = $bundleSuffix ? '@'.$bundleSuffix : '';
+        $bundleSuffix = $bundleSuffix ? '@' . $bundleSuffix : '';
 
         $this->dataBundles[$bundle] = [
             'identifier' => $bundleIdentifier,
             'name' => 'Google Tag Manager Bundle',
             'location' => $bundleLocation,
-            'version' => str_lstrip($bundleVersion, 'v').$bundleSuffix,
+            'version' => str_lstrip($bundleVersion, 'v') . $bundleSuffix,
             'dev_requirements' => $bundleDevRequirements,
         ];
 
         return true;
     }
 
+    /**
+     * @param Request $request
+     * @param Response $response
+     * @param $exception
+     * @return void
+     */
     public function collect(Request $request, Response $response, $exception = null)
     {
         $this->collectDataBundle(GtmBundle::class);
 
-        $this->data = array_map_recursive(fn ($v) => $this->cloneVar($v), $this->collectData());
+        $this->data = array_map_recursive(fn($v) => $this->cloneVar($v), $this->collectData());
         $this->data['_bundles'] = $this->dataBundles;
     }
 
+    /**
+     * @param string $bundle
+     * @return mixed|string|null
+     */
     protected function getBundleIdentifier(string $bundle)
     {
         if (!class_exists($bundle)) {
@@ -97,7 +118,7 @@ class DataCollector extends AbstractDataCollector
 
         foreach (InstalledVersions::getInstalledPackages() as $bundleIdentifier) {
             $bundleLocation = InstalledVersions::getRootPackage()['install_path'];
-            $bundleLocation = realpath($bundleLocation.'vendor/'.$bundleIdentifier);
+            $bundleLocation = realpath($bundleLocation . 'vendor/' . $bundleIdentifier);
 
             if ($bundleLocation && str_starts_with($bundleRoot, $bundleLocation)) {
                 return $bundleIdentifier;
@@ -107,13 +128,17 @@ class DataCollector extends AbstractDataCollector
         return null;
     }
 
+    /**
+     * @param string $bundle
+     * @return string
+     */
     private function getBundleFormattedName(string $bundle)
     {
         $bundleName = $this->getDataBundle($bundle)['name'] ?? null;
         $bundleVersion = $this->getDataBundle($bundle)['version'] ?? null;
-        $bundleVersion = ($bundleVersion ? ' ('.$bundleVersion.')' : '');
+        $bundleVersion = ($bundleVersion ? ' (' . $bundleVersion . ')' : '');
 
-        return $bundleName.$bundleVersion;
+        return $bundleName . $bundleVersion;
     }
 
     private function collectData(): array

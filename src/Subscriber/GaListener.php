@@ -10,6 +10,9 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
+/**
+ *
+ */
 class GaListener
 {
     /** @var bool */
@@ -45,12 +48,19 @@ class GaListener
         $this->requestStack = $requestStack;
     }
 
+    /**
+     * @param $event
+     * @return bool
+     */
     public function isProfiler($event)
     {
         $route = $event->getRequest()->get('_route');
         return str_starts_with($route ?? "", "_wdt") || str_starts_with($route ?? "", "_profiler");
     }
 
+    /**
+     * @return bool
+     */
     public function isEasyAdmin()
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -73,6 +83,10 @@ class GaListener
         return !empty($eaParents);
     }
 
+    /**
+     * @param ResponseEvent $event
+     * @return bool
+     */
     private function allowRender(ResponseEvent $event)
     {
         if (!$event->isMainRequest()) {

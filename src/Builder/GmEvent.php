@@ -2,6 +2,9 @@
 
 namespace Google\Builder;
 
+/**
+ *
+ */
 class GmEvent extends GmObject implements GmEventInterface
 {
     protected string $action;
@@ -20,11 +23,17 @@ class GmEvent extends GmObject implements GmEventInterface
         $this->action = 'addListener';
     }
 
+    /**
+     * @return string
+     */
     public function getEvent()
     {
         return $this->event;
     }
 
+    /**
+     * @return string
+     */
     public function getCallback()
     {
         return $this->callback;
@@ -57,6 +66,6 @@ class GmEvent extends GmObject implements GmEventInterface
             $callback = str_replace("\n", "\n//", $callback);
         }
 
-        return $commentTag.$this->getParentId().'.'.$this->action.'("'.$this->event.'", '.$callback.');';
+        return $commentTag . $this->getParentId() . '.' . $this->action . '("' . $this->event . '", ' . $callback . ');';
     }
 }

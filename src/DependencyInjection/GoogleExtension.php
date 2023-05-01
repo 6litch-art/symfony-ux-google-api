@@ -12,6 +12,9 @@ use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use function dirname;
 
+/**
+ *
+ */
 class GoogleExtension extends Extension
 {
     /**
@@ -24,7 +27,7 @@ class GoogleExtension extends Extension
         // Load service declaration (includes services, controllers,..)
 
         // Format XML
-        $loader = new XmlFileLoader($container, new FileLocator(dirname(__DIR__, 2).'/config'));
+        $loader = new XmlFileLoader($container, new FileLocator(dirname(__DIR__, 2) . '/config'));
         $loader->load('services.xml');
         $loader->load('services-public.xml');
 
@@ -49,11 +52,17 @@ class GoogleExtension extends Extension
         ));
     }
 
+    /**
+     * @param ContainerBuilder $container
+     * @param array $config
+     * @param $globalKey
+     * @return void
+     */
     public function setConfiguration(ContainerBuilder $container, array $config, $globalKey = "")
     {
         foreach ($config as $key => $value) {
             if (!empty($globalKey)) {
-                $key = $globalKey.".".$key;
+                $key = $globalKey . "." . $key;
             }
 
             if (is_array($value)) {

@@ -15,6 +15,9 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use function is_array;
 
+/**
+ *
+ */
 class CaptchaValidationListener implements EventSubscriberInterface
 {
     /**

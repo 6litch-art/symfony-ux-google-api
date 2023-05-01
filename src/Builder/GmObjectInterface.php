@@ -19,6 +19,16 @@ interface GmObjectInterface
 
     public function getOption(string $key): ?string;
 
+    /**
+     * @param $key
+     * @param $value
+     * @return $this
+     */
+    /**
+     * @param $key
+     * @param $value
+     * @return $this
+     */
     public function addOption($key, $value): self;
 
     public function addListener(string $event, string $callback): self;

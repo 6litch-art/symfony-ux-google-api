@@ -15,6 +15,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ *
+ */
 class FormTypeCaptchaExtension extends AbstractTypeExtension
 {
     protected bool $defaultEnabled;
@@ -49,7 +52,7 @@ class FormTypeCaptchaExtension extends AbstractTypeExtension
     }
 
     /**
-     * {@inheritdoc}
+     * {}
      */
     public function configureOptions(OptionsResolver $resolver)
     {
@@ -84,9 +87,9 @@ class FormTypeCaptchaExtension extends AbstractTypeExtension
     }
 
     /**
-     * @param array $input    Input array to add items to
-     * @param array $items    Items to insert (as an array)
-     * @param int   $position Position to inject items from (starts from 0)
+     * @param array $input Input array to add items to
+     * @param array $items Items to insert (as an array)
+     * @param int $position Position to inject items from (starts from 0)
      */
     public function arrayInject(array $input, array $items, int $position): array
     {

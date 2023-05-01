@@ -17,6 +17,9 @@ use Symfony\Component\Validator\Context\ExecutionContextFactory;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ *
+ */
 class CaptchaSubscriber implements EventSubscriberInterface
 {
     protected GrService $grService;
@@ -26,7 +29,7 @@ class CaptchaSubscriber implements EventSubscriberInterface
     protected TranslatorInterface $translator;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected ?string $translationDomain;
 
@@ -62,7 +65,7 @@ class CaptchaSubscriber implements EventSubscriberInterface
     public function onKernelException(ResponseEvent $event)
     {
         $exception = $event->getThrowable()->getClass() ?? '';
-        $this->grService->addFailedAttempt('exception['.$exception.']');
+        $this->grService->addFailedAttempt('exception[' . $exception . ']');
     }
 
     public function checkPassport(CheckPassportEvent $event): void

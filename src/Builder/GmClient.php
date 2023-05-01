@@ -2,21 +2,33 @@
 
 namespace Google\Builder;
 
+use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
+/**
+ *
+ */
 abstract class GmClient extends GmObject implements GmClientInterface
 {
     /**
      * HTTP Client Interface.
      *
-     * @var HttpClientInterface
+     * @var HttpClientInterface|null
      */
     private ?HttpClientInterface $client = null;
 
     protected mixed $mapMode;
 
+    /**
+     * @param HttpClientInterface|null $client
+     * @param $opts
+     */
     public function __construct(?HttpClientInterface $client, $opts = [])
     {
         parent::__construct($opts);
@@ -37,6 +49,14 @@ abstract class GmClient extends GmObject implements GmClientInterface
         return $this->baseUrl;
     }
 
+    /**
+     * @param $baseUrl
+     * @return $this
+     */
+    /**
+     * @param $baseUrl
+     * @return $this
+     */
     public function setBaseUrl($baseUrl): self
     {
         $this->baseUrl = $baseUrl;
@@ -54,6 +74,14 @@ abstract class GmClient extends GmObject implements GmClientInterface
         return $this->outputFormat;
     }
 
+    /**
+     * @param $outputFormat
+     * @return $this
+     */
+    /**
+     * @param $outputFormat
+     * @return $this
+     */
     public function setOutputFormat($outputFormat = self::NoEncoding): self
     {
         $outputFormat = strtolower($outputFormat);
@@ -87,24 +115,35 @@ abstract class GmClient extends GmObject implements GmClientInterface
         });
         $opts = array_merge($this->getOpts(), $opts);
 
-        $parameters = 'key='.$this->key;
+        $parameters = 'key=' . $this->key;
         foreach ($opts as $name => $value) {
             if (!$value) {
                 continue;
             }
 
             if (class_exists($value) && method_exists($value, 'toUrlValue')) {
-                $parameters .= '&'.$name.'='.$value->toUrlValue();
+                $parameters .= '&' . $name . '=' . $value->toUrlValue();
             } else {
-                $parameters .= '&'.$name.'='.$value;
+                $parameters .= '&' . $name . '=' . $value;
             }
         }
 
-        return rtrim($baseUrl, '/').($this->outputFormat ? '/'.$this->outputFormat : '').'?'.$parameters;
+        return rtrim($baseUrl, '/') . ($this->outputFormat ? '/' . $this->outputFormat : '') . '?' . $parameters;
     }
 
     private const EnableCache = true;
 
+    /**
+     * @param string $baseUrl
+     * @param array $opts
+     * @param int $expiration
+     * @return array|mixed|string
+     * @throws ClientExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws InvalidArgumentException
+     */
     public function send(string $baseUrl = '', array $opts = [], int $expiration = 30 * 86400)
     {
         if (!$this->client) {
@@ -133,21 +172,29 @@ abstract class GmClient extends GmObject implements GmClientInterface
         return $response;
     }
 
+    /**
+     * @param $request
+     * @return array
+     * @throws ClientExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     */
     public function getResponse($request): array
     {
         if (!($response = $this->client->request('GET', $request))) {
-            throw new Exception('Empty response received from: "'.$request.'"');
+            throw new Exception('Empty response received from: "' . $request . '"');
         }
 
         if (($statusCode = $response->getStatusCode()) != 200) {
-            throw new Exception('Unexpected status code '.$statusCode." returned from: \"$request\"");
+            throw new Exception('Unexpected status code ' . $statusCode . " returned from: \"$request\"");
         }
 
         if (self::NoEncoding != $this->getOutputFormat()) {
             $contentType = explode('; ', $response->getHeaders()['content-type'][0])[0];
-            $expectedContentType = 'application/'.$this->getOutputFormat();
+            $expectedContentType = 'application/' . $this->getOutputFormat();
             if ($contentType != $expectedContentType) {
-                throw new Exception('Unexpected content-type received: "'.$contentType."\" returned from: \"$request\"");
+                throw new Exception('Unexpected content-type received: "' . $contentType . "\" returned from: \"$request\"");
             }
         }
 
@@ -155,13 +202,17 @@ abstract class GmClient extends GmObject implements GmClientInterface
         $responseArray = json_decode($response->getContent(), true);
         $status = $responseArray['status'] ?? GmBuilder::STATUS_OK;
         if ('REQUEST_DENIED' == $status) {
-            throw new Exception(($responseArray['error_message'] ?? 'Unknown error')."\n\nHTTP Request: ".$request);
+            throw new Exception(($responseArray['error_message'] ?? 'Unknown error') . "\n\nHTTP Request: " . $request);
         }
 
         // Return result
         return $responseArray ?? ['status' => GmBuilder::STATUS_BAD];
     }
 
+    /**
+     * @param $args
+     * @return string
+     */
     public function render($args = []): string
     {
         $options = $this->parseArgs([
@@ -176,7 +227,7 @@ abstract class GmClient extends GmObject implements GmClientInterface
             GmBuilder::getInstance()->filesystem->uploadCache($this->getCachePath(), $this->send());
         }
 
-        return '<img '.$options." src='".$this->getCacheUrl()."'>".PHP_EOL;
+        return '<img ' . $options . " src='" . $this->getCacheUrl() . "'>" . PHP_EOL;
     }
 
     public function checkUrl(string $url, string $signature = null): bool
@@ -203,15 +254,25 @@ abstract class GmClient extends GmObject implements GmClientInterface
 
     // Sign a URL with a given crypto key
     // Note that this URL must be properly URL-encoded
+    /**
+     * @param $url
+     * @param $privateKey
+     * @return string
+     */
     public function signUrl($url, $privateKey = null)
     {
-        return $url.'&signature='.$this->getSignatureUrl($url, $privateKey);
+        return $url . '&signature=' . $this->getSignatureUrl($url, $privateKey);
     }
 
+    /**
+     * @param $url
+     * @param $privateKey
+     * @return array|string|string[]
+     */
     public function getSignatureUrl($url, $privateKey = null)
     {
         $parseUrl = parse_url($url);
-        $urlPartToSign = $parseUrl['path'].'?'.$parseUrl['query'];
+        $urlPartToSign = $parseUrl['path'] . '?' . $parseUrl['query'];
 
         return $this->getSignature($urlPartToSign, $privateKey);
     }

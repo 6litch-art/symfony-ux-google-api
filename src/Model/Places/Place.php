@@ -27,7 +27,7 @@ class Place extends GmClient
                 }
 
                 if ('OK' != $status) {
-                    throw new Exception('Unexpected response from Google API: '.$status);
+                    throw new Exception('Unexpected response from Google API: ' . $status);
                 }
             }
         } else {
@@ -40,12 +40,16 @@ class Place extends GmClient
                 }
 
                 if ('OK' != $status) {
-                    throw new Exception('Unexpected response from Google API: '.$status);
+                    throw new Exception('Unexpected response from Google API: ' . $status);
                 }
             }
         }
     }
 
+    /**
+     * @param string|null $placeId
+     * @return false|int
+     */
     public function guestIfValidPlaceId(?string $placeId)
     {
         if (!$placeId || !is_string($placeId)) {
@@ -62,6 +66,9 @@ class Place extends GmClient
         return preg_match($vchar, $placeId);
     }
 
+    /**
+     * @return float
+     */
     public function getLat()
     {
         $latLng = $this->getLatLng();
@@ -69,6 +76,9 @@ class Place extends GmClient
         return $latLng->getLat();
     }
 
+    /**
+     * @return float
+     */
     public function getLng()
     {
         $latLng = $this->getLatLng();
@@ -76,6 +86,9 @@ class Place extends GmClient
         return $latLng->getLng();
     }
 
+    /**
+     * @return LatLng
+     */
     public function getLatLng()
     {
         $location = $this->getOpts()['geometry']['location'] ?? [];
@@ -98,6 +111,12 @@ class Place extends GmClient
         return $this->send('https://maps.googleapis.com/maps/api/place/findplacefromtext', $opts) ?? [];
     }
 
+    /**
+     * @param LatLng|null $location
+     * @param int|null $radius
+     * @param array $opts
+     * @return array|mixed|string
+     */
     public function NearbySearch(LatLng $location = null, int $radius = null /* meter */, array $opts = [])
     {
         $opts['radius'] = $radius ?? $opts['radius'] ?? $this->getOption('radius');
@@ -110,6 +129,11 @@ class Place extends GmClient
         return $this->send('https://maps.googleapis.com/maps/api/place/nearbysearch', $opts);
     }
 
+    /**
+     * @param string|null $query
+     * @param array $opts
+     * @return array|mixed|string
+     */
     public function TextSearch(string $query = null, array $opts = [])
     {
         $opts['query'] = $query ?? $opts['query'] ?? $this->getOption('query');
@@ -120,6 +144,11 @@ class Place extends GmClient
         return $this->send('https://maps.googleapis.com/maps/api/place/textsearch', $opts);
     }
 
+    /**
+     * @param string|null $place_id
+     * @param array $opts
+     * @return array|mixed|string
+     */
     public function Details(string $place_id = null, array $opts = [])
     {
         $opts['place_id'] = $place_id ?? $opts['place_id'] ?? $this->getOption('place_id');

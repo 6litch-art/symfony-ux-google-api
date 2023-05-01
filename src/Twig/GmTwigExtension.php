@@ -17,6 +17,9 @@ use Twig\Environment;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
+/**
+ *
+ */
 class GmTwigExtension extends AbstractExtension
 {
     public function getFunctions(): array
@@ -28,6 +31,12 @@ class GmTwigExtension extends AbstractExtension
         ];
     }
 
+    /**
+     * @param Environment $env
+     * @param $id
+     * @param array $attributes
+     * @return string
+     */
     public function render(Environment $env, $id, array $attributes = []): string
     {
         if (!($instance = GmBuilder::getInstance($id))) {
@@ -41,6 +50,12 @@ class GmTwigExtension extends AbstractExtension
         return $instance->render();
     }
 
+    /**
+     * @param Environment $env
+     * @param $id
+     * @param array $attributes
+     * @return string
+     */
     public function render_suppress(Environment $env, $id, array $attributes = []): string
     {
         if (!($instance = GmBuilder::getInstance($id))) {
@@ -53,6 +68,12 @@ class GmTwigExtension extends AbstractExtension
         return $instance->render_suppress($contents, $attributes);
     }
 
+    /**
+     * @param Environment $env
+     * @param $id
+     * @param array $attributes
+     * @return string
+     */
     public function render_export(Environment $env, $id, array $attributes = []): string
     {
         if (!($instance = GmBuilder::getInstance($id))) {

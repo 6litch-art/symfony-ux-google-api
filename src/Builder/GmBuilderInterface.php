@@ -17,10 +17,20 @@ interface GmBuilderInterface
 
     public function addLatLng(string $id, LatLng $latLng): GmBuilder;
 
+    /**
+     * @param $object
+     * @param string|null $event
+     * @param string|null $callback
+     * @return GmBuilder
+     */
     public function addListener($object, ?string $event = null, ?string $callback = null): GmBuilder;
 
     public function addEntry(string $entry): GmBuilder;
 
+    /**
+     * @param $subject
+     * @return bool
+     */
     public function isGranted($subject = null): bool;
 
     public function build(): bool;

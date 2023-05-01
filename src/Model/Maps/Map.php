@@ -22,6 +22,14 @@ class Map extends GmObject
         $this->addListener('drag', "function(){ window.dispatchEvent(new Event('drag')); }");
     }
 
+    /**
+     * @param int $value
+     * @return $this
+     */
+    /**
+     * @param int $value
+     * @return $this
+     */
     public function setZoom(int $value)
     {
         $this->addOption('zoom', $value);
@@ -29,6 +37,14 @@ class Map extends GmObject
         return $this;
     }
 
+    /**
+     * @param LatLng $center
+     * @return $this
+     */
+    /**
+     * @param LatLng $center
+     * @return $this
+     */
     public function setCenter(LatLng $center)
     {
         $this->addOption('center', $center);
@@ -36,6 +52,14 @@ class Map extends GmObject
         return $this;
     }
 
+    /**
+     * @param bool $b
+     * @return $this
+     */
+    /**
+     * @param bool $b
+     * @return $this
+     */
     public function setDefaultUI(bool $b = true)
     {
         $this->addOption('disableDefaultUI', !$b ? 'true' : 'false');
@@ -43,9 +67,13 @@ class Map extends GmObject
         return $this;
     }
 
+    /**
+     * @param string $id
+     * @return Map
+     */
     public function setMapID(string $id)
     {
-        return $this->addOption('mapId', "'".$id."'");
+        return $this->addOption('mapId', "'" . $id . "'");
     }
 
     public function getMapID(): ?string
@@ -53,6 +81,16 @@ class Map extends GmObject
         return $this->getOption('mapId');
     }
 
+    /**
+     * @param $gmBuilder
+     * @param $opts
+     * @return $this
+     */
+    /**
+     * @param $gmBuilder
+     * @param $opts
+     * @return $this
+     */
     public function addMarker($gmBuilder, $opts = []): self
     {
         if (!$this->getId()) {
@@ -63,11 +101,23 @@ class Map extends GmObject
         $marker->addOption('map', $this->getId());
         $marker->setParent($this);
 
-        $gmBuilder->addMarker('marker_'.md5(uniqid(rand(), true)), $marker);
+        $gmBuilder->addMarker('marker_' . md5(uniqid(rand(), true)), $marker);
 
         return $this;
     }
 
+    /**
+     * @param $gmBuilder
+     * @param $name
+     * @param $featureTypes
+     * @return $this
+     */
+    /**
+     * @param $gmBuilder
+     * @param $name
+     * @param $featureTypes
+     * @return $this
+     */
     public function addMapStyle($gmBuilder, $name, $featureTypes = [])
     {
         if (!$this->getId()) {
@@ -80,10 +130,10 @@ class Map extends GmObject
         }
 
         $id = $this->getId();
-        $mapStyleId = 'mapTypeStyle_'.md5(uniqid(rand(), true));
+        $mapStyleId = 'mapTypeStyle_' . md5(uniqid(rand(), true));
 
         $gmBuilder->addMapStyle($mapStyleId, $mapStyle);
-        $this->addEntry($id.'.mapTypes.set('.$mapStyle->getName().', '.$mapStyleId.');');
+        $this->addEntry($id . '.mapTypes.set(' . $mapStyle->getName() . ', ' . $mapStyleId . ');');
 
         $this->mapStyleList[$mapStyle->getName()] = $mapStyle;
 
@@ -92,11 +142,24 @@ class Map extends GmObject
 
     protected array $mapStyleList = [];
 
+    /**
+     * @return array
+     */
     public function getMapStyleList()
     {
         return $this->mapStyleList;
     }
 
+    /**
+     * @param $mapStyle
+     * @param array $zStopList
+     * @return $this
+     */
+    /**
+     * @param $mapStyle
+     * @param array $zStopList
+     * @return $this
+     */
     public function setMapStyle($mapStyle, array $zStopList = [])
     {
         if (!$this->getId()) {
@@ -108,12 +171,12 @@ class Map extends GmObject
         }
 
         if (!array_key_exists($mapStyle->getName(), $this->mapStyleList)) {
-            throw new Exception('MapTypeStyle '.$mapStyle->getName().' is not in the list of the mapTypes for "'.$this->getId().'"');
+            throw new Exception('MapTypeStyle ' . $mapStyle->getName() . ' is not in the list of the mapTypes for "' . $this->getId() . '"');
         }
 
         // No zStop position then just set the display style
         if (empty($zStopList)) {
-            $this->addEntry($this->getId().'.setMapTypeId('.$mapStyle->getName().');');
+            $this->addEntry($this->getId() . '.setMapTypeId(' . $mapStyle->getName() . ');');
 
             return $this;
         }
@@ -127,20 +190,20 @@ class Map extends GmObject
         foreach ($zStopList as $zStop => $mapStyle2) {
             $zStop = intval($zStop);
             if (!$mapStyle2 instanceof MapTypeStyle) {
-                throw new Exception('MapTypeStyle '.$mapStyle2->getName().' is not an instance of MapTypeStyle for "'.$this->getId().'"');
+                throw new Exception('MapTypeStyle ' . $mapStyle2->getName() . ' is not an instance of MapTypeStyle for "' . $this->getId() . '"');
             }
 
             if ($i++ > 0) {
                 $zStopFunction .= ' else ';
             }
 
-            $condition = $this->getId().'.getZoom() < '.$zStop;
-            $setMapTypeId = $this->getId().'.setMapTypeId('.$mapStyle2->getName().'); '.PHP_EOL;
-            $zStopFunction .= 'if ('.$condition.') '.$setMapTypeId;
+            $condition = $this->getId() . '.getZoom() < ' . $zStop;
+            $setMapTypeId = $this->getId() . '.setMapTypeId(' . $mapStyle2->getName() . '); ' . PHP_EOL;
+            $zStopFunction .= 'if (' . $condition . ') ' . $setMapTypeId;
         }
 
         $zStopFunction .=
-            'else '.$this->getId().'.setMapTypeId('.$mapStyle->getName().');'.PHP_EOL;
+            'else ' . $this->getId() . '.setMapTypeId(' . $mapStyle->getName() . ');' . PHP_EOL;
 
         $zStopFunction .= '}';
 

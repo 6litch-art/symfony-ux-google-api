@@ -10,6 +10,9 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
+/**
+ *
+ */
 class GtmListener
 {
     /** @var bool */
@@ -18,9 +21,9 @@ class GtmListener
     protected bool $enableOnAdmin;
     /** @var bool */
     protected bool $autoAppend;
-    /** @var string */
+    /** @var string|null */
     protected ?string $containerId;
-    /** @var string */
+    /** @var string|null */
     protected ?string $serverUrl;
 
     /**
@@ -45,12 +48,19 @@ class GtmListener
         $this->requestStack = $requestStack;
     }
 
+    /**
+     * @param $event
+     * @return bool
+     */
     public function isProfiler($event)
     {
         $route = $event->getRequest()->get('_route') ?? "";
         return str_starts_with($route, "_wdt") || str_starts_with($route, "_profiler");
     }
 
+    /**
+     * @return bool
+     */
     public function isEasyAdmin()
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -73,6 +83,10 @@ class GtmListener
         return !empty($eaParents);
     }
 
+    /**
+     * @param ResponseEvent $event
+     * @return bool
+     */
     private function allowRender(ResponseEvent $event)
     {
         if (!$event->isMainRequest()) {
@@ -153,6 +167,11 @@ class GtmListener
         }
     }
 
+    /**
+     * @param ResponseEvent $event
+     * @return bool
+     * @throws \Exception
+     */
     public function onKernelResponse(ResponseEvent $event)
     {
         if (!$this->allowRender($event)) {

@@ -5,12 +5,15 @@ namespace Google\DependencyInjection;
 use Google\Service\GaService;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
+/**
+ *
+ */
 class CacheWarmer implements CacheWarmerInterface
 {
     protected int $shellVerbosity = 0;
 
     /**
-     * @var GaService
+     * @var GaService|null
      */
     protected ?GaService $gaService;
 
@@ -25,6 +28,10 @@ class CacheWarmer implements CacheWarmerInterface
         return true;
     }
 
+    /**
+     * @param $cacheDir
+     * @return array|string[]
+     */
     public function warmUp($cacheDir): array
     {
         if ($this->shellVerbosity > 0 && php_sapi_name() == "cli") {

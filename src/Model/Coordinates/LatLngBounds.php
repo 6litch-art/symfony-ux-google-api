@@ -12,6 +12,9 @@ Complete documentation:
 
 */
 
+/**
+ *
+ */
 class LatLngBounds
 {
     protected LatLng $sw;
@@ -34,6 +37,10 @@ class LatLngBounds
         $this->ne = $ne;
     }
 
+    /**
+     * @param LatLng $that
+     * @return bool
+     */
     public function equals(LatLng $that)
     {
         return $this == $that;
@@ -42,19 +49,29 @@ class LatLngBounds
     // public function contains(LatLng $latLng)
     // public function extends(Point $point);
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
-        return 'new google.maps.LatLngBounds('.$this->getSouthWest().', '.$this->getNorthEast().')';
+        return 'new google.maps.LatLngBounds(' . $this->getSouthWest() . ', ' . $this->getNorthEast() . ')';
     }
 
+    /**
+     * @return false|string
+     */
     public function toJSON()
     {
         return json_encode(['sw' => $this->getSouthWest()->toJSON(), 'ne' => $this->getNorthEast()->toJSON()]);
     }
 
+    /**
+     * @param $precision
+     * @return string
+     */
     public function toUrlValue($precision = 6): string
     {
-        return 'sw='.$this->getSouthWest()->toUrlValue($precision).
-            '&ne='.$this->getNorthEast()->toUrlValue($precision);
+        return 'sw=' . $this->getSouthWest()->toUrlValue($precision) .
+            '&ne=' . $this->getNorthEast()->toUrlValue($precision);
     }
 }

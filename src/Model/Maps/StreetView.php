@@ -11,6 +11,10 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class StreetView extends GmClient implements RenderingInterface
 {
+    /**
+     * @param HttpClientInterface $client
+     * @param $opts
+     */
     public function __construct(HttpClientInterface $client, $opts = [])
     {
         parent::__construct($client, $opts);
