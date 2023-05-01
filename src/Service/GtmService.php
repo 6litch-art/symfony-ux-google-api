@@ -6,15 +6,9 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class GtmService
 {
-    /**
-     * @var string
-     */
     private $id;
 
-    /**
-     * @var boolean
-     */
-    private $enable;
+    private bool $enable;
 
     /**
      * construct
@@ -22,13 +16,14 @@ class GtmService
     public function __construct(ParameterBagInterface $parameterBag)
     {
         $this->enable = $parameterBag->get("google.tag_manager.enable");
-        $this->id     = $parameterBag->get("google.tag_manager.id");
+        $this->id = $parameterBag->get("google.tag_manager.id");
     }
 
     public function getId()
     {
         return $this->id;
     }
+
     public function setId($id)
     {
         $this->id = $id;

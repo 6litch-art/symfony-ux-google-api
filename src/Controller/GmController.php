@@ -16,8 +16,10 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class GmController extends AbstractController
 {
-    protected $gmBuilder;
-    public function __construct(GmBuilderInterface $gmBuilder) {
+    protected GmBuilderInterface $gmBuilder;
+
+    public function __construct(GmBuilderInterface $gmBuilder)
+    {
         $this->gmBuilder = $gmBuilder;
     }
 
@@ -102,7 +104,7 @@ class GmController extends AbstractController
         }
 
         $tilesize = $request->request->get('gm_tilesize') ?? null;
-        if(!$tilesize) {
+        if (!$tilesize) {
 
             list($width, $height) = getimagesizefromstring(base64_decode(explode('base64,', $data)[1]));
             $nx = 1;
@@ -122,14 +124,14 @@ class GmController extends AbstractController
 
             $width = imagesx($im);
             $height = imagesy($im);
-            $nx = ceil($width  / $tilesize);
+            $nx = ceil($width / $tilesize);
             $ny = ceil($height / $tilesize);
 
             for ($iy = 0; $iy < $ny; $iy++) {
                 for ($ix = 0; $ix < $nx; $ix++) {
 
-                    $tileindex  = $iy*$nx + $ix;
-                    $tilewidth  = ($ix == $nx - 1 ? $width  - $ix * $tilesize : $tilesize);
+                    $tileindex = $iy * $nx + $ix;
+                    $tilewidth = ($ix == $nx - 1 ? $width - $ix * $tilesize : $tilesize);
                     $tileheight = ($iy == $ny - 1 ? $height - $iy * $tilesize : $tilesize);
 
                     // Crop image and keep its transparency
@@ -140,7 +142,7 @@ class GmController extends AbstractController
                     imagesavealpha($imcrop, true);
                     imagecopyresampled(
                         $imcrop, $im,
-                        0, 0, $tilesize*$ix, $tilesize*$iy,
+                        0, 0, $tilesize * $ix, $tilesize * $iy,
                         $tilewidth, $tileheight, $tilewidth, $tileheight
                     );
 
@@ -169,7 +171,7 @@ class GmController extends AbstractController
         }
 
         $array["status"] = GmBuilder::STATUS_OK;
-        $array["image_width"]  = $width;
+        $array["image_width"] = $width;
         $array["image_height"] = $height;
 
         $array["image_tilesize"] = $tilesize;
@@ -211,7 +213,7 @@ class GmController extends AbstractController
             $response->setPublic();
             $response->setMaxAge($this->gmBuilder->cacheLifetime);
 
-            $response->headers->addCacheControlDirective('must-revalidate', true);
+            $response->headers->addCacheControlDirective('must-revalidate');
             $response->headers->set('Content-Type', 'image/' . $this->gmBuilder->cacheFormat);
 
             $response->setEtag(md5($response->getContent()));

@@ -9,10 +9,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use function is_object;
 
 final class CaptchaValidator extends ConstraintValidator
 {
-    private $responses = [];
+    private array $responses = [];
 
     public function __construct(GrService $grService)
     {
@@ -25,13 +26,13 @@ final class CaptchaValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, Captcha::class);
         }
 
-        if ($value !== null && !is_scalar($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
+        if ($value !== null && !is_scalar($value) && !(is_object($value) && method_exists($value, '__toString'))) {
             throw new UnexpectedTypeException($value, 'string');
         }
 
         $value = explode(" ", $value)[0] ?? "";
         if ($constraint->getVersion() == GrService::APIV3) {
-            $value = null !== $value ? (string) $value : '';
+            $value = null !== $value ? (string)$value : '';
             if ($value === '') {
                 $this->context->buildViolation($constraint->messageMissingValue)->addViolation();
                 return;
@@ -51,7 +52,7 @@ final class CaptchaValidator extends ConstraintValidator
             }
 
             foreach ($response->getErrorCodes() as $error) {
-                $this->context->buildViolation("captcha.error.".str_replace("-", "_", $error))->addViolation();
+                $this->context->buildViolation("captcha.error." . str_replace("-", "_", $error))->addViolation();
             }
         }
     }

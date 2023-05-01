@@ -20,21 +20,21 @@ class GmListener
     /**
      * @var Environment
      */
-    protected $twig;
+    protected Environment $twig;
 
     /**
      * @var ParameterBagInterface
      */
-    protected $parameterBag;
+    protected ParameterBagInterface $parameterBag;
 
     /**
      * @var RequestStack
      */
-    protected $requestStack;
+    protected RequestStack $requestStack;
 
     public function __construct(ParameterBagInterface $parameterBag, Environment $twig, RequestStack $requestStack)
     {
-        $this->twig       = $twig;
+        $this->twig = $twig;
         $this->parameterBag = $parameterBag;
         $this->requestStack = $requestStack;
     }
@@ -57,7 +57,7 @@ class GmListener
             $parents[] = $parent;
         }
 
-        $eaParents = array_filter($parents, fn ($c) => str_starts_with($c, "EasyCorp\Bundle\EasyAdminBundle"));
+        $eaParents = array_filter($parents, fn($c) => str_starts_with($c, "EasyCorp\Bundle\EasyAdminBundle"));
         return !empty($eaParents);
     }
 
@@ -112,19 +112,19 @@ class GmListener
             return false;
         }
 
-        $response    = $event->getResponse();
-        $api         = $this->twig->getGlobals()["google_maps"]["api"] ?? "";
+        $response = $event->getResponse();
+        $api = $this->twig->getGlobals()["google_maps"]["api"] ?? "";
         $html2canvas = $this->twig->getGlobals()["google_maps"]["html2canvas"] ?? "";
-        $initMap     = $this->twig->getGlobals()["google_maps"]["initMap"] ?? "";
+        $initMap = $this->twig->getGlobals()["google_maps"]["initMap"] ?? "";
 
         $content = preg_replace([
             '/<\/body\b[^>]*>/',
             '/<\/head\b[^>]*>/',
             '/<\/head\b[^>]*>/'
         ], [
-            $api."$0",
-            $html2canvas."$0",
-            $initMap."$0",
+            $api . "$0",
+            $html2canvas . "$0",
+            $initMap . "$0",
 
         ], $response->getContent(), 1);
         $response->setContent($content);

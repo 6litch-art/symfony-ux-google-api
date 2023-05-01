@@ -1,14 +1,5 @@
 <?php
 
-/*
- * This file is part of the Symfony package.
- *
- * (c) Fabien Potencier <fabien@symfony.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace Google\Form\Extension;
 
 use EasyCorp\Bundle\EasyAdminBundle\Provider\AdminContextProvider;
@@ -23,6 +14,7 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 
 class FormTypeCaptchaExtension extends AbstractTypeExtension
 {
@@ -32,32 +24,32 @@ class FormTypeCaptchaExtension extends AbstractTypeExtension
     /**
      * @var GrService
      */
-    protected $grService;
+    protected GrService $grService;
 
     /**
      * @var ValidatorInterface
      */
-    protected $validator;
+    protected ValidatorInterface $validator;
 
     /**
      * @var TranslatorInterface
      */
-    protected $translator;
+    protected TranslatorInterface $translator;
 
     /**
-     * @var AdminContextProvider
+     * @var ?AdminContext
      */
-    protected $easyadminContext;
+    protected ?AdminContext $easyadminContext;
 
 
     public function __construct(GrService $grService, ValidatorInterface $validator, TranslatorInterface $translator, AdminContextProvider $adminContextProvider, bool $defaultEnabled = true)
     {
-        $this->grService        = $grService;
-        $this->translator       = $translator;
-        $this->validator        = $validator;
+        $this->grService = $grService;
+        $this->translator = $translator;
+        $this->validator = $validator;
         $this->easyadminContext = $adminContextProvider->getContext();
 
-        $this->defaultEnabled   = $defaultEnabled;
+        $this->defaultEnabled = $defaultEnabled;
     }
 
     /**
@@ -104,10 +96,10 @@ class FormTypeCaptchaExtension extends AbstractTypeExtension
     }
 
 
-     /**
-     * @param array $input    Input array to add items to
-     * @param array $items    Items to insert (as an array)
-     * @param int   $position Position to inject items from (starts from 0)
+    /**
+     * @param array $input Input array to add items to
+     * @param array $items Items to insert (as an array)
+     * @param int $position Position to inject items from (starts from 0)
      *
      * @return array
      */

@@ -86,7 +86,8 @@ class Map extends GmObject
         return $this;
     }
 
-    protected $mapStyleList = [];
+    protected array $mapStyleList = [];
+
     public function getMapStyleList()
     {
         return $this->mapStyleList;
@@ -103,7 +104,7 @@ class Map extends GmObject
         }
 
         if (!array_key_exists($mapStyle->getName(), $this->mapStyleList)) {
-            throw new Exception("MapTypeStyle ".$mapStyle->getName()." is not in the list of the mapTypes for \"".$this->getId()."\"");
+            throw new Exception("MapTypeStyle " . $mapStyle->getName() . " is not in the list of the mapTypes for \"" . $this->getId() . "\"");
         }
 
         // No zStop position then just set the display style
@@ -128,13 +129,13 @@ class Map extends GmObject
                 $zStopFunction .= " else ";
             }
 
-            $condition    = $this->getId() . ".getZoom() < " . $zStop;
-            $setMapTypeId = $this->getId() . ".setMapTypeId(" . $mapStyle2->getName() . "); ".PHP_EOL;
-            $zStopFunction .= "if (".$condition.") ".$setMapTypeId;
+            $condition = $this->getId() . ".getZoom() < " . $zStop;
+            $setMapTypeId = $this->getId() . ".setMapTypeId(" . $mapStyle2->getName() . "); " . PHP_EOL;
+            $zStopFunction .= "if (" . $condition . ") " . $setMapTypeId;
         }
 
         $zStopFunction .=
-            "else " . $this->getId() . ".setMapTypeId(" . $mapStyle->getName() . ");".PHP_EOL;
+            "else " . $this->getId() . ".setMapTypeId(" . $mapStyle->getName() . ");" . PHP_EOL;
 
         $zStopFunction .= "}";
 

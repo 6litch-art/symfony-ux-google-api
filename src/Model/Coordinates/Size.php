@@ -20,6 +20,7 @@ class Size
     {
         return $this->width;
     }
+
     public function setWidth($width)
     {
         $this->width = $width;
@@ -34,6 +35,7 @@ class Size
     {
         return $this->height;
     }
+
     public function setHeight($height)
     {
         $this->height = $height;
@@ -48,10 +50,12 @@ class Size
     {
         return !empty($this->widthUnit);
     }
+
     public function getWidthUnit()
     {
         return $this->widthUnit;
     }
+
     public function setWidthUnit($widthUnit)
     {
         $this->widthUnit = $widthUnit;
@@ -66,22 +70,24 @@ class Size
     {
         return !empty($this->heightUnit);
     }
+
     public function getHeightUnit()
     {
         return $this->heightUnit;
     }
+
     public function setHeightUnit($heightUnit)
     {
         $this->heightUnit = $heightUnit;
     }
 
     /**
-     * @param float       $width
-     * @param float       $height
+     * @param float $width
+     * @param float $height
      * @param string $widthUnit
      * @param string $heightUnit
      */
-    public function __construct($width = 1.0, $height = 1.0, string $widthUnit = "", string $heightUnit ="")
+    public function __construct(float $width = 1.0, float $height = 1.0, string $widthUnit = "", string $heightUnit = "")
     {
         $this->setWidth($width);
         $this->setHeight($height);
@@ -96,11 +102,11 @@ class Size
 
     public function __toString()
     {
-        return "new google.maps.Size(".
-                    $this->width.", ".$this->height .
-                    ($this->hasWidthUnit() ? ", " . $this->widthUnit : "") .
-                    ($this->hasHeightUnit() ? ", " . $this->heightUnit : "") .
-                ")";
+        return "new google.maps.Size(" .
+            $this->width . ", " . $this->height .
+            ($this->hasWidthUnit() ? ", " . $this->widthUnit : "") .
+            ($this->hasHeightUnit() ? ", " . $this->heightUnit : "") .
+            ")";
     }
 
     public function toUrlValue()

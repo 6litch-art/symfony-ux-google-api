@@ -10,7 +10,8 @@ use Google\Service\GaService;
 
 class GaController extends AbstractController
 {
-    private $gaService;
+    private GaService $gaService;
+
     public function __construct(GaService $gaService)
     {
         $this->gaService = $gaService;
@@ -22,6 +23,6 @@ class GaController extends AbstractController
      */
     public function Main(): Response
     {
-        return $this->json($this->gaService->getBasics(), 200);
+        return $this->json($this->gaService->getBasics());
     }
 }

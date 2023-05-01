@@ -21,21 +21,21 @@ class GrListener
     /**
      * @var Environment
      */
-    protected $twig;
+    protected Environment $twig;
 
     /**
      * @var ParameterBagInterface
      */
-    protected $parameterBag;
+    protected ParameterBagInterface $parameterBag;
 
     /**
      * @var RequestStack
      */
-    protected $requestStack;
+    protected RequestStack $requestStack;
 
     public function __construct(RequestStack $requestStack, ParameterBagInterface $parameterBag, Environment $twig)
     {
-        $this->twig         = $twig;
+        $this->twig = $twig;
         $this->parameterBag = $parameterBag;
         $this->requestStack = $requestStack;
     }
@@ -58,7 +58,7 @@ class GrListener
             $parents[] = $parent;
         }
 
-        $eaParents = array_filter($parents, fn ($c) => str_starts_with($c, "EasyCorp\Bundle\EasyAdminBundle"));
+        $eaParents = array_filter($parents, fn($c) => str_starts_with($c, "EasyCorp\Bundle\EasyAdminBundle"));
         return !empty($eaParents);
     }
 
@@ -112,8 +112,8 @@ class GrListener
             '/<\/head\b[^>]*>/',
             '/<\/head\b[^>]*>/',
         ], [
-            $javascripts. "$0",
-            $stylesheets."$0",
+            $javascripts . "$0",
+            $stylesheets . "$0",
 
         ], $response->getContent(), 1);
 

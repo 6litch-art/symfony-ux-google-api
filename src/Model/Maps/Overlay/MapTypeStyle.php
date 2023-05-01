@@ -31,27 +31,30 @@ class MapTypeStyle extends GmObject
         parent::__construct($opts);
         $this->setName($name);
     }
+
     public function __toString(): string
     {
-        return "new google.maps.StyledMapType(".
-                    $this->getArgs($this->featureTypes, self::JsonEncoding) . ", " .
-                    $this->getOpts(self::JsonEncoding).")";
+        return "new google.maps.StyledMapType(" .
+            $this->getArgs($this->featureTypes, self::JsonEncoding) . ", " .
+            $this->getOpts(self::JsonEncoding) . ")";
     }
 
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->getOption("name") ?? null;
     }
+
     public function setName(string $name)
     {
-        $this->addOption("name", "'".$name."'");
+        $this->addOption("name", "'" . $name . "'");
         return $this;
     }
 
-    public function getBaseMapTypeId(): string
+    public function getBaseMapTypeId(): ?string
     {
         return $this->getOption("name") ?? null;
     }
+
     public function setBaseMapTypeId($baseMapTypeId)
     {
         $this->addOption("baseMapTypeId", $baseMapTypeId);
@@ -59,24 +62,26 @@ class MapTypeStyle extends GmObject
         return $this;
     }
 
-    protected $featureTypes = [];
+    protected array $featureTypes = [];
+
     public function getFeatureTypes()
     {
         return $this->featureTypes;
     }
+
     public function addFeatureType(string $featureTypeName, string $elementType = null, array $stylers = [])
     {
         $featureType = [];
-        $featureType["featureType"] = "'".$featureTypeName."'";
+        $featureType["featureType"] = "'" . $featureTypeName . "'";
 
         if ($elementType) {
-            $featureType["elementType"] = "'".$elementType."'";
+            $featureType["elementType"] = "'" . $elementType . "'";
         }
 
-        if ($stylers && !empty($stylers)) {
+        if (!empty($stylers)) {
             $featureType["stylers"] = [];
             foreach ($stylers as $key => $styler) {
-                $featureType["stylers"][] = [$key => "'".$styler."'"];
+                $featureType["stylers"][] = [$key => "'" . $styler . "'"];
             }
         }
 
@@ -91,6 +96,7 @@ class MapTypeStyle extends GmObject
             ["visibility" => "off"]
         );
     }
+
     public function showEquatorAndIntlDateLine()
     {
         $this->addFeatureType(
@@ -108,6 +114,7 @@ class MapTypeStyle extends GmObject
             ["visibility" => "off"]
         );
     }
+
     public function showCountryLabels()
     {
         $this->addFeatureType(

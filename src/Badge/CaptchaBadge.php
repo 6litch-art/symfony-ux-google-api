@@ -15,20 +15,19 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
 
 class CaptchaBadge implements BadgeInterface
 {
-    private $resolved = false;
-    private $fieldId;
-    private $value;
-    private $api;
+    private bool $resolved = false;
+    private string $fieldId;
+    private ?string $value;
 
     /**
-     * @param string      $fieldId An arbitrary string used to generate the value of the CSRF token.
+     * @param string $fieldId An arbitrary string used to generate the value of the CSRF token.
      *                                 Using a different string for each authenticator improves its security.
-     * @param string|null $captcha   The CSRF token presented in the request, if any
+     * @param string|null $captcha The CSRF token presented in the request, if any
      */
     public function __construct(string $fieldId, ?string $value)
     {
         $this->fieldId = $fieldId;
-        $this->value   = $value;
+        $this->value = $value;
     }
 
     public function getFieldId(): string

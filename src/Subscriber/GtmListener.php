@@ -26,21 +26,21 @@ class GtmListener
     /**
      * @var Environment
      */
-    protected $twig;
+    protected Environment $twig;
 
     /**
      * @var ParameterBagInterface
      */
-    protected $parameterBag;
+    protected ParameterBagInterface $parameterBag;
 
     /**
      * @var RequestStack
      */
-    protected $requestStack;
+    protected RequestStack $requestStack;
 
     public function __construct(RequestStack $requestStack, ParameterBagInterface $parameterBag, Environment $twig)
     {
-        $this->twig   = $twig;
+        $this->twig = $twig;
         $this->parameterBag = $parameterBag;
         $this->requestStack = $requestStack;
     }
@@ -69,7 +69,7 @@ class GtmListener
             $parents[] = $parent;
         }
 
-        $eaParents = array_filter($parents, fn ($c) => str_starts_with($c, "EasyCorp\Bundle\EasyAdminBundle"));
+        $eaParents = array_filter($parents, fn($c) => str_starts_with($c, "EasyCorp\Bundle\EasyAdminBundle"));
         return !empty($eaParents);
     }
 
@@ -105,24 +105,24 @@ class GtmListener
             return;
         }
 
-        $this->enable     = $this->parameterBag->get("google.tag_manager.enable");
-        $this->enableOnAdmin     = $this->parameterBag->get("google.tag_manager.enable_on_admin");
+        $this->enable = $this->parameterBag->get("google.tag_manager.enable");
+        $this->enableOnAdmin = $this->parameterBag->get("google.tag_manager.enable_on_admin");
         if (!$this->enable) {
             return;
         }
 
         $this->autoAppend = $this->parameterBag->get("google.tag_manager.autoappend");
         foreach ($this->parameterBag->get("google.tag_manager.containers") ?? [] as $container) {
-            $this->containerId   = $container["id"] ?? null;
+            $this->containerId = $container["id"] ?? null;
             if (!$this->containerId) {
                 continue;
             }
 
-            $this->serverUrl     = $container["url"] ?? null;
+            $this->serverUrl = $container["url"] ?? null;
 
-            $noscripts   =
+            $noscripts =
                 "<noscript>
-                    <iframe src='".$this->serverUrl."/ns.html?id=".$this->containerId."' height='0' width='0' style='display:none;visibility:hidden'></iframe>
+                    <iframe src='" . $this->serverUrl . "/ns.html?id=" . $this->containerId . "' height='0' width='0' style='display:none;visibility:hidden'></iframe>
                 </noscript>";
 
             $javascripts =
@@ -138,16 +138,16 @@ class GtmListener
                             dl = l != 'dataLayer' ? '&l=' + l : '';
                         j.async = true;
                         j.src =
-                            '".$this->serverUrl."/gtm.js?id=' + i + dl;
+                            '" . $this->serverUrl . "/gtm.js?id=' + i + dl;
                         f.parentNode.insertBefore(j, f);
-                    })(window, document, 'script', 'dataLayer', '".$this->containerId."');
+                    })(window, document, 'script', 'dataLayer', '" . $this->containerId . "');
                 </script>";
 
             $this->twig->addGlobal("google_tag_manager", array_merge(
                 $this->twig->getGlobals()["google_tag_manager"] ?? [],
                 [
                     "javascripts" => ($this->twig->getGlobals()["google_tag_manager"]["javascripts"] ?? "") . $javascripts,
-                    "noscripts"   => ($this->twig->getGlobals()["google_tag_manager"]["noscripts"] ?? "") . $noscripts
+                    "noscripts" => ($this->twig->getGlobals()["google_tag_manager"]["noscripts"] ?? "") . $noscripts
                 ]
             ));
         }
@@ -159,9 +159,9 @@ class GtmListener
             return false;
         }
 
-        $response    = $event->getResponse();
+        $response = $event->getResponse();
         $javascripts = $this->twig->getGlobals()["google_tag_manager"]["javascripts"] ?? "";
-        $noscripts   = $this->twig->getGlobals()["google_tag_manager"]["noscripts"] ?? "";
+        $noscripts = $this->twig->getGlobals()["google_tag_manager"]["noscripts"] ?? "";
 
         $content = preg_replace([
             '/<\/head\b[^>]*>/',

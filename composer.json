@@ -1,50 +1,57 @@
 {
-    "name": "glitchr/ux-google",
-    "type": "symfony-bundle",
-    "description": "Google API integration for Symfony",
-    "keywords": ["symfony", "google", "analytics", "recaptcha", "maps", "gtm", "tag", "api"],
-    "homepage": "https://gitlab.glitchr.io/repository-public/symfony/bundles",
-    "license": "LGPL-3.0-or-later",
-    "authors": [
-        {
-            "name": "Marco Meyer",
-            "email": "marco.meyer@glitchr.io"
-        }
-    ],
-    "autoload": {
-        "psr-4": {
-            "Google\\": "./src"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Tests\\Google\\": "./Tests"
-        }
-    },
-    "require": {
-        "php": "^8.0",
-        "symfony/config": "^4.0|^5.0|^6.0",
-        "symfony/dependency-injection": "^4.0|^5.0|^6.0",
-        "symfony/http-kernel": "^4.0|^5.0|^6.0",
-
-        "symfony/framework-bundle": "^4.0|^5.0|^6.0",
-        "symfony/monolog-bundle": "^3.1",
-        "league/flysystem-bundle": "^2.2",
-
-        "symfony/webpack-encore-bundle": "^1.0",
-        "google/apiclient": "^2.12",
-        "google/recaptcha": "^1.2"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "^8.5",
-        "symfony/framework-bundle": "^4.0|^5.0|^6.0",
-        "symfony/twig-bundle": "^4.0|^5.0|^6.0",
-        "symfony/var-dumper": "^4.0|^5.0|^6.0"    },
-    "config": {
-        "preferred-install": {
-            "*": "dist"
-        },
-        "sort-packages": true
+  "name": "glitchr/ux-google",
+  "type": "symfony-bundle",
+  "description": "Google API integration for Symfony",
+  "keywords": [
+    "symfony",
+    "google",
+    "analytics",
+    "recaptcha",
+    "maps",
+    "gtm",
+    "tag",
+    "api"
+  ],
+  "homepage": "https://gitlab.glitchr.io/repository-public/symfony/bundles",
+  "license": "LGPL-3.0-or-later",
+  "authors": [
+    {
+      "name": "Marco Meyer",
+      "email": "marco.meyer@glitchr.io"
     }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Google\\": "./src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\Google\\": "./Tests"
+    }
+  },
+  "require": {
+    "php": "^8.0",
+    "symfony/config": "^4.0|^5.0|^6.0",
+    "symfony/dependency-injection": "^4.0|^5.0|^6.0",
+    "symfony/http-kernel": "^4.0|^5.0|^6.0",
+    "symfony/framework-bundle": "^4.0|^5.0|^6.0",
+    "symfony/monolog-bundle": "^3.1",
+    "league/flysystem-bundle": "^2.2",
+    "symfony/webpack-encore-bundle": "^1.0",
+    "google/apiclient": "^2.12",
+    "google/recaptcha": "^1.2"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^8.5",
+    "symfony/twig-bundle": "^4.0|^5.0|^6.0",
+    "symfony/var-dumper": "^4.0|^5.0|^6.0"
+  },
+  "config": {
+    "preferred-install": {
+      "*": "dist"
+    },
+    "sort-packages": true
+  }
 }
 

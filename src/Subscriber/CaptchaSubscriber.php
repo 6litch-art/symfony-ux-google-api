@@ -18,23 +18,24 @@ use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 use Symfony\Component\Validator\Context\ExecutionContextFactory;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use function is_string;
 
 class CaptchaSubscriber implements EventSubscriberInterface
 {
     /**
      * @var GrService
      */
-    protected $grService;
+    protected GrService $grService;
 
     /**
      * @var ValidatorInterface
      */
-    protected $validator;
+    protected ValidatorInterface $validator;
 
     /**
      * @var TranslatorInterface
      */
-    protected $translator;
+    protected TranslatorInterface $translator;
 
     /**
      * @var string
@@ -43,20 +44,20 @@ class CaptchaSubscriber implements EventSubscriberInterface
 
     public function __construct(GrService $grService, ValidatorInterface $validator, TranslatorInterface $translator, ?string $translationDomain = null)
     {
-        $this->validator         = $validator;
-        $this->grService         = $grService;
-        $this->translator        = $translator;
+        $this->validator = $validator;
+        $this->grService = $grService;
+        $this->translator = $translator;
         $this->translationDomain = $translationDomain;
     }
 
     public static function getSubscribedEvents(): array
     {
         return [
-            KernelEvents::EXCEPTION   => ['onKernelException', -1024],
+            KernelEvents::EXCEPTION => ['onKernelException', -1024],
             CheckPassportEvent::class => ['checkPassport', 512],
 
-            LoginSuccessEvent::class  => ['onLoginSuccess'],
-            LoginFailureEvent::class  => ['onLoginFailure']
+            LoginSuccessEvent::class => ['onLoginSuccess'],
+            LoginFailureEvent::class => ['onLoginFailure']
         ];
     }
 
@@ -73,7 +74,7 @@ class CaptchaSubscriber implements EventSubscriberInterface
     public function onKernelException(ResponseEvent $event)
     {
         $exception = $event->getThrowable()->getClass() ?? "";
-        $this->grService->addFailedAttempt("exception[".$exception."]");
+        $this->grService->addFailedAttempt("exception[" . $exception . "]");
     }
 
     public function checkPassport(CheckPassportEvent $event): void
@@ -89,8 +90,8 @@ class CaptchaSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $value = explode(" ", \is_string($badge->getValue() ?? null) ? $badge->getValue() : "");
-        $api   = $value[1] ?? GrService::APIV2;
+        $value = explode(" ", is_string($badge->getValue() ?? null) ? $badge->getValue() : "");
+        $api = $value[1] ?? GrService::APIV2;
         $value = $value[0] ?? "";
 
         $executionContextFactory = new ExecutionContextFactory($this->translator, $this->translationDomain);

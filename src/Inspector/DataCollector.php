@@ -4,7 +4,9 @@ namespace Google\Inspector;
 
 use Base\Service\ParameterBagInterface;
 
+use Composer\InstalledVersions;
 use Google\GtmBundle;
+use ReflectionClass;
 use Symfony\Bundle\FrameworkBundle\DataCollector\AbstractDataCollector;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -13,11 +15,12 @@ use Symfony\Component\HttpFoundation\Response;
 class DataCollector extends AbstractDataCollector
 {
     /**
-     * @var ParameterBag
+     * @var ParameterBagInterface
      */
-    protected $parameterBag;
+    protected ParameterBagInterface $parameterBag;
 
     public array $dataBundles = [];
+
     public function __construct(ParameterBagInterface $parameterBag)
     {
         $this->parameterBag = $parameterBag;
@@ -37,6 +40,7 @@ class DataCollector extends AbstractDataCollector
     {
         return $this->data;
     }
+
     public function getDataBundle(string $bundle): ?array
     {
         if (!array_key_exists($bundle, $this->dataBundles)) {
@@ -58,19 +62,19 @@ class DataCollector extends AbstractDataCollector
             return false;
         }
 
-        $bundleLocation = \Composer\InstalledVersions::getRootPackage($bundleIdentifier)["install_path"];
-        $bundleLocation = realpath($bundleLocation."vendor/".$bundleIdentifier);
+        $bundleLocation = InstalledVersions::getRootPackage()["install_path"];
+        $bundleLocation = realpath($bundleLocation . "vendor/" . $bundleIdentifier);
 
-        $bundleVersion = \Composer\InstalledVersions::getPrettyVersion($bundleIdentifier);
-        $bundleDevRequirements = !\Composer\InstalledVersions::isInstalled($bundleIdentifier, false);
-        $bundleSuffix = $bundleSuffix ? "@".$bundleSuffix : "";
+        $bundleVersion = InstalledVersions::getPrettyVersion($bundleIdentifier);
+        $bundleDevRequirements = !InstalledVersions::isInstalled($bundleIdentifier, false);
+        $bundleSuffix = $bundleSuffix ? "@" . $bundleSuffix : "";
 
         $this->dataBundles[$bundle] = [
-            "identifier"  => $bundleIdentifier,
+            "identifier" => $bundleIdentifier,
             "name" => "Google Tag Manager Bundle",
             "location" => $bundleLocation,
-            "version" => str_lstrip($bundleVersion, "v").$bundleSuffix,
-            "dev_requirements"  => $bundleDevRequirements
+            "version" => str_lstrip($bundleVersion, "v") . $bundleSuffix,
+            "dev_requirements" => $bundleDevRequirements
         ];
 
         return true;
@@ -80,7 +84,7 @@ class DataCollector extends AbstractDataCollector
     {
         $this->collectDataBundle(GtmBundle::class);
 
-        $this->data = array_map_recursive(fn ($v) => $this->cloneVar($v), $this->collectData());
+        $this->data = array_map_recursive(fn($v) => $this->cloneVar($v), $this->collectData());
         $this->data["_bundles"] = $this->dataBundles;
     }
 
@@ -94,12 +98,12 @@ class DataCollector extends AbstractDataCollector
             return $this->dataBundles[$bundle]["identifier"];
         }
 
-        $reflector = new \ReflectionClass($bundle);
+        $reflector = new ReflectionClass($bundle);
         $bundleRoot = dirname($reflector->getFileName());
 
-        foreach (\Composer\InstalledVersions::getInstalledPackages() as $bundleIdentifier) {
-            $bundleLocation = \Composer\InstalledVersions::getRootPackage($bundleIdentifier)["install_path"];
-            $bundleLocation = realpath($bundleLocation."vendor/".$bundleIdentifier);
+        foreach (InstalledVersions::getInstalledPackages() as $bundleIdentifier) {
+            $bundleLocation = InstalledVersions::getRootPackage()["install_path"];
+            $bundleLocation = realpath($bundleLocation . "vendor/" . $bundleIdentifier);
 
             if ($bundleLocation && str_starts_with($bundleRoot, $bundleLocation)) {
                 return $bundleIdentifier;
@@ -113,8 +117,8 @@ class DataCollector extends AbstractDataCollector
     {
         $bundleName = $this->getDataBundle($bundle)["name"] ?? null;
         $bundleVersion = $this->getDataBundle($bundle)["version"] ?? null;
-        $bundleVersion = ($bundleVersion ? " (".$bundleVersion.")" : "");
-        return $bundleName.$bundleVersion;
+        $bundleVersion = ($bundleVersion ? " (" . $bundleVersion . ")" : "");
+        return $bundleName . $bundleVersion;
     }
 
     private function collectData(): array

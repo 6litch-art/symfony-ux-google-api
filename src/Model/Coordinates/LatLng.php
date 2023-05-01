@@ -27,17 +27,18 @@ class LatLng extends GmObject
     /**
      * @var float
      */
-    protected $lat;
+    protected float $lat;
 
     /**
      * @var float
      */
-    protected $lng;
+    protected float $lng;
 
     /**
      * @var bool
      */
-    protected $noWrap;
+    protected bool $noWrap;
+
     public function setNoWrap($noWrap = true): self
     {
         $this->noWrap = $noWrap;
@@ -47,13 +48,13 @@ class LatLng extends GmObject
     /**
      * @param float $lat
      * @param float $lng
-     * @param bool  $noWrap
+     * @param bool $noWrap
      */
     public function __construct(float $lat = 0.0, float $lng = 0.0, bool $noWrap = false)
     {
         $this->noWrap = $noWrap;
-        $this->lat    = $lat;
-        $this->lng    = $lng;
+        $this->lat = $lat;
+        $this->lng = $lng;
     }
 
 
@@ -61,19 +62,20 @@ class LatLng extends GmObject
     {
         return $this->lat();
     }
+
     public function getLatitude(): float
     {
         return $this->lat();
     }
+
     public function lat(): float
     {
         if ($this->noWrap) {
             return $this->lat;
         }
 
-        return ($this->lat >  90 ? 90 :
-               ($this->lat < -90 ? -90 :
-                $this->lat));
+        return ($this->lat > 90 ? 90 :
+            (max($this->lat, -90)));
     }
 
     public function setLat($lat = null): self
@@ -83,6 +85,7 @@ class LatLng extends GmObject
         }
         return $this;
     }
+
     public function setLatitude($lat = null): self
     {
         return $this->setLat($lat);
@@ -92,18 +95,20 @@ class LatLng extends GmObject
     {
         return $this->lng();
     }
+
     public function getLongitude(): float
     {
         return $this->lng();
     }
+
     public function lng(): float
     {
         if ($this->noWrap) {
             return $this->lng;
         }
 
-        return ($this->lng >  180 ? $this->lng - 180 * ceil($this->lng / 180) :
-               ($this->lng < -180 ? $this->lng - 180 * floor($this->lng / 180) :
+        return ($this->lng > 180 ? $this->lng - 180 * ceil($this->lng / 180) :
+            ($this->lng < -180 ? $this->lng - 180 * floor($this->lng / 180) :
                 $this->lng));
     }
 
@@ -114,23 +119,23 @@ class LatLng extends GmObject
         }
         return $this;
     }
+
     public function setLongitude($lng = null): self
     {
         return $this->setLng($lng);
     }
 
 
-
     public function equals(LatLng $that)
     {
-        return ($this == $that);
+        return ($this === $that);
     }
 
     public function __toString(): string
     {
-        return "new google.maps.LatLng(".
-                    $this->lat.", ". $this->lng.", ".
-                    ($this->noWrap ? "true" : "false").")";
+        return "new google.maps.LatLng(" .
+            $this->lat . ", " . $this->lng . ", " .
+            ($this->noWrap ? "true" : "false") . ")";
     }
 
     public function toJSON()
@@ -140,7 +145,7 @@ class LatLng extends GmObject
 
     public function toUrlValue($precision = 6): string
     {
-        return (string) round($this->lat, $precision) . "," . round($this->lng, $precision);
+        return round($this->lat, $precision) . "," . round($this->lng, $precision);
     }
 
     public function getLocation($precision = 6): string

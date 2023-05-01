@@ -17,7 +17,8 @@ class LatLngBounds
     /**
      * @var LatLng
      */
-    protected $sw;
+    protected LatLng $sw;
+
     public function getSouthWest(): LatLng
     {
         return $this->sw;
@@ -26,7 +27,8 @@ class LatLngBounds
     /**
      * @var LatLng
      */
-    protected $ne;
+    protected LatLng $ne;
+
     public function getNorthEast(): LatLng
     {
         return $this->ne;
@@ -52,7 +54,7 @@ class LatLngBounds
 
     public function __toString()
     {
-        return "new google.maps.LatLngBounds(".$this->getSouthWest().", ".$this->getNorthEast().")";
+        return "new google.maps.LatLngBounds(" . $this->getSouthWest() . ", " . $this->getNorthEast() . ")";
     }
 
     public function toJSON()
@@ -62,7 +64,7 @@ class LatLngBounds
 
     public function toUrlValue($precision = 6): string
     {
-        return (string) "sw=".$this->getSouthWest()->toUrlValue($precision).
-                       "&ne=".$this->getNorthEast()->toUrlValue($precision);
+        return "sw=" . $this->getSouthWest()->toUrlValue($precision) .
+            "&ne=" . $this->getNorthEast()->toUrlValue($precision);
     }
 }

@@ -22,20 +22,20 @@ class GaListener
     /**
      * @var Environment
      */
-    protected $twig;
+    protected Environment $twig;
 
     /**
      * @var ParameterBagInterface
      */
-    protected $parameterBag;
+    protected ParameterBagInterface $parameterBag;
 
     /**
      * @var RequestStack
      */
-    protected $requestStack;
+    protected RequestStack $requestStack;
 
     /** @var string */
-    private $viewId;
+    private string $viewId;
 
     public function __construct(RequestStack $requestStack, ParameterBagInterface $parameterBag, Environment $twig)
     {
@@ -68,7 +68,7 @@ class GaListener
             $parents[] = $parent;
         }
 
-        $eaParents = array_filter($parents, fn ($c) => str_starts_with($c, "EasyCorp\Bundle\EasyAdminBundle"));
+        $eaParents = array_filter($parents, fn($c) => str_starts_with($c, "EasyCorp\Bundle\EasyAdminBundle"));
         return !empty($eaParents);
     }
 
@@ -83,7 +83,7 @@ class GaListener
         }
 
         if (!$this->viewId) {
-            return;
+            return false;
         }
 
         if (!$this->autoAppend) {
@@ -108,29 +108,29 @@ class GaListener
             return;
         }
 
-        $this->enable     = $this->parameterBag->get("ga.enable");
+        $this->enable = $this->parameterBag->get("ga.enable");
         $this->enableOnAdmin = $this->parameterBag->get("google.recaptcha.nable_on_admin");
         if (!$this->enable) {
-            return false;
+            return;
         }
 
-        $this->viewId     = $this->parameterBag->get("ga.view_id");
+        $this->viewId = $this->parameterBag->get("ga.view_id");
         if (!$this->viewId) {
             return;
         }
 
-        $this->serverUrl     = $this->parameterBag->get("ga.server_url");
+        $this->serverUrl = $this->parameterBag->get("ga.server_url");
         if (!$this->serverUrl) {
             return;
         }
 
         $this->autoAppend = $this->parameterBag->get("ga.autoappend");
-        $javascripts = "<script src='".$this->serverUrl."/gtag/js?id=" . $this->viewId . "' async></script>".
-                       "<script><!-- Global site tag (gtag.js) - Google Analytics -->" . PHP_EOL .
-                       "    window.dataLayer = window.dataLayer || [];" . PHP_EOL .
-                       "    function gtag() { dataLayer.push(arguments); }" . PHP_EOL .
-                       "    gtag('js', new Date());" . PHP_EOL .
-                       "    gtag('config', '".$this->viewId."');</script>";
+        $javascripts = "<script src='" . $this->serverUrl . "/gtag/js?id=" . $this->viewId . "' async></script>" .
+            "<script><!-- Global site tag (gtag.js) - Google Analytics -->" . PHP_EOL .
+            "    window.dataLayer = window.dataLayer || [];" . PHP_EOL .
+            "    function gtag() { dataLayer.push(arguments); }" . PHP_EOL .
+            "    gtag('js', new Date());" . PHP_EOL .
+            "    gtag('config', '" . $this->viewId . "');</script>";
 
         // Adding user-defined assets
         $this->twig->addGlobal("google_analytics", array_merge(
@@ -142,18 +142,16 @@ class GaListener
     public function onKernelResponse(ResponseEvent $event)
     {
         if (!$this->allowRender($event)) {
-            return false;
+            return;
         }
 
         $response = $event->getResponse();
         $javascript = $this->twig->getGlobals()["google_analytics"]["javascripts"] ?? "";
 
-        $content = preg_replace(['/<\/head\b[^>]*>/'], [$javascript."$0"], $response->getContent(), 1);
+        $content = preg_replace(['/<\/head\b[^>]*>/'], [$javascript . "$0"], $response->getContent(), 1);
 
         if (!is_instanceof($response, [StreamedResponse::class, BinaryFileResponse::class])) {
             $response->setContent($content);
         }
-
-        return true;
     }
 }

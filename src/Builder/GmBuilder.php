@@ -2,6 +2,8 @@
 
 namespace Google\Builder;
 
+use Base\Routing\RouterInterface;
+use League\Flysystem\UnableToDeleteFile;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Contracts\Cache\CacheInterface;
 
@@ -10,7 +12,6 @@ use Twig\Environment;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
-use League\Flysystem\FilesystemError;
 use League\Flysystem\UnableToWriteFile;
 use League\Flysystem\UnableToReadFile;
 use League\Flysystem\UnableToRetrieveMetadata;
@@ -22,6 +23,7 @@ use Google\Model\Maps\MapEmbed;
 use Google\Model\Places\Place;
 use Google\Model\Coordinates\LatLng;
 use Google\Model\Maps\Overlay\MapTypeStyle;
+
 // use Google\Model\StaticMap;
 // use Google\Model\EmbedMap;
 // use Google\Model\Elevation;
@@ -33,19 +35,6 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-// use Google\Model\Directions;
-
-// use Google\Model\Road;
-// use Google\Model\Place;
-// use Google\Model\Elevation;
-// use Google\Model\Timezone;
-// use Google\Model\Geocoding;
-// use Google\Model\Geolocation;
-// use Google\Model\DistanceMatrix;
-
-/*
- * @author Marco Meyer <marco.meyerconde@google.maps.il.com>
- */
 class GmBuilder implements GmBuilderInterface
 {
     /** @var bool */
@@ -57,62 +46,62 @@ class GmBuilder implements GmBuilderInterface
     /**
      * @var RequestStack
      */
-    public $requestStack;
+    public RequestStack $requestStack;
 
-    public const STATUS_OK       = "OK";
-    public const STATUS_BAD    = "BAD";
+    public const STATUS_OK = "OK";
+    public const STATUS_BAD = "BAD";
     public const STATUS_NOCLIENT = "NOCLIENT";
 
     public $callback;
     public $libraries;
     public $version;
 
-    public $client;
-    public $cache;
+    public HttpClientInterface $client;
+    public CacheInterface $cache;
     public $cacheDir;
     public $cachePool;
-    public $cachePublic;
+    public string $cachePublic;
     public $cacheLifetime;
     public $cacheOnly;
     public $cacheControl;
     public $cacheFormat;
     public $cacheQuality;
     public $cacheTilesize;
-    public $filesystem;
+    public mixed $filesystem;
     public $html2canvas;
     public $tilemap;
 
     /**
-     * @var TokenManager
+     * @var CsrfTokenManagerInterface
      */
-    public $tokenManager;
+    public CsrfTokenManagerInterface $tokenManager;
 
     /**
      * @var Environment
      */
-    public $environment;
+    public Environment $environment;
 
     /**
-     * @var Router
+     * @var RouterInterface
      */
-    public $router;
+    public RouterInterface $router;
 
     /**
      * @var Environment
      */
-    public $twig;
+    public Environment $twig;
 
     /**
      * construct
      */
     public function __construct(
-        KernelInterface $kernel,
-        Environment $twig,
-        CacheInterface $cache,
-        LazyFactory $lazyFactory,
-        RequestStack $requestStack,
-        HttpClientInterface $client,
-        Security $security,
+        KernelInterface           $kernel,
+        Environment               $twig,
+        CacheInterface            $cache,
+        LazyFactory               $lazyFactory,
+        RequestStack              $requestStack,
+        HttpClientInterface       $client,
+        Security                  $security,
         CsrfTokenManagerInterface $csrfTokenManager
     )
     {
@@ -121,44 +110,44 @@ class GmBuilder implements GmBuilderInterface
         //
         // Autowiring
         //
-        $this->cache        = $cache;
-        $this->client       = $client;
+        $this->cache = $cache;
+        $this->client = $client;
         $this->tokenManager = $csrfTokenManager;
-        $this->router       = $kernel->getContainer()->get("router");
-        $this->environment  = $kernel->getEnvironment(); // "dev", "prod", etc..
-        $this->security     = $security;
+        $this->router = $kernel->getContainer()->get("router");
+        $this->environment = $kernel->getEnvironment(); // "dev", "prod", etc..
+        $this->security = $security;
         $this->requestStack = $requestStack;
 
         //
         // Get variables
         //
-        $this->enable        = $kernel->getContainer()->getParameter("google.maps.enable");
-        $this->cachePool     = $kernel->getContainer()->getParameter("google.maps.cache_pool");
+        $this->enable = $kernel->getContainer()->getParameter("google.maps.enable");
+        $this->cachePool = $kernel->getContainer()->getParameter("google.maps.cache_pool");
         $this->cacheLifetime = $kernel->getContainer()->getParameter("google.maps.cache_lifetime");
-        $this->cacheOnly     = $kernel->getContainer()->getParameter("google.maps.cache_only");
-        $this->cacheControl  = $kernel->getContainer()->getParameter("google.maps.cache_control");
-        $this->cacheQuality  = $kernel->getContainer()->getParameter("google.maps.cache_quality");
-        $this->cachePublic   = $this->getAsset($kernel->getContainer()->getParameter("google.maps.cache_public"));
+        $this->cacheOnly = $kernel->getContainer()->getParameter("google.maps.cache_only");
+        $this->cacheControl = $kernel->getContainer()->getParameter("google.maps.cache_control");
+        $this->cacheQuality = $kernel->getContainer()->getParameter("google.maps.cache_quality");
+        $this->cachePublic = $this->getAsset($kernel->getContainer()->getParameter("google.maps.cache_public"));
 
         $this->cacheTilesize = $kernel->getContainer()->getParameter("google.maps.cache_tilesize");
         if ($this->cacheTilesize < 1) {
             $this->cacheTilesize = null;
         }
 
-        $this->cacheFormat   = $kernel->getContainer()->getParameter("google.maps.cache_format");
+        $this->cacheFormat = $kernel->getContainer()->getParameter("google.maps.cache_format");
         if ($this->cacheFormat == "txt") {
             throw new Exception("Cache format cannot be text");
         }
 
-        $this->keyClient     = $kernel->getContainer()->getParameter("google.maps.apikey.client");
-        $this->keyServer     = $kernel->getContainer()->getParameter("google.maps.apikey.server");
-        $this->secret        = $kernel->getContainer()->getParameter("google.maps.secret");
-        $this->callback      = $kernel->getContainer()->getParameter("google.maps.callback");
-        $this->libraries     = $kernel->getContainer()->getParameter("google.maps.libraries");
-        $this->version       = $kernel->getContainer()->getParameter("google.maps.version");
+        $this->keyClient = $kernel->getContainer()->getParameter("google.maps.apikey.client");
+        $this->keyServer = $kernel->getContainer()->getParameter("google.maps.apikey.server");
+        $this->secret = $kernel->getContainer()->getParameter("google.maps.secret");
+        $this->callback = $kernel->getContainer()->getParameter("google.maps.callback");
+        $this->libraries = $kernel->getContainer()->getParameter("google.maps.libraries");
+        $this->version = $kernel->getContainer()->getParameter("google.maps.version");
 
-        $this->filesystem    = $lazyFactory->createStorage(
-            $kernel->getContainer()->getParameter("google.maps.cache"), 
+        $this->filesystem = $lazyFactory->createStorage(
+            $kernel->getContainer()->getParameter("google.maps.cache"),
             "google.maps"
         );
 
@@ -173,38 +162,45 @@ class GmBuilder implements GmBuilderInterface
         return $this->enable;
     }
 
-    public $keyClient;
+    public ?string $keyClient;
+
     public function getClientKey()
     {
         return $this->keyClient;
     }
+
     public function setClientKey($key)
     {
         $this->keyClient = $key;
     }
 
-    public $keyServer;
+    public ?string $keyServer;
+
     public function getServerKey()
     {
         return $this->keyServer;
     }
+
     public function setServerKey($keyServer)
     {
         $this->keyServer = $keyServer;
     }
 
-    public $secret;
+    public ?string $secret;
+
     public function getSecret()
     {
         return $this->secret;
     }
+
     public function setSecret($secret)
     {
         $this->secret = $secret;
     }
 
     private static $_instance = null;
-    private static array $_instanceId  = [];
+    private static array $_instanceId = [];
+
     public static function getInstance(string $id = null)
     {
         if ($id == null) {
@@ -222,9 +218,9 @@ class GmBuilder implements GmBuilderInterface
     /**
      * @var Security
      */
-    public $security;
+    public Security $security;
 
-    public function isReady()
+    public static function isReady()
     {
         return self::$_instance != null;
     }
@@ -245,7 +241,7 @@ class GmBuilder implements GmBuilderInterface
             $id = $object;
             $object = $this->getInstance($id);
             if (!$object) {
-                throw new Exception("Unknown GmObject #ID: \"" . $id ."\"");
+                throw new Exception("Unknown GmObject #ID: \"" . $id . "\"");
             }
         }
 
@@ -295,6 +291,7 @@ class GmBuilder implements GmBuilderInterface
     }
 
     public array $rules = [];
+
     public function findOneRuleLoop($rule = null, array $visitedRules = [])
     {
         // Initialization
@@ -405,13 +402,13 @@ class GmBuilder implements GmBuilderInterface
             } else {
                 $isGranted = $this->isGranted();
                 $cacheEnabled = $object->cacheEnabled();
-                $cacheExists  = $object->cacheExists() || $object->parentCacheExists();
-                $cacheOnly    = GmBuilder::getInstance()->cacheOnly;
+                $cacheExists = $object->cacheExists() || $object->parentCacheExists();
+                $cacheOnly = GmBuilder::getInstance()->cacheOnly;
 
                 // Display Google API in the following cases
                 $caseA = !$cacheEnabled;
                 $caseB = !$cacheOnly && !$cacheExists;
-                $caseC =  $cacheOnly && $isGranted && !$cacheExists;
+                $caseC = $cacheOnly && $isGranted && !$cacheExists;
 
                 if ($caseA || $caseB || $caseC) {
                     $javascripts .= "var " . $object->getId() . " = " . $object . ";" . PHP_EOL;
@@ -479,7 +476,7 @@ class GmBuilder implements GmBuilderInterface
 
         $path = $parseUrl["path"];
         if (!str_starts_with($path, "/") && $this->requestStack->getCurrentRequest()) {
-            $path = $this->requestStack->getCurrentRequest()->getBasePath()."/".$path;
+            $path = $this->requestStack->getCurrentRequest()->getBasePath() . "/" . $path;
         }
 
         return $path;
@@ -491,7 +488,7 @@ class GmBuilder implements GmBuilderInterface
             return;
         }
 
-        $javascripts  = "<script src='" . $this->getAsset("/bundles/google/maps.js") . "'></script>" . PHP_EOL;
+        $javascripts = "<script src='" . $this->getAsset("/bundles/google/maps.js") . "'></script>" . PHP_EOL;
         $this->twig->addGlobal("google_maps", array_merge(
             $this->twig->getGlobals()["google_maps"] ?? [],
             ["html2canvas" => ($this->twig->getGlobals()["google_maps"]["html2canvas"] ?? "") . $javascripts]
@@ -506,8 +503,8 @@ class GmBuilder implements GmBuilderInterface
 
         $locale = $this->requestStack->getCurrentRequest()?->getLocale() ?? "en";
 
-        $javascripts  = "<script src='https://polyfill.io/v3/polyfill.min.js?features=default'></script>" . PHP_EOL;
-        $javascripts .= "<script src='https://maps.googleapis.com/maps/api/js?key=" . $this->keyClient . "&callback=" . $this->callback . "&libraries=" . $this->libraries . "&v=" . $this->version . "&language=".$locale."' defer async></script>";
+        $javascripts = "<script src='https://polyfill.io/v3/polyfill.min.js?features=default'></script>" . PHP_EOL;
+        $javascripts .= "<script src='https://maps.googleapis.com/maps/api/js?key=" . $this->keyClient . "&callback=" . $this->callback . "&libraries=" . $this->libraries . "&v=" . $this->version . "&language=" . $locale . "' defer async></script>";
         $this->twig->addGlobal("google_maps", array_merge(
             $this->twig->getGlobals()["google_maps"] ?? [],
             ["api" => ($this->twig->getGlobals()["google_maps"]["api"] ?? "") . $javascripts]
@@ -520,7 +517,7 @@ class GmBuilder implements GmBuilderInterface
             return;
         }
 
-        $initMap = "<script type='text/javascript'>function ".GmBuilder::getInstance()->callback."() { " . PHP_EOL. $initMapContent . PHP_EOL." }</script>";
+        $initMap = "<script type='text/javascript'>function " . GmBuilder::getInstance()->callback . "() { " . PHP_EOL . $initMapContent . PHP_EOL . " }</script>";
         $this->twig->addGlobal("google_maps", array_merge(
             $this->twig->getGlobals()["google_maps"] ?? [],
             ["initMap" => $initMap]
@@ -539,7 +536,7 @@ class GmBuilder implements GmBuilderInterface
 
         foreach (self::$_instanceId as $id0 => $object0) {
             if ($object0 == $object) {
-                throw new Exception("Instance ID \"" . $id . "\" already referenced in GmBuilder as ".$id0);
+                throw new Exception("Instance ID \"" . $id . "\" already referenced in GmBuilder as " . $id0);
             }
         }
 
@@ -567,7 +564,7 @@ class GmBuilder implements GmBuilderInterface
     {
         try {
             GmBuilder::getInstance()->filesystem->write($path, $contents, $config);
-        } catch (FilesystemError | UnableToWriteFile $exception) {
+        } catch (FilesystemError|UnableToWriteFile $exception) {
             throw new Exception("Unable to write file \"$path\" into cache..");
             return null;
         }
@@ -578,30 +575,32 @@ class GmBuilder implements GmBuilderInterface
     {
         try {
 
-            $id  = $opts["id"] ?? 0;
+            $id = $opts["id"] ?? 0;
 
             $file = $this->getCachePath($signature, $id);
             $contents = GmBuilder::getInstance()->filesystem->read($file);
 
-            $width  = $opts["width"] ?? 0;
+            $width = $opts["width"] ?? 0;
             $height = $opts["height"] ?? 0;
             if ($width || $height) {
                 $image = imagecreatefromstring($contents);
-                $imageCrop = $this->cropAlign($image, $width, $height, 'center', 'middle');
+                $imageCrop = $this->cropAlign($image, $width, $height);
 
                 ob_start();
-                switch(GmBuilder::getInstance()->cacheFormat) {
-                    case "jpeg": imagejpeg($imageCrop);
+                switch (GmBuilder::getInstance()->cacheFormat) {
+                    case "jpeg":
+                        imagejpeg($imageCrop);
                     // no break
-                    default: imagepng($imageCrop);
+                    default:
+                        imagepng($imageCrop);
                 }
-                $contents =  ob_get_clean();
+                $contents = ob_get_clean();
                 imagedestroy($image);
                 imagedestroy($imageCrop);
             }
 
             return $contents;
-        } catch (FilesystemError | UnableToReadFile $exception) {
+        } catch (UnableToReadFile $exception) {
             throw new Exception("Unable to read file \"$file\" from cache..");
             return null;
         }
@@ -609,10 +608,10 @@ class GmBuilder implements GmBuilderInterface
 
     public function getCachePath(string $signature, int $id = 0): string
     {
-        if($id < 0)
+        if ($id < 0)
             return $this->getCacheDirectory() . "/" . $signature . "/metadata.txt";
 
-        return $this->getCacheDirectory() . "/" . str_replace(["{signature}", "{id}"], [$signature, $id], $this->cachePublic).".".$this->cacheFormat;
+        return $this->getCacheDirectory() . "/" . str_replace(["{signature}", "{id}"], [$signature, $id], $this->cachePublic) . "." . $this->cacheFormat;
     }
 
     public function getCacheUrl($signature, $id = null): string
@@ -631,7 +630,7 @@ class GmBuilder implements GmBuilderInterface
 
         try {
             GmBuilder::getInstance()->filesystem->write($path, $contents, $config);
-        } catch (FilesystemError | UnableToWriteFile $exception) {
+        } catch (UnableToWriteFile $exception) {
             throw new Exception("Unable to write metadata file \"$path\" into cache..");
             return null;
         }
@@ -649,9 +648,9 @@ class GmBuilder implements GmBuilderInterface
         try {
             $contents = GmBuilder::getInstance()->filesystem->read($file);
             return unserialize($contents);
-        } catch (FilesystemError | UnableToReadFile $exception) {
+        } catch (UnableToReadFile $exception) {
             throw new Exception("Unable to read metadata file \"$file\" from cache..");
-            return ["status" => GmBuilder::STATUS_BAD];
+            //return ["status" => GmBuilder::STATUS_BAD];
         }
     }
 
@@ -659,14 +658,14 @@ class GmBuilder implements GmBuilderInterface
     {
         try {
 
-            $id  = $opts["id"] ?? -1;
+            $id = $opts["id"] ?? -1;
 
-            if($id < 0) $path = $this->getCacheDirectory() . "/" . $signature . "/metadata.txt";
+            if ($id < 0) $path = $this->getCacheDirectory() . "/" . $signature . "/metadata.txt";
             else $path = $this->getCachePath($signature, $id);
 
             return GmBuilder::getInstance()->filesystem->fileExists($path);
 
-        } catch (FilesystemError | UnableToRetrieveMetadata $exception) {
+        } catch (UnableToRetrieveMetadata $exception) {
 
             throw new Exception("Unable to retrieve file \"$path\" from cache..");
             return null;
@@ -676,12 +675,13 @@ class GmBuilder implements GmBuilderInterface
     public function deleteCache(string $signature)
     {
         try {
+
             $file = $this->getCacheDirectory() . "/" . $signature . "/";
             GmBuilder::getInstance()->filesystem->deleteDirectory($file);
             return true;
-        } catch (FilesystemError | UnableToDeleteMetadata $exception) {
+
+        } catch (UnableToDeleteFile $exception) {
             throw new Exception("Unable to delete file \"$file\" from cache..");
-            return false;
         }
     }
 
@@ -709,31 +709,24 @@ class GmBuilder implements GmBuilderInterface
 
     public function calculatePixelsForAlign($imageSize, $cropSize, $align)
     {
-        switch ($align) {
-            case 'left':
-            case 'top':
-                return [0, min($cropSize, $imageSize)];
-            case 'right':
-            case 'bottom':
-                return [max(0, $imageSize - $cropSize), min($cropSize, $imageSize)];
-            case 'center':
-            case 'middle':
-                return [
-                    max(0, floor(($imageSize / 2) - ($cropSize / 2))),
-                    min($cropSize, $imageSize),
-                ];
-            default:
-                return [0, $imageSize];
-        }
+        return match ($align) {
+            'left', 'top' => [0, min($cropSize, $imageSize)],
+            'right', 'bottom' => [max(0, $imageSize - $cropSize), min($cropSize, $imageSize)],
+            'center', 'middle' => [
+                max(0, floor(($imageSize / 2) - ($cropSize / 2))),
+                min($cropSize, $imageSize),
+            ],
+            default => [0, $imageSize],
+        };
     }
 
     public function addMap(string $id, $map): self
     {
         if (!($map instanceof MapStatic ||
-               $map instanceof MapUrl    ||
-               $map instanceof MapEmbed  ||
-               $map instanceof Map)) {
-            throw new Exception("Map parameter received is \"".get_class($map)."\" expected: \"MapStatic, MapUrl, MapEmbed, Map\"");
+            $map instanceof MapUrl ||
+            $map instanceof MapEmbed ||
+            $map instanceof Map)) {
+            throw new Exception("Map parameter received is \"" . get_class($map) . "\" expected: \"MapStatic, MapUrl, MapEmbed, Map\"");
         }
 
         $this->bind($id, $map);

@@ -13,24 +13,25 @@ use Symfony\Component\Form\Util\ServerParams;
 use Symfony\Component\Validator\Context\ExecutionContextFactory;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use function is_array;
 
 class CaptchaValidationListener implements EventSubscriberInterface
 {
     /**
      * @var GrService
      */
-    protected $grService;
+    protected GrService $grService;
 
     /** @var string */
-    private $fieldName;
+    private string $fieldName;
 
     /** @var string */
-    private $api;
+    private string $api;
 
     /**
      * @var TranslatorInterface
      */
-    protected $translator;
+    protected TranslatorInterface $translator;
 
     /**
      * @var string
@@ -40,10 +41,10 @@ class CaptchaValidationListener implements EventSubscriberInterface
     /**
      * @var ValidatorInterface
      */
-    protected $validator;
+    protected ValidatorInterface $validator;
 
     /** @var ServerParams */
-    private $serverParams;
+    private ServerParams $serverParams;
 
     public static function getSubscribedEvents(): array
     {
@@ -85,7 +86,7 @@ class CaptchaValidationListener implements EventSubscriberInterface
             return;
         }
 
-         if ($form->getConfig()->getOptions()["captcha_api"] == GrService::APIV2 && !$this->grService->hasTriggeredMinimumAttempts($form, $form->getConfig()->getOptions())) {
+        if ($form->getConfig()->getOptions()["captcha_api"] == GrService::APIV2 && !$this->grService->hasTriggeredMinimumAttempts($form, $form->getConfig()->getOptions())) {
             return;
         }
 
@@ -108,7 +109,7 @@ class CaptchaValidationListener implements EventSubscriberInterface
                 $form->addError(new FormError($violation->getMessage()));
             }
 
-            if (\is_array($data)) {
+            if (is_array($data)) {
                 unset($data[$this->fieldName]);
                 $event->setData($data);
             }
