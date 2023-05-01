@@ -36,6 +36,7 @@ class GaListener
 
     /** @var string */
     private string $viewId;
+    private string|int|bool|array|null|float|\UnitEnum $serverUrl;
 
     public function __construct(RequestStack $requestStack, ParameterBagInterface $parameterBag, Environment $twig)
     {

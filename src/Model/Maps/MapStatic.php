@@ -20,6 +20,10 @@ class MapStatic extends GmClient
         $this->setBaseUrl('https://maps.googleapis.com/maps/api/staticmap');
 
         $size = $this->pop('size');
+
+        $width = 0;
+        $height = 0;
+
         if ($size instanceof Size) {
             $width = $size->getWidth();
             $width = $size->getHeight();
@@ -38,7 +42,7 @@ class MapStatic extends GmClient
             throw new Exception('Unknown dimension size');
         }
 
-        $this->addOption('size', new Size((float) $width, (float) $height));
+        $this->addOption('size', new Size((float)$width, (float)$height));
     }
 
     public function setZoom(int $value)
@@ -62,6 +66,7 @@ class MapStatic extends GmClient
 
     public function setSize($width, int $height = null)
     {
+        $sizde = null;
         if ($width instanceof Size) {
             $size = $width;
         }

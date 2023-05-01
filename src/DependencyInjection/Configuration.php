@@ -189,7 +189,7 @@ class Configuration implements ConfigurationInterface
 
     private function addAnalyticsOptions(ArrayNodeDefinition $rootNode)
     {
-        $dataPath = dirname(__DIR__, 5).'/data';
+        $dataPath = dirname(__DIR__, 5) . '/data';
 
         $rootNode
             ->children()
@@ -209,7 +209,7 @@ class Configuration implements ConfigurationInterface
             ->end()
             ->scalarNode('json')
             ->info('JSON key location')
-            ->defaultValue($dataPath.'/google-analytics-api.json')
+            ->defaultValue($dataPath . '/google-analytics-api.json')
             ->end()
             ->scalarNode('view_id')
             ->info('View #ID to load (can be set later)')

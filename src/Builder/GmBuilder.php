@@ -19,6 +19,7 @@ use League\FlysystemBundle\Lazy\LazyFactory;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpFoundation\RequestStack;
+
 // use Google\Model\StaticMap;
 // use Google\Model\EmbedMap;
 // use Google\Model\Elevation;
@@ -74,15 +75,16 @@ class GmBuilder implements GmBuilderInterface
      * construct.
      */
     public function __construct(
-        KernelInterface $kernel,
-        Environment $twig,
-        CacheInterface $cache,
-        LazyFactory $lazyFactory,
-        RequestStack $requestStack,
-        HttpClientInterface $client,
-        Security $security,
+        KernelInterface           $kernel,
+        Environment               $twig,
+        CacheInterface            $cache,
+        LazyFactory               $lazyFactory,
+        RequestStack              $requestStack,
+        HttpClientInterface       $client,
+        Security                  $security,
         CsrfTokenManagerInterface $csrfTokenManager
-    ) {
+    )
+    {
         self::$_instance = $this;
 
         //
@@ -202,7 +204,7 @@ class GmBuilder implements GmBuilderInterface
 
     public static function getPublicDirectory(): string
     {
-        return dirname(__FILE__, 6).'/public/bundles/google';
+        return dirname(__FILE__, 6) . '/public/bundles/google';
     }
 
     public function getCacheDirectory(): ?string
@@ -216,7 +218,7 @@ class GmBuilder implements GmBuilderInterface
             $id = $object;
             $object = $this->getInstance($id);
             if (!$object) {
-                throw new Exception('Unknown GmObject #ID: "'.$id.'"');
+                throw new Exception('Unknown GmObject #ID: "' . $id . '"');
             }
         }
 
@@ -241,7 +243,7 @@ class GmBuilder implements GmBuilderInterface
             $id = $object->getId();
         }
 
-        $id = $id.'_'.$event.'_'.md5($callback);
+        $id = $id . '_' . $event . '_' . md5($callback);
         $this->bind($id, $gmEvent);
         $this->rules[] = $this->getInstance($id);
 
@@ -258,7 +260,7 @@ class GmBuilder implements GmBuilderInterface
             throw new Exception('Unexpected entry provided as parameter (it must be either string or GmEntry)');
         }
 
-        $id = $entry->getId() ?? 'entry_'.md5($entry);
+        $id = $entry->getId() ?? 'entry_' . md5($entry);
         $this->unbind($id);
 
         $this->bind($id, $entry);
@@ -311,7 +313,7 @@ class GmBuilder implements GmBuilderInterface
             $loopStr = implode(' -> ', array_map(function ($rule) {
                 return $rule->getId();
             }, $loop));
-            throw new Exception('Cannot build from Google Map: one loop has been found (refers to the rule list): '.$loopStr);
+            throw new Exception('Cannot build from Google Map: one loop has been found (refers to the rule list): ' . $loopStr);
         }
 
         for ($i = 0; $parent = $rule->getParent(); ++$i) {
@@ -374,9 +376,9 @@ class GmBuilder implements GmBuilderInterface
         $javascripts = '';
         foreach ($this->sortRules() as $object) {
             if ($object instanceof GmEntry) {
-                $javascripts .= $object.PHP_EOL;
+                $javascripts .= $object . PHP_EOL;
             } elseif ($object instanceof GmEvent) {
-                $javascripts .= $object.PHP_EOL;
+                $javascripts .= $object . PHP_EOL;
             } else {
                 $isGranted = $this->isGranted();
                 $cacheEnabled = $object->cacheEnabled();
@@ -389,7 +391,7 @@ class GmBuilder implements GmBuilderInterface
                 $caseC = $cacheOnly && $isGranted && !$cacheExists;
 
                 if ($caseA || $caseB || $caseC) {
-                    $javascripts .= 'var '.$object->getId().' = '.$object.';'.PHP_EOL;
+                    $javascripts .= 'var ' . $object->getId() . ' = ' . $object . ';' . PHP_EOL;
                 }
             }
         }
@@ -455,7 +457,7 @@ class GmBuilder implements GmBuilderInterface
 
         $path = $parseUrl['path'];
         if (!str_starts_with($path, '/') && $this->requestStack->getCurrentRequest()) {
-            $path = $this->requestStack->getCurrentRequest()->getBasePath().'/'.$path;
+            $path = $this->requestStack->getCurrentRequest()->getBasePath() . '/' . $path;
         }
 
         return $path;
@@ -467,10 +469,10 @@ class GmBuilder implements GmBuilderInterface
             return;
         }
 
-        $javascripts = "<script src='".$this->getAsset('/bundles/google/maps.js')."'></script>".PHP_EOL;
+        $javascripts = "<script src='" . $this->getAsset('/bundles/google/maps.js') . "'></script>" . PHP_EOL;
         $this->twig->addGlobal('google_maps', array_merge(
             $this->twig->getGlobals()['google_maps'] ?? [],
-            ['html2canvas' => ($this->twig->getGlobals()['google_maps']['html2canvas'] ?? '').$javascripts]
+            ['html2canvas' => ($this->twig->getGlobals()['google_maps']['html2canvas'] ?? '') . $javascripts]
         ));
     }
 
@@ -482,11 +484,11 @@ class GmBuilder implements GmBuilderInterface
 
         $locale = $this->requestStack->getCurrentRequest()?->getLocale() ?? 'en';
 
-        $javascripts = "<script src='https://polyfill.io/v3/polyfill.min.js?features=default'></script>".PHP_EOL;
-        $javascripts .= "<script src='https://maps.googleapis.com/maps/api/js?key=".$this->keyClient.'&callback='.$this->callback.'&libraries='.$this->libraries.'&v='.$this->version.'&language='.$locale."' defer async></script>";
+        $javascripts = "<script src='https://polyfill.io/v3/polyfill.min.js?features=default'></script>" . PHP_EOL;
+        $javascripts .= "<script src='https://maps.googleapis.com/maps/api/js?key=" . $this->keyClient . '&callback=' . $this->callback . '&libraries=' . $this->libraries . '&v=' . $this->version . '&language=' . $locale . "' defer async></script>";
         $this->twig->addGlobal('google_maps', array_merge(
             $this->twig->getGlobals()['google_maps'] ?? [],
-            ['api' => ($this->twig->getGlobals()['google_maps']['api'] ?? '').$javascripts]
+            ['api' => ($this->twig->getGlobals()['google_maps']['api'] ?? '') . $javascripts]
         ));
     }
 
@@ -496,7 +498,7 @@ class GmBuilder implements GmBuilderInterface
             return;
         }
 
-        $initMap = "<script type='text/javascript'>function ".GmBuilder::getInstance()->callback.'() { '.PHP_EOL.$initMapContent.PHP_EOL.' }</script>';
+        $initMap = "<script type='text/javascript'>function " . GmBuilder::getInstance()->callback . '() { ' . PHP_EOL . $initMapContent . PHP_EOL . ' }</script>';
         $this->twig->addGlobal('google_maps', array_merge(
             $this->twig->getGlobals()['google_maps'] ?? [],
             ['initMap' => $initMap]
@@ -510,12 +512,12 @@ class GmBuilder implements GmBuilderInterface
         } // Nothing to do
 
         if (array_key_exists($id, GmBuilder::$_instanceId) && GmBuilder::$_instanceId[$id] != $object) {
-            throw new Exception('Instance ID "'.$id.'" already referenced in GmBuilder');
+            throw new Exception('Instance ID "' . $id . '" already referenced in GmBuilder');
         }
 
         foreach (self::$_instanceId as $id0 => $object0) {
             if ($object0 == $object) {
-                throw new Exception('Instance ID "'.$id.'" already referenced in GmBuilder as '.$id0);
+                throw new Exception('Instance ID "' . $id . '" already referenced in GmBuilder as ' . $id0);
             }
         }
 
@@ -570,7 +572,7 @@ class GmBuilder implements GmBuilderInterface
                 switch (GmBuilder::getInstance()->cacheFormat) {
                     case 'jpeg':
                         imagejpeg($imageCrop);
-                        // no break
+                    // no break
                     default:
                         imagepng($imageCrop);
                 }
@@ -580,9 +582,10 @@ class GmBuilder implements GmBuilderInterface
             }
 
             return $contents;
-        } catch (UnableToReadFile $exception) {
-            throw new Exception("Unable to read file \"$file\" from cache..");
 
+        } catch (UnableToReadFile $exception) {
+
+            throw new Exception("Unable to read file \"$signature\" from cache..");
             return null;
         }
     }
@@ -590,10 +593,10 @@ class GmBuilder implements GmBuilderInterface
     public function getCachePath(string $signature, int $id = 0): string
     {
         if ($id < 0) {
-            return $this->getCacheDirectory().'/'.$signature.'/metadata.txt';
+            return $this->getCacheDirectory() . '/' . $signature . '/metadata.txt';
         }
 
-        return $this->getCacheDirectory().'/'.str_replace(['{signature}', '{id}'], [$signature, $id], $this->cachePublic).'.'.$this->cacheFormat;
+        return $this->getCacheDirectory() . '/' . str_replace(['{signature}', '{id}'], [$signature, $id], $this->cachePublic) . '.' . $this->cacheFormat;
     }
 
     public function getCacheUrl($signature, $id = null): string
@@ -608,7 +611,7 @@ class GmBuilder implements GmBuilderInterface
 
     public function setCacheMetadata(string $signature, array $array, array $config = []): ?string
     {
-        $path = $this->getCacheDirectory().'/'.$signature.'/metadata.txt';
+        $path = $this->getCacheDirectory() . '/' . $signature . '/metadata.txt';
         $contents = serialize($array);
 
         try {
@@ -624,7 +627,7 @@ class GmBuilder implements GmBuilderInterface
 
     public function getCacheMetadata($signature)
     {
-        $file = $this->getCacheDirectory().'/'.$signature.'/metadata.txt';
+        $file = $this->getCacheDirectory() . '/' . $signature . '/metadata.txt';
         if (!GmBuilder::getInstance()->filesystem->fileExists($file)) {
             return ['status' => GmBuilder::STATUS_BAD];
         }
@@ -645,15 +648,16 @@ class GmBuilder implements GmBuilderInterface
             $id = $opts['id'] ?? -1;
 
             if ($id < 0) {
-                $path = $this->getCacheDirectory().'/'.$signature.'/metadata.txt';
+                $path = $this->getCacheDirectory() . '/' . $signature . '/metadata.txt';
             } else {
                 $path = $this->getCachePath($signature, $id);
             }
 
             return GmBuilder::getInstance()->filesystem->fileExists($path);
+            
         } catch (UnableToRetrieveMetadata $exception) {
-            throw new Exception("Unable to retrieve file \"$path\" from cache..");
 
+            throw new Exception("Unable to retrieve file \"$signature\" from cache..");
             return null;
         }
     }
@@ -661,12 +665,14 @@ class GmBuilder implements GmBuilderInterface
     public function deleteCache(string $signature)
     {
         try {
-            $file = $this->getCacheDirectory().'/'.$signature.'/';
-            GmBuilder::getInstance()->filesystem->deleteDirectory($file);
+
+            $path = $this->getCacheDirectory() . '/' . $signature . '/';
+            GmBuilder::getInstance()->filesystem->deleteDirectory($path);
 
             return true;
+
         } catch (UnableToDeleteFile $exception) {
-            throw new Exception("Unable to delete file \"$file\" from cache..");
+            throw new Exception("Unable to delete file \"$signature\" from cache..");
         }
     }
 
@@ -712,7 +718,7 @@ class GmBuilder implements GmBuilderInterface
             $map instanceof MapUrl ||
             $map instanceof MapEmbed ||
             $map instanceof Map)) {
-            throw new Exception('Map parameter received is "'.get_class($map).'" expected: "MapStatic, MapUrl, MapEmbed, Map"');
+            throw new Exception('Map parameter received is "' . get_class($map) . '" expected: "MapStatic, MapUrl, MapEmbed, Map"');
         }
 
         $this->bind($id, $map);

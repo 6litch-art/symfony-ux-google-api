@@ -10,7 +10,7 @@ Encore
     .enableBuildNotifications()
     .enableSourceMaps(!Encore.isProduction())
     .enableVersioning(false)
-    
+
     .configureCssMinimizerPlugin((options) => {
         options.minimizerOptions = { preset: ['default', { svgo: false }] };
     })

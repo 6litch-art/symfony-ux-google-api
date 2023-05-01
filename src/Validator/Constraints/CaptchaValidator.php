@@ -12,6 +12,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 final class CaptchaValidator extends ConstraintValidator
 {
     private array $responses = [];
+    private GrService $grService;
 
     public function __construct(GrService $grService)
     {
@@ -30,7 +31,7 @@ final class CaptchaValidator extends ConstraintValidator
 
         $value = explode(' ', $value)[0] ?? '';
         if (GrService::APIV3 == $constraint->getVersion()) {
-            $value = null !== $value ? (string) $value : '';
+            $value = null !== $value ? (string)$value : '';
             if ('' === $value) {
                 $this->context->buildViolation($constraint->messageMissingValue)->addViolation();
 
@@ -51,7 +52,7 @@ final class CaptchaValidator extends ConstraintValidator
             }
 
             foreach ($response->getErrorCodes() as $error) {
-                $this->context->buildViolation('captcha.error.'.str_replace('-', '_', $error))->addViolation();
+                $this->context->buildViolation('captcha.error.' . str_replace('-', '_', $error))->addViolation();
             }
         }
     }

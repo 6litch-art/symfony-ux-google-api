@@ -25,6 +25,7 @@ class GaService
     private ?CacheInterface $cache;
 
     private bool $enable;
+    private array $reportingDimensions;
 
     /**
      * construct.
@@ -105,7 +106,7 @@ class GaService
             return -1;
         }
 
-        return $this->cache->get($metric.'.'.$dateStart.'.'.$dateEnd, function (ItemInterface $item) use ($metric, $expiration, $dateStart, $dateEnd) {
+        return $this->cache->get($metric . '.' . $dateStart . '.' . $dateEnd, function (ItemInterface $item) use ($metric, $expiration, $dateStart, $dateEnd) {
             $item->expiresAfter(self::EnableCache ? $expiration : 0);
 
             // Create the DateRange object
@@ -153,7 +154,7 @@ class GaService
 
             $result = $report ? $report->getReports()[0]->getData()->getTotals()[0]->getValues()[0] : null;
 
-            return (string) $result;
+            return (string)$result;
         });
     }
 
