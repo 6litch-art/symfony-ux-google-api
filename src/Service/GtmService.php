@@ -11,12 +11,12 @@ class GtmService
     private bool $enable;
 
     /**
-     * construct
+     * construct.
      */
     public function __construct(ParameterBagInterface $parameterBag)
     {
-        $this->enable = $parameterBag->get("google.tag_manager.enable");
-        $this->id = $parameterBag->get("google.tag_manager.id");
+        $this->enable = $parameterBag->get('google.tag_manager.enable');
+        $this->id = $parameterBag->get('google.tag_manager.id');
     }
 
     public function getId()

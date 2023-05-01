@@ -2,15 +2,13 @@
 
 namespace Google\Subscriber;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
 use Google\Badge\CaptchaBadge;
 use Google\Exception\InvalidCaptchaException;
 use Google\Service\GrService;
 use Google\Validator\Constraints\Captcha;
 use Google\Validator\Constraints\CaptchaValidator;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
-
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 use Symfony\Component\Security\Http\Event\LoginFailureEvent;
@@ -18,23 +16,13 @@ use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 use Symfony\Component\Validator\Context\ExecutionContextFactory;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use function is_string;
 
 class CaptchaSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var GrService
-     */
     protected GrService $grService;
 
-    /**
-     * @var ValidatorInterface
-     */
     protected ValidatorInterface $validator;
 
-    /**
-     * @var TranslatorInterface
-     */
     protected TranslatorInterface $translator;
 
     /**
@@ -57,24 +45,24 @@ class CaptchaSubscriber implements EventSubscriberInterface
             CheckPassportEvent::class => ['checkPassport', 512],
 
             LoginSuccessEvent::class => ['onLoginSuccess'],
-            LoginFailureEvent::class => ['onLoginFailure']
+            LoginFailureEvent::class => ['onLoginFailure'],
         ];
     }
 
     public function onLoginFailure(LoginFailureEvent $event)
     {
-        $this->grService->addFailedAttempt("login");
+        $this->grService->addFailedAttempt('login');
     }
 
     public function onLoginSuccess(LoginSuccessEvent $event)
     {
-        $this->grService->resetFailedAttempt("login");
+        $this->grService->resetFailedAttempt('login');
     }
 
     public function onKernelException(ResponseEvent $event)
     {
-        $exception = $event->getThrowable()->getClass() ?? "";
-        $this->grService->addFailedAttempt("exception[" . $exception . "]");
+        $exception = $event->getThrowable()->getClass() ?? '';
+        $this->grService->addFailedAttempt('exception['.$exception.']');
     }
 
     public function checkPassport(CheckPassportEvent $event): void
@@ -90,9 +78,9 @@ class CaptchaSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $value = explode(" ", is_string($badge->getValue() ?? null) ? $badge->getValue() : "");
+        $value = explode(' ', \is_string($badge->getValue() ?? null) ? $badge->getValue() : '');
         $api = $value[1] ?? GrService::APIV2;
-        $value = $value[0] ?? "";
+        $value = $value[0] ?? '';
 
         $executionContextFactory = new ExecutionContextFactory($this->translator, $this->translationDomain);
         $context = $executionContextFactory->createContext($this->validator, $value);
@@ -100,7 +88,7 @@ class CaptchaSubscriber implements EventSubscriberInterface
         $constraintValidator = new CaptchaValidator($this->grService);
         $constraintValidator->initialize($context);
 
-        $violations = $this->validator->validate($value, new Captcha(["api" => $api]));
+        $violations = $this->validator->validate($value, new Captcha(['api' => $api]));
         if ($violations->count() > 0) {
             throw new InvalidCaptchaException($violations[0]->getMessage());
         }

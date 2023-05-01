@@ -4,7 +4,6 @@ namespace Google\Form;
 
 use Base\Validator\Constraints\NotBlank;
 use Google\Form\Type\ReCaptchaV2Type;
-
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -17,17 +16,17 @@ class GrFormTypeV2 extends AbstractType
     {
         $builder
         ->add('title', TextType::class, [
-            'constraints' => [new NotBlank(['message' => 'Blank title.']) ]
+            'constraints' => [new NotBlank(['message' => 'Blank title.'])],
         ]);
 
-        $builder->add('captcha', ReCaptchaV2Type::class, ["type" => "checkbox"]);
+        $builder->add('captcha', ReCaptchaV2Type::class, ['type' => 'checkbox']);
         $builder->add('valid', SubmitType::class);
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefault('attr', [
-            'novalidate' => true
+            'novalidate' => true,
         ]);
     }
 }

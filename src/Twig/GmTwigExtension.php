@@ -12,12 +12,10 @@
 namespace Google\Twig;
 
 use Google\Builder\GmBuilder;
-
-use Twig\Environment;
-use Twig\TwigFunction;
-use Twig\Extension\AbstractExtension;
-
 use Symfony\Component\Config\Definition\Exception\Exception;
+use Twig\Environment;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
 class GmTwigExtension extends AbstractExtension
 {
@@ -32,8 +30,9 @@ class GmTwigExtension extends AbstractExtension
 
     public function render(Environment $env, $id, array $attributes = []): string
     {
-        if (!($instance = GmBuilder::getInstance($id)))
+        if (!($instance = GmBuilder::getInstance($id))) {
             throw new Exception("Unexpected instance #ID requested: \"$id\"");
+        }
 
         foreach ($attributes as $id => $attr) {
             $instance->addOption($id, $attr);
@@ -44,22 +43,24 @@ class GmTwigExtension extends AbstractExtension
 
     public function render_suppress(Environment $env, $id, array $attributes = []): string
     {
-        if (!($instance = GmBuilder::getInstance($id)))
+        if (!($instance = GmBuilder::getInstance($id))) {
             throw new Exception("Unexpected instance #ID requested: \"$id\"");
+        }
 
-        $contents = $attributes["text"] ?? "X";
-        unset($attributes["text"]);
+        $contents = $attributes['text'] ?? 'X';
+        unset($attributes['text']);
 
         return $instance->render_suppress($contents, $attributes);
     }
 
     public function render_export(Environment $env, $id, array $attributes = []): string
     {
-        if (!($instance = GmBuilder::getInstance($id)))
+        if (!($instance = GmBuilder::getInstance($id))) {
             throw new Exception("Unexpected instance #ID requested: \"$id\"");
+        }
 
-        $contents = $attributes["text"] ?? "O";
-        unset($attributes["text"]);
+        $contents = $attributes['text'] ?? 'O';
+        unset($attributes['text']);
 
         return $instance->render_export($contents, $attributes);
     }

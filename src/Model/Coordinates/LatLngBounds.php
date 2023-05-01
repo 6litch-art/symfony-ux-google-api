@@ -14,9 +14,6 @@ Complete documentation:
 
 class LatLngBounds
 {
-    /**
-     * @var LatLng
-     */
     protected LatLng $sw;
 
     public function getSouthWest(): LatLng
@@ -24,9 +21,6 @@ class LatLngBounds
         return $this->sw;
     }
 
-    /**
-     * @var LatLng
-     */
     protected LatLng $ne;
 
     public function getNorthEast(): LatLng
@@ -34,10 +28,6 @@ class LatLngBounds
         return $this->ne;
     }
 
-    /**
-     * @param LatLng $sw
-     * @param LatLng $ne
-     */
     public function __construct(LatLng $sw, LatLng $ne)
     {
         $this->sw = $sw;
@@ -46,25 +36,25 @@ class LatLngBounds
 
     public function equals(LatLng $that)
     {
-        return ($this == $that);
+        return $this == $that;
     }
 
-    //public function contains(LatLng $latLng)
-    //public function extends(Point $point);
+    // public function contains(LatLng $latLng)
+    // public function extends(Point $point);
 
     public function __toString()
     {
-        return "new google.maps.LatLngBounds(" . $this->getSouthWest() . ", " . $this->getNorthEast() . ")";
+        return 'new google.maps.LatLngBounds('.$this->getSouthWest().', '.$this->getNorthEast().')';
     }
 
     public function toJSON()
     {
-        return json_encode(["sw" => $this->getSouthWest()->toJSON(), "ne" => $this->getNorthEast()->toJSON()]);
+        return json_encode(['sw' => $this->getSouthWest()->toJSON(), 'ne' => $this->getNorthEast()->toJSON()]);
     }
 
     public function toUrlValue($precision = 6): string
     {
-        return "sw=" . $this->getSouthWest()->toUrlValue($precision) .
-            "&ne=" . $this->getNorthEast()->toUrlValue($precision);
+        return 'sw='.$this->getSouthWest()->toUrlValue($precision).
+            '&ne='.$this->getNorthEast()->toUrlValue($precision);
     }
 }

@@ -3,11 +3,9 @@
 namespace Google\Model\Maps\Overlay;
 
 use Google\Builder\GmObject;
-use Symfony\Component\Config\Definition\Exception\Exception;
 
 /**
  * @author Marco Meyer <marco.meyerconde@google.maps.il.com>
- *
  */
 class MapTypeStyle extends GmObject
 {
@@ -34,30 +32,31 @@ class MapTypeStyle extends GmObject
 
     public function __toString(): string
     {
-        return "new google.maps.StyledMapType(" .
-            $this->getArgs($this->featureTypes, self::JsonEncoding) . ", " .
-            $this->getOpts(self::JsonEncoding) . ")";
+        return 'new google.maps.StyledMapType('.
+            $this->getArgs($this->featureTypes, self::JsonEncoding).', '.
+            $this->getOpts(self::JsonEncoding).')';
     }
 
     public function getName(): ?string
     {
-        return $this->getOption("name") ?? null;
+        return $this->getOption('name') ?? null;
     }
 
     public function setName(string $name)
     {
-        $this->addOption("name", "'" . $name . "'");
+        $this->addOption('name', "'".$name."'");
+
         return $this;
     }
 
     public function getBaseMapTypeId(): ?string
     {
-        return $this->getOption("name") ?? null;
+        return $this->getOption('name') ?? null;
     }
 
     public function setBaseMapTypeId($baseMapTypeId)
     {
-        $this->addOption("baseMapTypeId", $baseMapTypeId);
+        $this->addOption('baseMapTypeId', $baseMapTypeId);
 
         return $this;
     }
@@ -72,16 +71,16 @@ class MapTypeStyle extends GmObject
     public function addFeatureType(string $featureTypeName, string $elementType = null, array $stylers = [])
     {
         $featureType = [];
-        $featureType["featureType"] = "'" . $featureTypeName . "'";
+        $featureType['featureType'] = "'".$featureTypeName."'";
 
         if ($elementType) {
-            $featureType["elementType"] = "'" . $elementType . "'";
+            $featureType['elementType'] = "'".$elementType."'";
         }
 
         if (!empty($stylers)) {
-            $featureType["stylers"] = [];
+            $featureType['stylers'] = [];
             foreach ($stylers as $key => $styler) {
-                $featureType["stylers"][] = [$key => "'" . $styler . "'"];
+                $featureType['stylers'][] = [$key => "'".$styler."'"];
             }
         }
 
@@ -91,36 +90,36 @@ class MapTypeStyle extends GmObject
     public function hideEquatorAndIntlDateLine()
     {
         $this->addFeatureType(
-            "administrative",
-            "geometry.fill",
-            ["visibility" => "off"]
+            'administrative',
+            'geometry.fill',
+            ['visibility' => 'off']
         );
     }
 
     public function showEquatorAndIntlDateLine()
     {
         $this->addFeatureType(
-            "administrative",
-            "geometry.fill",
-            ["visibility" => "on"]
+            'administrative',
+            'geometry.fill',
+            ['visibility' => 'on']
         );
     }
 
     public function hideCountryLabels()
     {
         $this->addFeatureType(
-            "all",
-            "labels",
-            ["visibility" => "off"]
+            'all',
+            'labels',
+            ['visibility' => 'off']
         );
     }
 
     public function showCountryLabels()
     {
         $this->addFeatureType(
-            "all",
-            "labels",
-            ["visibility" => "on"]
+            'all',
+            'labels',
+            ['visibility' => 'on']
         );
     }
 }

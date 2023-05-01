@@ -2,15 +2,13 @@
 
 namespace Google\Service;
 
-use Symfony\Component\HttpFoundation\Request;
 use Base\Service\ParameterBagInterface;
-use Exception;
 use Google\Form\Type\ReCaptchaV2Type;
 use Google\Form\Type\ReCaptchaV3Type;
-use LogicException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\SubmitButton;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Contracts\Cache\CacheInterface;
@@ -20,32 +18,19 @@ use Twig\Loader\ChainLoader;
 class GrService
 {
     public const CACHE_DURATION = 24 * 3600;
-    public const APIV2 = "apiv2";
-    public const APIV3 = "apiv3";
+    public const APIV2 = 'apiv2';
+    public const APIV3 = 'apiv3';
 
-    public const SEPARATOR = "_";
+    public const SEPARATOR = '_';
 
-    /** @var bool */
     protected bool $enable;
 
-    /**
-     * @var Request
-     */
     protected Request $request;
 
-    /**
-     * @var Environment
-     */
     protected Environment $twig;
 
-    /**
-     * @var CacheInterface
-     */
     protected CacheInterface $cache;
 
-    /**
-     * @var ContainerInterface
-     */
     protected ContainerInterface $container;
 
     /** * @var string */
@@ -60,13 +45,13 @@ class GrService
         $this->cache = $cache;
         $this->request = $requestStack->getCurrentRequest();
 
-        $this->enable = $this->parameterBag->get("google.recaptcha.enable");
-        $this->onLoadMethod = $this->parameterBag->get("google.recaptcha.onload");
+        $this->enable = $this->parameterBag->get('google.recaptcha.enable');
+        $this->onLoadMethod = $this->parameterBag->get('google.recaptcha.onload');
 
         $this->twig = $twig;
         if ($this->getLoader()) {
-            $this->getLoader()->prependPath($kernel->getProjectDir() . "/vendor/glitchr/ux-google/templates/form");
-            $this->getLoader()->prependPath($kernel->getProjectDir() . "/vendor/symfony/twig-bridge/Resources/views", "Twig");
+            $this->getLoader()->prependPath($kernel->getProjectDir().'/vendor/glitchr/ux-google/templates/form');
+            $this->getLoader()->prependPath($kernel->getProjectDir().'/vendor/symfony/twig-bridge/Resources/views', 'Twig');
         }
     }
 
@@ -84,13 +69,13 @@ class GrService
     {
         $url = trim($url);
         $parseUrl = parse_url($url);
-        if ($parseUrl["scheme"] ?? false) {
+        if ($parseUrl['scheme'] ?? false) {
             return $url;
         }
 
-        $path = $parseUrl["path"];
-        if (!str_starts_with($path, "/")) {
-            $path = $this->request->getBasePath() . "/" . $path;
+        $path = $parseUrl['path'];
+        if (!str_starts_with($path, '/')) {
+            $path = $this->request->getBasePath().'/'.$path;
         }
 
         return $path;
@@ -101,7 +86,7 @@ class GrService
         return match ($api) {
             self::APIV2 => ReCaptchaV2Type::class,
             self::APIV3 => ReCaptchaV3Type::class,
-            default => throw new Exception("Invalid API version provided."),
+            default => throw new \Exception('Invalid API version provided.'),
         };
     }
 
@@ -111,20 +96,19 @@ class GrService
             return;
         }
 
-        if (!empty($this->twig->getGlobals()["google_recaptcha"] ?? null))
+        if (!empty($this->twig->getGlobals()['google_recaptcha'] ?? null)) {
             return;
+        }
 
-        $javascripts = "<script src='" . $this->getAsset("bundles/google/recaptcha.js") . "'></script>" . PHP_EOL;
-        $javascripts .= "<script src='https://www.google.com/recaptcha/api.js?onload=" . $this->onLoadMethod . "&render=explicit'></script>";
+        $javascripts = "<script src='".$this->getAsset('bundles/google/recaptcha.js')."'></script>".PHP_EOL;
+        $javascripts .= "<script src='https://www.google.com/recaptcha/api.js?onload=".$this->onLoadMethod."&render=explicit'></script>";
 
         try {
-
-            $this->twig->addGlobal("google_recaptcha", array_merge(
-                $this->twig->getGlobals()["google_recaptcha"] ?? [],
-                ["javascripts" => ($this->twig->getGlobals()["google_recaptcha"]["javascripts"] ?? "") . $javascripts]
+            $this->twig->addGlobal('google_recaptcha', array_merge(
+                $this->twig->getGlobals()['google_recaptcha'] ?? [],
+                ['javascripts' => ($this->twig->getGlobals()['google_recaptcha']['javascripts'] ?? '').$javascripts]
             ));
-
-        } catch (LogicException $e) {
+        } catch (\LogicException $e) {
         }
     }
 
@@ -136,15 +120,15 @@ class GrService
     public function getSecret(string $api)
     {
         return match ($api) {
-            self::APIV2, self::APIV3 => $this->parameterBag->get("google.recaptcha." . $api . ".secret"),
-            default => throw new Exception("Invalid API version provided."),
+            self::APIV2, self::APIV3 => $this->parameterBag->get('google.recaptcha.'.$api.'.secret'),
+            default => throw new \Exception('Invalid API version provided.'),
         };
     }
 
     public function getFailedAttempts(string $formName): int
     {
-        $normalizedIp = str_replace(":", ".", $this->request->getClientIp());
-        $key = $formName . self::SEPARATOR . "failedAttempts" . self::SEPARATOR . $normalizedIp;
+        $normalizedIp = str_replace(':', '.', $this->request->getClientIp());
+        $key = $formName.self::SEPARATOR.'failedAttempts'.self::SEPARATOR.$normalizedIp;
         $cacheItem = $this->cache->getItem($key);
 
         if (!$cacheItem->isHit()) {
@@ -158,8 +142,8 @@ class GrService
 
     public function resetFailedAttempt(string $formName)
     {
-        $normalizedIp = str_replace(":", ".", $this->request->getClientIp());
-        $key = $formName . self::SEPARATOR . "failedAttempts" . self::SEPARATOR . $normalizedIp;
+        $normalizedIp = str_replace(':', '.', $this->request->getClientIp());
+        $key = $formName.self::SEPARATOR.'failedAttempts'.self::SEPARATOR.$normalizedIp;
         $this->cache->delete($key);
 
         return $this;
@@ -167,8 +151,8 @@ class GrService
 
     public function addFailedAttempt(string $formName, int $expiresAfter = self::CACHE_DURATION)
     {
-        $normalizedIp = str_replace(":", ".", $this->request->getClientIp());
-        $key = $formName . self::SEPARATOR . "failedAttempts" . self::SEPARATOR . $normalizedIp;
+        $normalizedIp = str_replace(':', '.', $this->request->getClientIp());
+        $key = $formName.self::SEPARATOR.'failedAttempts'.self::SEPARATOR.$normalizedIp;
         $cacheItem = $this->cache->getItem($key);
 
         if (!$cacheItem->isHit()) {
@@ -202,8 +186,8 @@ class GrService
     public function getSiteKey(string $api)
     {
         return match ($api) {
-            self::APIV2, self::APIV3 => $this->parameterBag->get("google.recaptcha." . $api . ".sitekey"),
-            default => throw new Exception("Invalid API version provided."),
+            self::APIV2, self::APIV3 => $this->parameterBag->get('google.recaptcha.'.$api.'.sitekey'),
+            default => throw new \Exception('Invalid API version provided.'),
         };
     }
 
@@ -211,7 +195,6 @@ class GrService
     {
         $submitButton = null;
         foreach ($form->all() as $child) {
-
             if ($child instanceof SubmitButton) {
                 $submitButton = $child;
                 break;

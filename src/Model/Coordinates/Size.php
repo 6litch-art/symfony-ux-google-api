@@ -11,9 +11,6 @@ Complete documentation:
 
 class Size
 {
-    /**
-     * @var float
-     */
     private float $width;
 
     public function getWidth()
@@ -26,9 +23,6 @@ class Size
         $this->width = $width;
     }
 
-    /**
-     * @var float
-     */
     private float $height;
 
     public function getHeight()
@@ -41,9 +35,6 @@ class Size
         $this->height = $height;
     }
 
-    /**
-     * @var string
-     */
     private string $widthUnit;
 
     public function hasWidthUnit()
@@ -61,9 +52,6 @@ class Size
         $this->widthUnit = $widthUnit;
     }
 
-    /**
-     * @var string
-     */
     private string $heightUnit;
 
     public function hasHeightUnit()
@@ -81,13 +69,7 @@ class Size
         $this->heightUnit = $heightUnit;
     }
 
-    /**
-     * @param float $width
-     * @param float $height
-     * @param string $widthUnit
-     * @param string $heightUnit
-     */
-    public function __construct(float $width = 1.0, float $height = 1.0, string $widthUnit = "", string $heightUnit = "")
+    public function __construct(float $width = 1.0, float $height = 1.0, string $widthUnit = '', string $heightUnit = '')
     {
         $this->setWidth($width);
         $this->setHeight($height);
@@ -97,20 +79,20 @@ class Size
 
     public function equals(LatLng $that)
     {
-        return ($this == $that);
+        return $this == $that;
     }
 
     public function __toString()
     {
-        return "new google.maps.Size(" .
-            $this->width . ", " . $this->height .
-            ($this->hasWidthUnit() ? ", " . $this->widthUnit : "") .
-            ($this->hasHeightUnit() ? ", " . $this->heightUnit : "") .
-            ")";
+        return 'new google.maps.Size('.
+            $this->width.', '.$this->height.
+            ($this->hasWidthUnit() ? ', '.$this->widthUnit : '').
+            ($this->hasHeightUnit() ? ', '.$this->heightUnit : '').
+            ')';
     }
 
     public function toUrlValue()
     {
-        return $this->width . "x" . $this->height;
+        return $this->width.'x'.$this->height;
     }
 }

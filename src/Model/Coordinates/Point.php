@@ -11,9 +11,6 @@ Complete documentation:
 
 class Point
 {
-    /**
-     * @var float
-     */
     private float $x;
 
     public function getX()
@@ -26,9 +23,6 @@ class Point
         $this->x = $x;
     }
 
-    /**
-     * @var float
-     */
     private float $y;
 
     public function getY()
@@ -41,10 +35,6 @@ class Point
         $this->y = $y;
     }
 
-    /**
-     * @param float $x
-     * @param float $y
-     */
     public function __construct(float $x = 0.0, float $y = 0.0)
     {
         $this->setX($x);
@@ -53,11 +43,11 @@ class Point
 
     public function equals(LatLng $that)
     {
-        return ($this == $that);
+        return $this == $that;
     }
 
     public function __toString(): string
     {
-        return "new google.maps.Size(" . $this->x . ", " . $this->y . ")";
+        return 'new google.maps.Size('.$this->x.', '.$this->y.')';
     }
 }

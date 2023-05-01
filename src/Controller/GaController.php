@@ -2,11 +2,10 @@
 
 namespace Google\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\Response;
-
 use Google\Service\GaService;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 
 class GaController extends AbstractController
 {
@@ -18,7 +17,8 @@ class GaController extends AbstractController
     }
 
     /**
-     * Controller example
+     * Controller example.
+     *
      * @Route("/analytics", name="analytics", priority=2)
      */
     public function Main(): Response

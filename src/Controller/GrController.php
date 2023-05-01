@@ -2,17 +2,16 @@
 
 namespace Google\Controller;
 
-use Google\Form\GrFormType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\Response;
-
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 
 class GrController extends AbstractController
 {
     /**
-     * Controller example
+     * Controller example.
+     *
      * @Route("/recaptcha/v2", name="google_recaptcha_v2", priority=2)
      */
     public function RecaptchaV2(Request $request): Response
@@ -29,12 +28,13 @@ class GrController extends AbstractController
         }
 
         return $this->render('@Gr/index.html.twig', [
-            'form' => $form->createView()
+            'form' => $form->createView(),
         ]);
     }
 
     /**
-     * Controller example
+     * Controller example.
+     *
      * @Route("/recaptcha/v3", name="google_recaptcha_v3", priority=2)
      */
     public function RecaptchaV3(Request $request): Response
@@ -51,7 +51,7 @@ class GrController extends AbstractController
         }
 
         return $this->render('@Gr/index.html.twig', [
-            'form' => $form->createView()
+            'form' => $form->createView(),
         ]);
     }
 }

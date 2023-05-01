@@ -24,39 +24,25 @@ Complete documentation:
 
 class LatLng extends GmObject
 {
-    /**
-     * @var float
-     */
     protected float $lat;
 
-    /**
-     * @var float
-     */
     protected float $lng;
 
-    /**
-     * @var bool
-     */
     protected bool $noWrap;
 
     public function setNoWrap($noWrap = true): self
     {
         $this->noWrap = $noWrap;
+
         return $this;
     }
 
-    /**
-     * @param float $lat
-     * @param float $lng
-     * @param bool $noWrap
-     */
     public function __construct(float $lat = 0.0, float $lng = 0.0, bool $noWrap = false)
     {
         $this->noWrap = $noWrap;
         $this->lat = $lat;
         $this->lng = $lng;
     }
-
 
     public function getLat(): float
     {
@@ -74,8 +60,8 @@ class LatLng extends GmObject
             return $this->lat;
         }
 
-        return ($this->lat > 90 ? 90 :
-            (max($this->lat, -90)));
+        return $this->lat > 90 ? 90 :
+            (max($this->lat, -90));
     }
 
     public function setLat($lat = null): self
@@ -83,6 +69,7 @@ class LatLng extends GmObject
         if ($this->lat) {
             $this->lat = $lat;
         }
+
         return $this;
     }
 
@@ -107,9 +94,9 @@ class LatLng extends GmObject
             return $this->lng;
         }
 
-        return ($this->lng > 180 ? $this->lng - 180 * ceil($this->lng / 180) :
+        return $this->lng > 180 ? $this->lng - 180 * ceil($this->lng / 180) :
             ($this->lng < -180 ? $this->lng - 180 * floor($this->lng / 180) :
-                $this->lng));
+                $this->lng);
     }
 
     public function setLng($lng = null): self
@@ -117,6 +104,7 @@ class LatLng extends GmObject
         if ($this->lng) {
             $this->lng = $lng;
         }
+
         return $this;
     }
 
@@ -125,27 +113,26 @@ class LatLng extends GmObject
         return $this->setLng($lng);
     }
 
-
     public function equals(LatLng $that)
     {
-        return ($this === $that);
+        return $this === $that;
     }
 
     public function __toString(): string
     {
-        return "new google.maps.LatLng(" .
-            $this->lat . ", " . $this->lng . ", " .
-            ($this->noWrap ? "true" : "false") . ")";
+        return 'new google.maps.LatLng('.
+            $this->lat.', '.$this->lng.', '.
+            ($this->noWrap ? 'true' : 'false').')';
     }
 
     public function toJSON()
     {
-        return json_encode(["lat" => $this->lat, "lng" => $this->lng]);
+        return json_encode(['lat' => $this->lat, 'lng' => $this->lng]);
     }
 
     public function toUrlValue($precision = 6): string
     {
-        return round($this->lat, $precision) . "," . round($this->lng, $precision);
+        return round($this->lat, $precision).','.round($this->lng, $precision);
     }
 
     public function getLocation($precision = 6): string

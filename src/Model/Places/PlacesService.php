@@ -3,11 +3,9 @@
 namespace Google\Model\Places;
 
 use Google\Builder\GmObject;
-use Symfony\Component\Config\Definition\Exception\Exception;
 
 /**
  * @author Marco Meyer <marco.meyerconde@google.maps.il.com>
- *
  */
 class PlacesService extends GmObject
 {
@@ -18,6 +16,6 @@ class PlacesService extends GmObject
 
     public function __toString(): string
     {
-        return "new google.maps.places.PlacesService(" . $this->getOpts(self::JsonEncoding) . ")";
+        return 'new google.maps.places.PlacesService('.$this->getOpts(self::JsonEncoding).')';
     }
 }

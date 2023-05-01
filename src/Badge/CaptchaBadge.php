@@ -20,8 +20,8 @@ class CaptchaBadge implements BadgeInterface
     private ?string $value;
 
     /**
-     * @param string $fieldId An arbitrary string used to generate the value of the CSRF token.
-     *                                 Using a different string for each authenticator improves its security.
+     * @param string      $fieldId An arbitrary string used to generate the value of the CSRF token.
+     *                             Using a different string for each authenticator improves its security.
      * @param string|null $captcha The CSRF token presented in the request, if any
      */
     public function __construct(string $fieldId, ?string $value)

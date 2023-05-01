@@ -2,7 +2,6 @@
 
 namespace Google\Validator\Constraints;
 
-use Exception;
 use Google\Service\GrService;
 use Symfony\Component\Validator\Constraint;
 
@@ -25,10 +24,10 @@ final class Captcha extends Constraint
     {
         parent::__construct($options ?? [], $groups, $payload);
 
-        $api = $options["api"];
+        $api = $options['api'];
         $this->api = match ($api) {
             GrService::APIV2, GrService::APIV3 => $api,
-            default => throw new Exception("Invalid API version provided."),
+            default => throw new \Exception('Invalid API version provided.'),
         };
     }
 }

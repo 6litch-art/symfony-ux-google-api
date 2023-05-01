@@ -2,16 +2,14 @@
 
 namespace Google\Builder;
 
-use Symfony\Contracts\Cache\CacheInterface;
-use Symfony\Contracts\Cache\ItemInterface;
-
 use Symfony\Component\Config\Definition\Exception\Exception;
+use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 abstract class GmClient extends GmObject implements GmClientInterface
 {
     /**
-     * HTTP Client Interface
+     * HTTP Client Interface.
      *
      * @var HttpClientInterface
      */
@@ -23,7 +21,7 @@ abstract class GmClient extends GmObject implements GmClientInterface
     {
         parent::__construct($opts);
         if (!$client && !GmBuilder::isReady()) {
-            throw new Exception("Missing HttpClientInterface parameter and GmBuilder not initialized");
+            throw new Exception('Missing HttpClientInterface parameter and GmBuilder not initialized');
         }
 
         $this->client = $client;
@@ -31,10 +29,8 @@ abstract class GmClient extends GmObject implements GmClientInterface
 
     /**
      * Base baseUrl including "http://" protocol information.
-     *
-     * @var string
      */
-    protected string $baseUrl = "";
+    protected string $baseUrl = '';
 
     public function getBaseUrl(): string
     {
@@ -44,13 +40,12 @@ abstract class GmClient extends GmObject implements GmClientInterface
     public function setBaseUrl($baseUrl): self
     {
         $this->baseUrl = $baseUrl;
+
         return $this;
     }
 
     /**
-     * Google Map Output Format, either JSON (recommanded) or XML
-     *
-     * @var string
+     * Google Map Output Format, either JSON (recommanded) or XML.
      */
     protected string $outputFormat = self::NoEncoding;
 
@@ -64,11 +59,11 @@ abstract class GmClient extends GmObject implements GmClientInterface
         $outputFormat = strtolower($outputFormat);
         $this->outputFormat = match ($outputFormat) {
             self::NoEncoding, self::JsonEncoding, self::XmlEncoding => $outputFormat,
-            default => throw new Exception("Unexpected output format. It must be either empty, JSON (recommended) or XML"),
+            default => throw new Exception('Unexpected output format. It must be either empty, JSON (recommended) or XML'),
         };
 
         // Map mode is empty when output format is set
-        $this->mapMode = "";
+        $this->mapMode = '';
 
         return $this;
     }
@@ -78,55 +73,55 @@ abstract class GmClient extends GmObject implements GmClientInterface
         return $this->getOpts(self::JsonEncoding);
     }
 
-    public function getRequest(string $baseUrl = "", array $opts = []): string
+    public function getRequest(string $baseUrl = '', array $opts = []): string
     {
         if (empty($baseUrl)) {
             $baseUrl = $this->baseUrl;
         }
         if (empty($baseUrl)) {
-            throw new Exception("No URL defined.");
+            throw new Exception('No URL defined.');
         }
 
         $opts = array_filter($opts, static function ($var) {
-            return $var !== null;
+            return null !== $var;
         });
         $opts = array_merge($this->getOpts(), $opts);
 
-        $parameters = "key=" . $this->key;
+        $parameters = 'key='.$this->key;
         foreach ($opts as $name => $value) {
             if (!$value) {
                 continue;
             }
 
-            if (class_exists($value) && method_exists($value, "toUrlValue")) {
-                $parameters .= "&" . $name . "=" . $value->toUrlValue();
+            if (class_exists($value) && method_exists($value, 'toUrlValue')) {
+                $parameters .= '&'.$name.'='.$value->toUrlValue();
             } else {
-                $parameters .= "&" . $name . "=" . $value;
+                $parameters .= '&'.$name.'='.$value;
             }
         }
 
-        return rtrim($baseUrl, '/') . ($this->outputFormat ? "/" . $this->outputFormat : "") . "?" . $parameters;
+        return rtrim($baseUrl, '/').($this->outputFormat ? '/'.$this->outputFormat : '').'?'.$parameters;
     }
 
     private const EnableCache = true;
 
-    public function send(string $baseUrl = "", array $opts = [], int $expiration = 30 * 86400)
+    public function send(string $baseUrl = '', array $opts = [], int $expiration = 30 * 86400)
     {
         if (!$this->client) {
-            return ["status" => GmBuilder::STATUS_NOCLIENT];
+            return ['status' => GmBuilder::STATUS_NOCLIENT];
         }
 
         $request = $this->getRequest($baseUrl, $opts);
         $request = $this->signUrl($request);
 
-        if (php_sapi_name() == "cli") {
+        if ('cli' == php_sapi_name()) {
             $response = $this->getResponse($request);
         } else {
             $response = GmBuilder::getInstance()->cache->get(
                 md5($request),
                 function (ItemInterface $item) use ($request, $expiration) {
                     $content = $this->getResponse($request);
-                    if ($content["status"] == GmBuilder::STATUS_OK) {
+                    if (GmBuilder::STATUS_OK == $content['status']) {
                         $item->expiresAfter((self::EnableCache) ? $expiration : 0);
                     }
 
@@ -138,69 +133,68 @@ abstract class GmClient extends GmObject implements GmClientInterface
         return $response;
     }
 
-
     public function getResponse($request): array
     {
         if (!($response = $this->client->request('GET', $request))) {
-            throw new Exception("Empty response received from: \"" . $request . "\"");
+            throw new Exception('Empty response received from: "'.$request.'"');
         }
 
         if (($statusCode = $response->getStatusCode()) != 200) {
-            throw new Exception("Unexpected status code " . $statusCode . " returned from: \"$request\"");
+            throw new Exception('Unexpected status code '.$statusCode." returned from: \"$request\"");
         }
 
-        if ($this->getOutputFormat() != self::NoEncoding) {
-            $contentType = explode("; ", $response->getHeaders()['content-type'][0])[0];
-            $expectedContentType = "application/" . $this->getOutputFormat();
+        if (self::NoEncoding != $this->getOutputFormat()) {
+            $contentType = explode('; ', $response->getHeaders()['content-type'][0])[0];
+            $expectedContentType = 'application/'.$this->getOutputFormat();
             if ($contentType != $expectedContentType) {
-                throw new Exception("Unexpected content-type received: \"" . $contentType . "\" returned from: \"$request\"");
+                throw new Exception('Unexpected content-type received: "'.$contentType."\" returned from: \"$request\"");
             }
         }
 
         // Disable cache if not invalid response
         $responseArray = json_decode($response->getContent(), true);
-        $status = $responseArray["status"] ?? GmBuilder::STATUS_OK;
-        if ($status == "REQUEST_DENIED") {
-            throw new Exception(($responseArray["error_message"] ?? "Unknown error") . "\n\nHTTP Request: " . $request);
+        $status = $responseArray['status'] ?? GmBuilder::STATUS_OK;
+        if ('REQUEST_DENIED' == $status) {
+            throw new Exception(($responseArray['error_message'] ?? 'Unknown error')."\n\nHTTP Request: ".$request);
         }
 
         // Return result
-        return $responseArray ?? ["status" => GmBuilder::STATUS_BAD];
+        return $responseArray ?? ['status' => GmBuilder::STATUS_BAD];
     }
 
     public function render($args = []): string
     {
         $options = $this->parseArgs([
             'id    ' => $this->id,
-            'class ' => $this->pop("class") ?? "",
-            'style ' => $this->pop("style") ?? "",
-            'width ' => $this->pop("width") ?? "",
-            'height' => $this->pop("height") ?? ""
+            'class ' => $this->pop('class') ?? '',
+            'style ' => $this->pop('style') ?? '',
+            'width ' => $this->pop('width') ?? '',
+            'height' => $this->pop('height') ?? '',
         ]);
 
         if (!$this->cacheExists()) {
             GmBuilder::getInstance()->filesystem->uploadCache($this->getCachePath(), $this->send());
         }
 
-        return "<img " . $options . " src='" . $this->getCacheUrl() . "'>" . PHP_EOL;
+        return '<img '.$options." src='".$this->getCacheUrl()."'>".PHP_EOL;
     }
 
     public function checkUrl(string $url, string $signature = null): bool
     {
         // Remove signature variable
         $urlWithoutSignature = preg_replace('/([?&])signature=[^&]+(&|$)/', '$1', $url);
-        $urlWithoutSignature = trim($urlWithoutSignature, "&");
+        $urlWithoutSignature = trim($urlWithoutSignature, '&');
 
         // Get reference signature
-        if ($signature == null) {
+        if (null == $signature) {
             $url = parse_url($url);
 
             $get = [];
-            parse_str($url["query"] ?? "", $get);
-            $signature = $get["signature"];
+            parse_str($url['query'] ?? '', $get);
+            $signature = $get['signature'];
 
-            if ($signature == null) {
-                throw new Exception("No signature found.");
+            if (null == $signature) {
+                throw new Exception('No signature found.');
             }
         }
 
@@ -211,13 +205,13 @@ abstract class GmClient extends GmObject implements GmClientInterface
     // Note that this URL must be properly URL-encoded
     public function signUrl($url, $privateKey = null)
     {
-        return $url . "&signature=" . $this->getSignatureUrl($url, $privateKey);
+        return $url.'&signature='.$this->getSignatureUrl($url, $privateKey);
     }
 
     public function getSignatureUrl($url, $privateKey = null)
     {
         $parseUrl = parse_url($url);
-        $urlPartToSign = $parseUrl['path'] . "?" . $parseUrl['query'];
+        $urlPartToSign = $parseUrl['path'].'?'.$parseUrl['query'];
 
         return $this->getSignature($urlPartToSign, $privateKey);
     }

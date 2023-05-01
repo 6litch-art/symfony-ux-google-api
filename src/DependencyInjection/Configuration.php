@@ -2,15 +2,14 @@
 
 namespace Google\DependencyInjection;
 
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
-
-use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
 class Configuration implements ConfigurationInterface
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getConfigTreeBuilder(): TreeBuilder
     {
@@ -51,7 +50,7 @@ class Configuration implements ConfigurationInterface
             ->end()
             ->scalarNode('onload')
             ->info('On load function called when recaptche required')
-            ->defaultValue("onGoogleLoad")
+            ->defaultValue('onGoogleLoad')
             ->end()
             ->arrayNode('form_themes')
             ->addDefaultChildrenIfNoneSet()
@@ -64,11 +63,11 @@ class Configuration implements ConfigurationInterface
             ->children()
             ->scalarNode('sitekey')
             ->info('Client key (might be displayed, must use HTTP referrer restriction)')
-            ->defaultValue("6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI")
+            ->defaultValue('6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI')
             ->end()
             ->scalarNode('secret')
             ->info('Secret key (not shown)')
-            ->defaultValue("6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe")
+            ->defaultValue('6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe')
             ->end()
             ->integerNode('min_attempts')
             ->info('Minimum number of attempts before securing the page form')
@@ -81,11 +80,11 @@ class Configuration implements ConfigurationInterface
             ->children()
             ->scalarNode('sitekey')
             ->info('Client key (might be displayed, must use HTTP referrer restriction)')
-            ->defaultValue("")
+            ->defaultValue('')
             ->end()
             ->scalarNode('secret')
             ->info('Secret key (not shown)')
-            ->defaultValue("")
+            ->defaultValue('')
             ->end()
             ->integerNode('min_attempts')
             ->info('Minimum number of attempts before securing the page form')
@@ -93,7 +92,7 @@ class Configuration implements ConfigurationInterface
             ->end()
             ->scalarNode('score_threshold')
             ->info('Server key (not shown)')
-            ->defaultValue("")
+            ->defaultValue('')
             ->end()
             ->end()
             ->end()
@@ -123,18 +122,18 @@ class Configuration implements ConfigurationInterface
             ->end()
             ->scalarNode('cache_format')
             ->info('Cache output format')
-            ->defaultValue("jpeg")
+            ->defaultValue('jpeg')
             ->end()
             ->scalarNode('cache')
             ->info('Place to store cache')
             ->end()
             ->scalarNode('cache_pool')
             ->info('Cache pool')
-            ->defaultValue("google")
+            ->defaultValue('google')
             ->end()
             ->scalarNode('cache_public')
             ->info('Public place to store cache')
-            ->defaultValue("storage/default/google")
+            ->defaultValue('storage/default/google')
             ->end()
             ->scalarNode('cache_only')
             ->info('Cache only (display no-image if true)')
@@ -150,38 +149,38 @@ class Configuration implements ConfigurationInterface
             ->end()
             ->scalarNode('cache_control')
             ->info('Cache control for manual deletion')
-            ->defaultValue("ROLE_ADMIN")
+            ->defaultValue('ROLE_ADMIN')
             ->end()
             ->scalarNode('stylesheet')
             ->info('Google Maps custom CSS stylesheet')
-            ->defaultValue("")
+            ->defaultValue('')
             ->end()
             ->scalarNode('callback')
             ->info('Init callback function')
-            ->defaultValue("initMap")
+            ->defaultValue('initMap')
             ->end()
             ->scalarNode('libraries')
             ->info('Additional libraries')
-            ->defaultValue("")
+            ->defaultValue('')
             ->end()
             ->scalarNode('version')
             ->info('Google Map API Version')
-            ->defaultValue("weekly")
+            ->defaultValue('weekly')
             ->end()
             ->scalarNode('secret')
             ->info('Secret for signature (not shown)')
-            ->defaultValue("")
+            ->defaultValue('')
             ->end()
             ->arrayNode('apikey')
             ->addDefaultsIfNotSet()
             ->children()
             ->scalarNode('client')
             ->info('Client key (might be displayed, must use HTTP referrer restriction)')
-            ->defaultValue("")
+            ->defaultValue('')
             ->end()
             ->scalarNode('server')
             ->info('Server key (not shown)')
-            ->defaultValue("")
+            ->defaultValue('')
             ->end()
             ->end()
             ->end()
@@ -190,7 +189,7 @@ class Configuration implements ConfigurationInterface
 
     private function addAnalyticsOptions(ArrayNodeDefinition $rootNode)
     {
-        $dataPath = dirname(__DIR__, 5) . "/data";
+        $dataPath = dirname(__DIR__, 5).'/data';
 
         $rootNode
             ->children()
@@ -210,7 +209,7 @@ class Configuration implements ConfigurationInterface
             ->end()
             ->scalarNode('json')
             ->info('JSON key location')
-            ->defaultValue($dataPath . "/google-analytics-api.json")
+            ->defaultValue($dataPath.'/google-analytics-api.json')
             ->end()
             ->scalarNode('view_id')
             ->info('View #ID to load (can be set later)')
@@ -245,19 +244,19 @@ class Configuration implements ConfigurationInterface
             ->arrayNode('containers')
             ->useAttributeAsKey('name')
             ->defaultValue([
-                "name" => "default",
-                "type" => "web",
-                "id" => null,
-                "url" => 'https://www.googletagmanager.com'
+                'name' => 'default',
+                'type' => 'web',
+                'id' => null,
+                'url' => 'https://www.googletagmanager.com',
             ])
             ->arrayPrototype()
             ->children()
-            ->scalarNode("name")
+            ->scalarNode('name')
             ->end()
-            ->scalarNode("id")
+            ->scalarNode('id')
             ->isRequired()
             ->end()
-            ->scalarNode("url")
+            ->scalarNode('url')
             ->info('Server container url')
             ->defaultValue('https://www.googletagmanager.com')
             ->end()

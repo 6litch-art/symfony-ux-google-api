@@ -2,15 +2,15 @@
 
 namespace Google\Builder;
 
-use Symfony\Component\Config\Definition\Exception\Exception;
-
 class GmEntry extends GmObject implements GmEntryInterface
 {
     private string $cmdline;
+
     public function getCommandLine(): string
     {
         return $this->cmdline;
     }
+
     public function setCommandLine(string $cmdline)
     {
         $this->cmdline = $cmdline;
@@ -23,10 +23,10 @@ class GmEntry extends GmObject implements GmEntryInterface
 
     public function render(): string
     {
-        return "";
+        return '';
     }
 
-    public function __construct(string $cmdline = "")
+    public function __construct(string $cmdline = '')
     {
         parent::__construct();
         $this->cmdline = $cmdline;

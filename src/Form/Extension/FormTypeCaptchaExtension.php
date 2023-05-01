@@ -2,45 +2,33 @@
 
 namespace Google\Form\Extension;
 
+use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Provider\AdminContextProvider;
-use Google\Form\Type\ReCaptchaV3Type;
 use Google\Service\GrService;
+use Google\Subscriber\CaptchaValidationListener;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
-use Google\Subscriber\CaptchaValidationListener;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 
 class FormTypeCaptchaExtension extends AbstractTypeExtension
 {
-    /** @var bool */
     protected bool $defaultEnabled;
 
-    /**
-     * @var GrService
-     */
     protected GrService $grService;
 
-    /**
-     * @var ValidatorInterface
-     */
     protected ValidatorInterface $validator;
 
-    /**
-     * @var TranslatorInterface
-     */
     protected TranslatorInterface $translator;
 
     /**
      * @var ?AdminContext
      */
     protected ?AdminContext $easyadminContext;
-
 
     public function __construct(GrService $grService, ValidatorInterface $validator, TranslatorInterface $translator, AdminContextProvider $adminContextProvider, bool $defaultEnabled = true)
     {
@@ -66,19 +54,19 @@ class FormTypeCaptchaExtension extends AbstractTypeExtension
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'captcha_protection' => $this->defaultEnabled && ($this->easyadminContext === null),
+            'captcha_protection' => $this->defaultEnabled && (null === $this->easyadminContext),
             'captcha_api' => GrService::APIV2,
-            'captcha_type' => "checkbox",
-            'captcha_field_name' => "_captcha",
-            "captcha_reset_on_success" => true,
-            "captcha_min_attempts" => 5,
-            "captcha_score_threshold" => 0
+            'captcha_type' => 'checkbox',
+            'captcha_field_name' => '_captcha',
+            'captcha_reset_on_success' => true,
+            'captcha_min_attempts' => 5,
+            'captcha_score_threshold' => 0,
         ]);
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        if (!$options["captcha_protection"]) {
+        if (!$options['captcha_protection']) {
             return;
         }
         if (!$builder->getForm()->isRoot()) {
@@ -91,17 +79,14 @@ class FormTypeCaptchaExtension extends AbstractTypeExtension
             $options['captcha_api'],
             $this->validator,
             $this->translator,
-            $options['translation_domain'] ?? ""
+            $options['translation_domain'] ?? ''
         ));
     }
 
-
     /**
-     * @param array $input Input array to add items to
-     * @param array $items Items to insert (as an array)
-     * @param int $position Position to inject items from (starts from 0)
-     *
-     * @return array
+     * @param array $input    Input array to add items to
+     * @param array $items    Items to insert (as an array)
+     * @param int   $position Position to inject items from (starts from 0)
      */
     public function arrayInject(array $input, array $items, int $position): array
     {
@@ -125,7 +110,7 @@ class FormTypeCaptchaExtension extends AbstractTypeExtension
             return;
         }
         if (!$view->parent && $options['compound']) {
-            if ($options["captcha_api"] == GrService::APIV2 && !$this->grService->hasTriggeredMinimumAttempts($form, $options)) {
+            if (GrService::APIV2 == $options['captcha_api'] && !$this->grService->hasTriggeredMinimumAttempts($form, $options)) {
                 return;
             }
             if ($this->grService->findCaptchaType($form)) {
@@ -133,12 +118,11 @@ class FormTypeCaptchaExtension extends AbstractTypeExtension
             }
 
             $factory = $form->getConfig()->getFormFactory();
-            $captchaForm = $factory->createNamed($options['captcha_field_name'], $this->grService->getType($options["captcha_api"]), null, [
+            $captchaForm = $factory->createNamed($options['captcha_field_name'], $this->grService->getType($options['captcha_api']), null, [
                 'mapped' => false,
             ]);
 
-            if (($submitButton = $this->grService->findSubmitButton($form))) {
-
+            if ($submitButton = $this->grService->findSubmitButton($form)) {
                 $keys = array_keys($view->children);
                 $submitIndex = array_search($submitButton->getName(), $keys);
 
