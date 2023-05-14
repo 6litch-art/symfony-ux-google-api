@@ -68,7 +68,7 @@ class GmBuilder implements GmBuilderInterface
 
     public CsrfTokenManagerInterface $tokenManager;
 
-    public Environment $environment;
+    public string $environment;
 
     public RouterInterface $router;
 
