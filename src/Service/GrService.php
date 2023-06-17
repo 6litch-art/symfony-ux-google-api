@@ -129,6 +129,7 @@ class GrService
      */
     public function isEnabled()
     {
+        $this->enable = $this->parameterBag->get('google.recaptcha.enable');
         return $this->enable;
     }
 

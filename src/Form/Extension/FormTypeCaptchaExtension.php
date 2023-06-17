@@ -33,14 +33,12 @@ class FormTypeCaptchaExtension extends AbstractTypeExtension
      */
     protected ?AdminContext $easyadminContext;
 
-    public function __construct(GrService $grService, ValidatorInterface $validator, TranslatorInterface $translator, AdminContextProvider $adminContextProvider, bool $defaultEnabled = true)
+    public function __construct(GrService $grService, ValidatorInterface $validator, TranslatorInterface $translator, AdminContextProvider $adminContextProvider)
     {
         $this->grService = $grService;
         $this->translator = $translator;
         $this->validator = $validator;
         $this->easyadminContext = $adminContextProvider->getContext();
-
-        $this->defaultEnabled = $defaultEnabled;
     }
 
     /**
@@ -57,8 +55,8 @@ class FormTypeCaptchaExtension extends AbstractTypeExtension
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'captcha_protection' => $this->defaultEnabled && (null === $this->easyadminContext),
-            'captcha_api' => GrService::APIV2,
+            'captcha_protection' => $this->grService->isEnabled() && (null === $this->easyadminContext),
+            'captcha_api' => GrService::APIV3,
             'captcha_type' => 'checkbox',
             'captcha_field_name' => '_captcha',
             'captcha_reset_on_success' => true,
@@ -72,6 +70,7 @@ class FormTypeCaptchaExtension extends AbstractTypeExtension
         if (!$options['captcha_protection']) {
             return;
         }
+        
         if (!$builder->getForm()->isRoot()) {
             return;
         }
