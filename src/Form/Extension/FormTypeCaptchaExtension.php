@@ -49,10 +49,7 @@ class FormTypeCaptchaExtension extends AbstractTypeExtension
         return [FormType::class];
     }
 
-    /**
-     * {}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'captcha_protection' => $this->grService->isEnabled() && (null === $this->easyadminContext),
@@ -65,7 +62,7 @@ class FormTypeCaptchaExtension extends AbstractTypeExtension
         ]);
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if (!$options['captcha_protection']) {
             return;
@@ -106,7 +103,7 @@ class FormTypeCaptchaExtension extends AbstractTypeExtension
         );
     }
 
-    public function finishView(FormView $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         if (!$options['captcha_protection']) {
             return;
