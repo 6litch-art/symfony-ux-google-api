@@ -53,7 +53,7 @@ class FormTypeCaptchaExtension extends AbstractTypeExtension
     {
         $resolver->setDefaults([
             'captcha_protection' => $this->grService->isEnabled() && (null === $this->easyadminContext),
-            'captcha_api' => GrService::APIV3,
+            'captcha_api' => GrService::APIV2,
             'captcha_type' => 'checkbox',
             'captcha_field_name' => '_captcha',
             'captcha_reset_on_success' => true,
