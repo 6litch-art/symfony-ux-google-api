@@ -234,7 +234,7 @@ class GrService
      */
     public function getScoreThreshold(array $options = [])
     {
-        return $options['captcha_score_threshold'] ?? 0;
+        return $options['captcha_score_threshold'] ?? 0.5;
     }
 
     /**

@@ -58,7 +58,7 @@ class FormTypeCaptchaExtension extends AbstractTypeExtension
             'captcha_field_name' => '_captcha',
             'captcha_reset_on_success' => true,
             'captcha_min_attempts' => 5,
-            'captcha_score_threshold' => 0,
+            'captcha_score_threshold' => 0.5,
         ]);
     }
 
