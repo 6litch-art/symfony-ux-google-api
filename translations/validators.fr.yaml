@@ -2,6 +2,7 @@ captcha:
   test:
     success: Le test captcha est validé !
     failed: Le test captcha a échoué.
+    missing_value: Pas de test captcha trouvé dans le formulaire
   error:
     invalid_keys: Clef captcha incorrecte.
     hostname_mismatch: Hôte incorrecte dans la vérification captcha
