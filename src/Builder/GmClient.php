@@ -154,19 +154,29 @@ abstract class GmClient extends GmObject implements GmClientInterface
         $request = $this->signUrl($request);
 
         if ('cli' == php_sapi_name()) {
+            
             $response = $this->getResponse($request);
-        } else {
-            $response = GmBuilder::getInstance()->cache->get(
-                md5($request),
-                function (ItemInterface $item) use ($request, $expiration) {
-                    $content = $this->getResponse($request);
-                    if (GmBuilder::STATUS_OK == $content['status']) {
-                        $item->expiresAfter((self::EnableCache) ? $expiration : 0);
-                    }
 
-                    return $content;
-                }
-            );
+        } else {
+
+            try {
+                $response = GmBuilder::getInstance()->cache->get(
+                    
+                    md5($request),
+
+                    function (ItemInterface $item) use ($request, $expiration) {
+                        $content = $this->getResponse($request);
+                        if (GmBuilder::STATUS_OK == $content['status']) {
+                            $item->expiresAfter((self::EnableCache) ? $expiration : 0);
+                        }
+
+                        return $content;
+                    }
+                );
+            } catch (Exception $e)
+            {
+                return ['status' => GmBuilder::STATUS_BAD];
+            }
         }
 
         return $response;
