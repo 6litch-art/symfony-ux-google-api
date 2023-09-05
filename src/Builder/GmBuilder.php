@@ -92,7 +92,6 @@ class GmBuilder implements GmBuilderInterface
 
         //
         // Autowiring
-        //
         $this->cache = $cache;
         $this->client = $client;
         $this->tokenManager = $csrfTokenManager;
@@ -103,14 +102,13 @@ class GmBuilder implements GmBuilderInterface
 
         //
         // Get variables
-        //
-        $this->enable = $kernel->getContainer()->getParameter('google.maps.enable');
-        $this->cachePool = $kernel->getContainer()->getParameter('google.maps.cache_pool');
+        $this->enable        = $kernel->getContainer()->getParameter('google.maps.enable');
+        $this->cachePool     = $kernel->getContainer()->getParameter('google.maps.cache_pool');
         $this->cacheLifetime = $kernel->getContainer()->getParameter('google.maps.cache_lifetime');
-        $this->cacheOnly = $kernel->getContainer()->getParameter('google.maps.cache_only');
-        $this->cacheControl = $kernel->getContainer()->getParameter('google.maps.cache_control');
-        $this->cacheQuality = $kernel->getContainer()->getParameter('google.maps.cache_quality');
-        $this->cachePublic = $this->getAsset($kernel->getContainer()->getParameter('google.maps.cache_public'));
+        $this->cacheOnly     = $kernel->getContainer()->getParameter('google.maps.cache_only');
+        $this->cacheControl  = $kernel->getContainer()->getParameter('google.maps.cache_control');
+        $this->cacheQuality  = $kernel->getContainer()->getParameter('google.maps.cache_quality');
+        $this->cachePublic   = $this->getAsset($kernel->getContainer()->getParameter('google.maps.cache_public'));
 
         $this->cacheTilesize = $kernel->getContainer()->getParameter('google.maps.cache_tilesize');
         if ($this->cacheTilesize < 1) {
@@ -124,10 +122,10 @@ class GmBuilder implements GmBuilderInterface
 
         $this->keyClient = $kernel->getContainer()->getParameter('google.maps.apikey.client');
         $this->keyServer = $kernel->getContainer()->getParameter('google.maps.apikey.server');
-        $this->secret = $kernel->getContainer()->getParameter('google.maps.secret');
-        $this->callback = $kernel->getContainer()->getParameter('google.maps.callback');
+        $this->secret    = $kernel->getContainer()->getParameter('google.maps.secret');
+        $this->callback  = $kernel->getContainer()->getParameter('google.maps.callback');
         $this->libraries = $kernel->getContainer()->getParameter('google.maps.libraries');
-        $this->version = $kernel->getContainer()->getParameter('google.maps.version');
+        $this->version   = $kernel->getContainer()->getParameter('google.maps.version');
 
         $this->filesystem = $lazyFactory->createStorage(
             $kernel->getContainer()->getParameter('google.maps.cache'),

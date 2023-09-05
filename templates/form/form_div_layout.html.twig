@@ -9,7 +9,7 @@
 
 {% block recaptchaV3_widget %}
 {% if enable %}
-<div class="captcha-response" style="height:0; overflow:hidden;margin-bottom: -1.5em; margin-top: 1.5em;"><input type="text" data-api="{{api}}" data-toggle="recaptcha" required="required" data-name="{{name}}" data-id="{{id}}" data-type="{{ type }}" data-sitekey="{{ sitekey }}"  {{ block('widget_attributes') }}/><div>
+<div class="captcha-response" style="display:none;"><input type="text" data-api="{{api}}" data-toggle="recaptcha" required="required" data-name="{{name}}" data-id="{{id}}" data-type="{{ type }}" data-sitekey="{{ sitekey }}"  {{ block('widget_attributes') }}/><div>
 {% endif %} 
 {% endblock %}
 

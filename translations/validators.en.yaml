@@ -2,6 +2,7 @@ captcha:
   test:
     success: Captcha test succeeded !
     failed: Captcha test failed.
+    missing_value: No captcha test found in form.
   error:
     invalid_keys: Captcha key invalid
     hostname_mismatch: Hostname mismatch for captcha verification.

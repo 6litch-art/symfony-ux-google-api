@@ -115,7 +115,7 @@ window.addEventListener('load', function(event) {
               elTile[index].setAttribute("id", el.getAttribute("id")+"_"+index);
               elTile[index].setAttribute("data-background-image", tmp_src); //url('"+missing+"')
               elTile[index].style.opacity   = "0";
-              elTile[index].style.transition   = "opacity 0.75s ease";
+              elTile[index].style.transition   = "opacity 0.5s ease";
               el.append(elTile[index]);
           }
 
@@ -135,5 +135,4 @@ window.addEventListener('load', function(event) {
     window.addEventListener("orientationChange", tilesLazyload);
     tilesLazyload();
   }
-     
 });

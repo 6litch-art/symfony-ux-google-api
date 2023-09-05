@@ -33,14 +33,12 @@ class FormTypeCaptchaExtension extends AbstractTypeExtension
      */
     protected ?AdminContext $easyadminContext;
 
-    public function __construct(GrService $grService, ValidatorInterface $validator, TranslatorInterface $translator, AdminContextProvider $adminContextProvider, bool $defaultEnabled = true)
+    public function __construct(GrService $grService, ValidatorInterface $validator, TranslatorInterface $translator, AdminContextProvider $adminContextProvider)
     {
         $this->grService = $grService;
         $this->translator = $translator;
         $this->validator = $validator;
         $this->easyadminContext = $adminContextProvider->getContext();
-
-        $this->defaultEnabled = $defaultEnabled;
     }
 
     /**
@@ -51,27 +49,25 @@ class FormTypeCaptchaExtension extends AbstractTypeExtension
         return [FormType::class];
     }
 
-    /**
-     * {}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'captcha_protection' => $this->defaultEnabled && (null === $this->easyadminContext),
+            'captcha_protection' => $this->grService->isEnabled() && (null === $this->easyadminContext),
             'captcha_api' => GrService::APIV2,
             'captcha_type' => 'checkbox',
             'captcha_field_name' => '_captcha',
             'captcha_reset_on_success' => true,
             'captcha_min_attempts' => 5,
-            'captcha_score_threshold' => 0,
+            'captcha_score_threshold' => 0.5,
         ]);
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if (!$options['captcha_protection']) {
             return;
         }
+        
         if (!$builder->getForm()->isRoot()) {
             return;
         }
@@ -107,7 +103,7 @@ class FormTypeCaptchaExtension extends AbstractTypeExtension
         );
     }
 
-    public function finishView(FormView $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         if (!$options['captcha_protection']) {
             return;
