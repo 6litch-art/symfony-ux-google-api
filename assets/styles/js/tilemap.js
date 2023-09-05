@@ -1,4 +1,5 @@
-window.addEventListener('DOMContentLoaded', function () {
+
+window.addEventListener('load', function(event) {
 
   var container = document.querySelectorAll(".google-tilemap");
   for (var i = 0; i < container.length; i++) {
@@ -114,7 +115,7 @@ window.addEventListener('DOMContentLoaded', function () {
               elTile[index].setAttribute("id", el.getAttribute("id")+"_"+index);
               elTile[index].setAttribute("data-background-image", tmp_src); //url('"+missing+"')
               elTile[index].style.opacity   = "0";
-              elTile[index].style.transition   = "opacity 0.4s ease";
+              elTile[index].style.transition   = "opacity 0.75s ease";
               el.append(elTile[index]);
           }
 
@@ -134,4 +135,5 @@ window.addEventListener('DOMContentLoaded', function () {
     window.addEventListener("orientationChange", tilesLazyload);
     tilesLazyload();
   }
+     
 });
