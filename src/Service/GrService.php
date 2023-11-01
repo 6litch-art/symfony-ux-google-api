@@ -2,7 +2,7 @@
 
 namespace Google\Service;
 
-use Base\Service\ParameterBagInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Google\Form\Type\ReCaptchaV2Type;
 use Google\Form\Type\ReCaptchaV3Type;
 use Symfony\Component\DependencyInjection\ContainerInterface;

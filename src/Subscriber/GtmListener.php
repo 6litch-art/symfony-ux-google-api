@@ -126,7 +126,13 @@ class GtmListener
         }
 
         $this->autoAppend = $this->parameterBag->get("google.tag_manager.autoappend");
-        foreach ($this->parameterBag->get("google.tag_manager.containers") ?? [] as $container) {
+        $containers = [];
+        if($this->parameterBag->has("google.tag_manager.containers")) {
+            $containers = $this->parameterBag->get("google.tag_manager.containers");
+        }
+
+        foreach ($containers as $container) {
+
             $this->containerId = $container["id"] ?? null;
             if (!$this->containerId) {
                 continue;
