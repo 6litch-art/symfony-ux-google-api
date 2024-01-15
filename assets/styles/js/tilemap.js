@@ -26,7 +26,7 @@ window.addEventListener('load', function(event) {
     var resolution = 2;
     var xtiles    = parseInt(el.getAttribute("data-xtiles"));
     var ytiles    = parseInt(el.getAttribute("data-ytiles"));
-    var missing   = el.getAttribute("data-missing");
+    // var missing   = el.getAttribute("data-missing");
 
     el.addEventListener("lazyload.gm_tilemap", function() {
 
@@ -85,54 +85,47 @@ window.addEventListener('load', function(event) {
       };
     }
 
-    function tilesLazyload() {
+    var width  = xtiles*tilesize/resolution;
+    var height = ytiles*tilesize/resolution;
 
-      var width  = xtiles*tilesize/resolution;
-      var height = ytiles*tilesize/resolution;
+    var tile = objectFit(true, width, height, el.clientWidth, el.clientHeight);
+    if(tile.width == width) tile = objectFit(false, width, height, el.clientWidth, el.clientHeight);
+    
+    var elTile = $(el).find("span")
+    for(iy = 0; iy < ytiles; iy++) {
+    
+      for(ix = 0; ix < xtiles; ix++) {
 
-      var tile = objectFit(true, width, height, el.clientWidth, el.clientHeight);
-      if(tile.width == width) tile = objectFit(false, width, height, el.clientWidth, el.clientHeight);
-      
-      var elTile = $(el).find("span")
-      for(iy = 0; iy < ytiles; iy++) {
-      
-        for(ix = 0; ix < xtiles; ix++) {
+        var _tilesize = Math.max(tile.height/ytiles, tile.width/xtiles);
+        var index = iy*xtiles + ix;
 
-          var _tilesize = Math.max(tile.height/ytiles, tile.width/xtiles);
-          var index = iy*xtiles + ix;
+        if (elTile[index] === undefined) {
 
-          if (elTile[index] === undefined) {
+            elTile[index] = document.createElement("span");
 
-              elTile[index] = document.createElement("span");
+            var tmp_src = decodeURI(src);
+            
+            if(tmp_src.indexOf("{signature}")) tmp_src = tmp_src.replaceAll("{signature}", signature);
+            else tmp_src += "/" + signature;
+            if(tmp_src.indexOf("{id}")) tmp_src = tmp_src.replaceAll("{id}", index);
+            else tmp_src += "/" + index;
 
-              var tmp_src = decodeURI(src);
-              
-              if(tmp_src.indexOf("{signature}")) tmp_src = tmp_src.replaceAll("{signature}", signature);
-              else tmp_src += "/" + signature;
-              if(tmp_src.indexOf("{id}")) tmp_src = tmp_src.replaceAll("{id}", index);
-              else tmp_src += "/" + index;
-
-              elTile[index].setAttribute("id", el.getAttribute("id")+"_"+index);
-              elTile[index].setAttribute("data-background-image", tmp_src); //url('"+missing+"')
-              elTile[index].style.opacity   = "0";
-              elTile[index].style.transition   = "opacity 0.5s ease";
-              el.append(elTile[index]);
-          }
-
-          elTile[index].style.position = "absolute";
-          elTile[index].style.left     = tile.left + (_tilesize*ix) + "px";
-          elTile[index].style.top      = tile.top  + (_tilesize*iy) + "px";    
-          elTile[index].style.width    = _tilesize + "px";
-          elTile[index].style.height   = _tilesize + "px";
-          elTile[index].style.backgroundSize   = _tilesize + "px";
-
-          el.dispatchEvent(new Event("lazyload.gm_tilemap"));
+            elTile[index].setAttribute("id", el.getAttribute("id")+"_"+index);
+            elTile[index].setAttribute("data-background-image", tmp_src); //url('"+missing+"')
+            elTile[index].style.opacity   = "0";
+            elTile[index].style.transition   = "opacity 0.5s ease";
+            el.append(elTile[index]);
         }
+
+        elTile[index].style.position = "absolute";
+        elTile[index].style.left     = tile.left + (_tilesize*ix) + "px";
+        elTile[index].style.top      = tile.top  + (_tilesize*iy) + "px";    
+        elTile[index].style.width    = _tilesize + "px";
+        elTile[index].style.height   = _tilesize + "px";
+        elTile[index].style.backgroundSize   = _tilesize + "px";
+
+        el.dispatchEvent(new Event("lazyload.gm_tilemap"));
       }
     }
-
-    window.addEventListener("resize", tilesLazyload);
-    window.addEventListener("orientationChange", tilesLazyload);
-    tilesLazyload();
   }
 });
