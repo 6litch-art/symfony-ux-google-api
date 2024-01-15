@@ -36,13 +36,14 @@ class GaService
      */
     public function __construct(ParameterBagInterface $parameterBag, CacheInterface $cache)
     {
-        $this->enable = $parameterBag->get('ga.enable') ?? false;
-        $this->viewId = $parameterBag->get('ga.view_id');
-        $this->jsonLocation = $parameterBag->get('ga.json');
+        $this->enable = $parameterBag->get('google.analytics.enable') ?? false;
+        $this->viewId = $parameterBag->get('google.analytics.view_id');
+        $this->jsonLocation = $parameterBag->get('google.analytics.json');
+        $this->enable &= file_exists($this->jsonLocation);
 
         $this->cache = $cache;
-
         if ($this->enable) {
+            
             $this->client = new \Google_Client();
             $this->client->setApplicationName('GoogleAnalytics');
             $this->client->setScopes(['https://www.googleapis.com/auth/analytics.readonly']);

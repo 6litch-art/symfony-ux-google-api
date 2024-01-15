@@ -2,7 +2,7 @@
 
 namespace Google\Inspector;
 
-use Base\Service\ParameterBagInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Composer\InstalledVersions;
 use Google\GtmBundle;
 use Symfony\Bundle\FrameworkBundle\DataCollector\AbstractDataCollector;
