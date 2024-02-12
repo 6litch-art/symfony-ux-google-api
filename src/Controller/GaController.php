@@ -21,9 +21,9 @@ class GaController extends AbstractController
 
     /**
      * Controller example.
-     *
-     * @Route("/analytics", name="analytics", priority=2)
      */
+    
+    #[Route("/analytics", name:"analytics", priority:2)]
     public function Main(): Response
     {
         return $this->json($this->gaService->getBasics());

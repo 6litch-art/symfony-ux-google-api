@@ -32,7 +32,7 @@ class CacheWarmer implements CacheWarmerInterface
      * @param $cacheDir
      * @return array|string[]
      */
-    public function warmUp($cacheDir): array
+    public function warmUp(string $cacheDir, ?string $buildDir = null): array
     {
         if ($this->shellVerbosity > 0 && php_sapi_name() == "cli") {
             echo " // Warming up cache... Google Analytics Basics" . PHP_EOL . PHP_EOL;

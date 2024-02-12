@@ -2,6 +2,8 @@
 
 namespace Google\Controller;
 
+use Google\Form\GrFormTypeV2;
+use Google\Form\GrFormTypeV3;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,9 +16,9 @@ class GrController extends AbstractController
 {
     /**
      * Controller example.
-     *
-     * @Route("/recaptcha/v2", name="google_recaptcha_v2", priority=2)
      */
+    
+    #[Route("/recaptcha/v2", name:"google_recaptcha_v2", priority:2)]
     public function RecaptchaV2(Request $request): Response
     {
         $form = $this->createForm(GrFormTypeV2::class);
@@ -37,9 +39,9 @@ class GrController extends AbstractController
 
     /**
      * Controller example.
-     *
-     * @Route("/recaptcha/v3", name="google_recaptcha_v3", priority=2)
      */
+
+    #[Route("/recaptcha/v3", name:"google_recaptcha_v3", priority:2)]
     public function RecaptchaV3(Request $request): Response
     {
         $form = $this->createForm(GrFormTypeV3::class);

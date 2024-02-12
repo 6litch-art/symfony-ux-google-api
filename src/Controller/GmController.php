@@ -25,61 +25,11 @@ class GmController extends AbstractController
         $this->gmBuilder = $gmBuilder;
     }
 
-    // /**
-    //  * Controller example
-    //  * @Route("/google/maps", name="gm_example")
-    //  */
-    // public function Example(): Response
-    // {
-    //     if (!$this->gmBuilder->alreadyExists("myMap")) {
-    //         $sidney  = new Place("ChIJN1t_tDeuEmsRUsoyG83frY4");
-    //         $url = "https://maps.googleapis.com/maps/api/staticmap?center=40.714%2c%20-73.998&zoom=12&size=400x400&key=AIzaSyDtqB9Vqs9nj2Yu5sQLMyqwK9pGWEbSltA";
-
-    //         $myMarker = new Marker([
-    //             "map" => "myMap",
-    //             "position" => $sidney->getLatLng(),
-    //             "title" => "\"Sidney !\""
-    //         ]);
-
-    //         $myMap = new Map([
-    //             "zoom" => 8,
-    //             "center" => $sidney->getLatLng(),
-    //             "html2canvas" => true
-    //         ]);
-
-    //         $myMap->setDefaultUI(0);
-    //         $myMarker->setParent($myMap);
-
-    //         $this->gmBuilder
-    //             ->addMap("myMap", $myMap)
-    //             ->addMarker("myMarker", $myMarker)
-    //             ->addListener(
-    //                 "myMap",
-    //                 "click",
-    //                 "function placeMarker(location) {
-
-    //                 console.log(location);
-    //                 if (myMarker != null) myMarker.setPosition(location.latLng);
-    //                 else {
-
-    //                     myMarker = new google.maps.Marker({
-    //                         position: location,
-    //                         map: myMap
-    //                     });
-    //                 }
-    //             }"
-    //             )
-    //         ->build();
-    //     }
-
-    //     return $this->render("@Gm/index.html.twig");
-    // }
-
     /**
      * Display cache image.
-     *
-     * @Route("/google/maps/{signature}", name="gm_show_metadata")
      */
+
+    #[Route("/google/maps/{signature}", name:"gm_show_metadata")]
     public function ShowMetadata(string $signature)
     {
         $metadata = $this->gmBuilder->getCacheMetadata($signature);
@@ -89,9 +39,9 @@ class GmController extends AbstractController
 
     /**
      * Export using html2canvas.
-     *
-     * @Route("/google/maps/{signature}/export", name="gm_export")
      */
+
+    #[Route("/google/maps/{signature}/export", name:"gm_export")]
     public function Export(string $signature, Request $request)
     {
         if (!$this->gmBuilder->isGranted()) {
@@ -110,6 +60,7 @@ class GmController extends AbstractController
 
         $tilesize = $request->request->get('gm_tilesize') ?? null;
         if (!$tilesize) {
+
             list($width, $height) = getimagesizefromstring(base64_decode(explode('base64,', $data)[1]));
             $nx = 1;
             $ny = 1;
@@ -119,7 +70,9 @@ class GmController extends AbstractController
                 $this->gmBuilder->getCachePath($signature),
                 base64_decode(explode('base64,', $data)[1])
             );
+
         } else {
+
             // Subdivide picture
             $im = imagecreatefromstring(base64_decode(explode('base64,', $data)[1]));
             if (false === $im) {
@@ -187,9 +140,9 @@ class GmController extends AbstractController
 
     /**
      * Suppress a cache image.
-     *
-     * @Route("/google/maps/{signature}/suppress", name="gm_suppress")
-     * */
+     */
+    
+    #[Route("/google/maps/{signature}/suppress", name:"gm_suppress")]
     public function Suppress(string $signature)
     {
         if (!$this->gmBuilder->isGranted()) {
@@ -205,9 +158,9 @@ class GmController extends AbstractController
 
     /**
      * Display cache image.
-     *
-     * @Route("/google/maps/{signature}/{id}", name="gm_show")
      */
+
+    #[Route("/google/maps/{signature}/{id}", name:"gm_show")]
     public function Show(string $signature, int $id = 0): Response
     {
         if ($this->gmBuilder->cacheExists($signature, ['id' => $id])) {
