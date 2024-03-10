@@ -40,7 +40,7 @@ class GmTwigExtension extends AbstractExtension
     public function render(Environment $env, $id, array $attributes = []): string
     {
         if (!($instance = GmBuilder::getInstance($id))) {
-            throw new Exception("Unexpected instance #ID requested: \"$id\"");
+            return "";
         }
 
         foreach ($attributes as $id => $attr) {
@@ -59,7 +59,7 @@ class GmTwigExtension extends AbstractExtension
     public function render_suppress(Environment $env, $id, array $attributes = []): string
     {
         if (!($instance = GmBuilder::getInstance($id))) {
-            throw new Exception("Unexpected instance #ID requested: \"$id\"");
+            return "";
         }
 
         $contents = $attributes['text'] ?? 'X';
@@ -77,7 +77,7 @@ class GmTwigExtension extends AbstractExtension
     public function render_export(Environment $env, $id, array $attributes = []): string
     {
         if (!($instance = GmBuilder::getInstance($id))) {
-            throw new Exception("Unexpected instance #ID requested: \"$id\"");
+            return "";
         }
 
         $contents = $attributes['text'] ?? 'O';
