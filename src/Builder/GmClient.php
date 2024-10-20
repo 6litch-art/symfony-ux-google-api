@@ -173,7 +173,7 @@ abstract class GmClient extends GmObject implements GmClientInterface
                         return $content;
                     }
                 );
-            } catch (Exception $e)
+            } catch (Exception|Symfony\Component\HttpClient\Exception\TransportException $e)
             {
                 return ['status' => GmBuilder::STATUS_BAD];
             }
