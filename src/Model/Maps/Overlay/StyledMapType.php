@@ -5,9 +5,9 @@ namespace Google\Model\Maps\Overlay;
 use Google\Builder\GmObject;
 
 /**
- * @author Marco Meyer <marco.meyerconde@google.maps.il.com>
+ * @author Marco Meyer <marco.meyerconde@gmail.com>
  */
-class MapTypeStyle extends GmObject
+class StyledMapType extends GmObject
 {
     /*
         References:
@@ -34,7 +34,7 @@ class MapTypeStyle extends GmObject
     {
         return 'new google.maps.StyledMapType(' .
             $this->getArgs($this->featureTypes, self::JsonEncoding) . ', ' .
-            $this->getOpts(self::JsonEncoding) . ')';
+            $this->getOptions(self::JsonEncoding) . ')';
     }
 
     public function getName(): ?string

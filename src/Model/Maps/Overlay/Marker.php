@@ -5,12 +5,12 @@ namespace Google\Model\Maps\Overlay;
 use Google\Builder\GmObject;
 
 /**
- * @author Marco Meyer <marco.meyerconde@google.maps.il.com>
+ * @author Marco Meyer <marco.meyerconde@gmail.com>
  */
 class Marker extends GmObject
 {
-    public function __toString(): string
+    public function getAssets(): \Generator
     {
-        return 'new google.maps.Marker('.$this->getOpts(self::JsonEncoding).')';
+        yield "await google.maps.importLibrary('maps')";
     }
 }

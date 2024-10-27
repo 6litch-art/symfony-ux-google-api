@@ -17,6 +17,47 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
     public const DivFormat = 'div';
 
     protected ?GmObjectInterface $parent = null;
+    protected $first;
+
+    public function __construct(array $options = [])
+    {
+        $this->first = true;
+
+        $options['html2canvas'] = $options['html2canvas'] ?? !empty(GmBuilder::getInstance()->html2canvas);
+        $this->setKey($this->pop('key') ?? GmBuilder::getInstance()->keyServer ?? GmBuilder::getInstance()->keyClient);
+        $this->addOption($options);
+    }
+
+    public function loadAssets(): string
+    {
+        if (!$this->first) return "";
+        $this->first = false;
+
+        $classname = explode('\\', get_class($this));
+        $classname = $classname[count($classname) - 1];
+
+        $assets = $this->getAssets();
+
+        $ret = "";
+        foreach($assets as $asset) {
+            $ret .= "const { ".$classname." } = ".$asset.";".PHP_EOL;
+        }
+
+        return $ret;
+    }
+
+    public function getAssets(): \Generator { yield from []; }
+
+    public function __toString(): string
+    {
+        $classname = explode('\\', get_class($this));
+        $classname = $classname[count($classname) - 1];
+
+        $elementId = (!empty($this->id) ? "document.getElementById('" . $this->id . "'), " : '');
+
+        return 'new '.$classname . '(' . $elementId . $this->getOptions(self::JsonEncoding) . ')';
+
+    }
 
     public function setParent(?GmObjectInterface $parent)
     {
@@ -40,14 +81,14 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
     }
 
     /**
-     * @param array|null $opts
+     * @param array|null $options
      * @return bool
      */
-    public function parentCacheExists(?array $opts = [])
+    public function parentCacheExists(?array $options = [])
     {
         $parent = $this; // If it has at least one parent cache, then it needs to be commented..
         while ($parent = $parent->getParent()) {
-            if ($parent->cacheExists($opts)) {
+            if ($parent->cacheExists($options)) {
                 return true;
             }
         }
@@ -70,27 +111,27 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
         return false;
     }
 
-    private array $opts = [];
+    private array $options = [];
 
     /**
      * @param string $encoding
      * @return array|string
      */
-    public function getOpts(string $encoding = self::NoEncoding)
+    public function getOptions(string $encoding = self::NoEncoding)
     {
-        return $this->getArgs($this->opts, $encoding);
+        return $this->getArgs($this->options, $encoding);
     }
 
-    public function setOpts(array $opts): self
+    public function setOptions(array $options): self
     {
-        $this->opts = $opts;
+        $this->options = $options;
 
         return $this;
     }
 
-    public function parseOpts(string $format = self::UrlFormat): string
+    public function parseOptions(string $format = self::UrlFormat): string
     {
-        return $this->parseArgs($this->opts, $format);
+        return $this->parseArgs($this->options, $format);
     }
 
     /**
@@ -100,17 +141,18 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
      */
     public function getArgs($args, string $encoding = self::NoEncoding)
     {
+
         switch ($encoding) {
             case self::JsonEncoding:
                 if (is_array($args)) {
-                    // NB: NOT using "json_encode", because of quotes..
-                    // e.g. getArgs(["name" => "value"]) would return => {"name":"value"}
-                    //      I want this: {"name":value};
+
+                    // NB: NOT using "json_encode", because of quote issue..
+                    // e.g. getArgs(["name" => "value"]) would return => {"name":"value"} instead of {"name":value};
 
                     $isAssoc = array_keys($args) !== range(0, count($args) - 1);
 
                     $json = '';
-                    foreach ($args as $key => $arg) {
+                    foreach (array_filter($args) as $key => $arg) {
                         $json .= (empty($json) ? '' : ', ');
                         if ($isAssoc) {
                             $json .= $key . ':' . $this->getArgs($arg, $encoding);
@@ -181,14 +223,14 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
             }
 
             foreach ($array as $key => $value) {
-                $this->opts[$key] = $value;
+                $this->options[$key] = $value;
             }
 
             return $this;
         }
 
         if ($value) {
-            $this->opts[$key] = $value;
+            $this->options[$key] = $value;
         }
 
         return $this;
@@ -196,14 +238,14 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
 
     public function removeOption(string $key): self
     {
-        unset($this->opts[$key]);
+        unset($this->options[$key]);
 
         return $this;
     }
 
     public function getOption(string $key): ?string
     {
-        return $this->opts[$key] ?? null;
+        return $this->options[$key] ?? null;
     }
 
     /**
@@ -212,12 +254,12 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
      */
     public function pop(string $key)
     {
-        if (!array_key_exists($key, $this->opts)) {
+        if (!array_key_exists($key, $this->options)) {
             return null;
         }
 
-        $value = $this->opts[$key];
-        unset($this->opts[$key]);
+        $value = $this->options[$key];
+        unset($this->options[$key]);
 
         return $value;
     }
@@ -276,23 +318,6 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
         GmBuilder::getInstance($id)->unbind($this);
 
         return $this;
-    }
-
-    public function __construct(array $opts = [])
-    {
-        $opts['html2canvas'] = $opts['html2canvas'] ?? !empty(GmBuilder::getInstance()->html2canvas);
-        $this->setKey($this->pop('key') ?? GmBuilder::getInstance()->keyServer ?? GmBuilder::getInstance()->keyClient);
-        $this->addOption($opts);
-    }
-
-    public function __toString(): string
-    {
-        $classname = explode('\\', get_class($this));
-        $classname = $classname[count($classname) - 1];
-
-        $elementId = (!empty($this->id) ? "document.getElementById('" . $this->id . "'), " : '');
-
-        return 'new google.maps.' . $classname . '(' . $elementId . $this->getOpts(self::JsonEncoding) . ')';
     }
 
     protected array $listener = [];
@@ -508,11 +533,11 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
         return GmBuilder::getInstance()->getCache($signature);
     }
 
-    public function cacheExists(?array $opts = []): bool
+    public function cacheExists(?array $options = []): bool
     {
         $signature = $this->getSignatureWithOptions();
 
-        return GmBuilder::getInstance()->cacheExists($signature, $opts);
+        return GmBuilder::getInstance()->cacheExists($signature, $options);
     }
 
     public function getCachePath(): string
@@ -533,11 +558,10 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
         return $url;
     }
 
-    // Encode a string to URL-safe base64
-
     /**
      * @param $value
      * @return array|string|string[]
+     * @brief Encode a string to URL-safe base64
      */
     public static function base64_encode($value)
     {
@@ -548,11 +572,10 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
         );
     }
 
-    // Decode a string from URL-safe base64
-
     /**
      * @param $value
      * @return false|string
+     * @brief Decode a string from URL-safe base64
      */
     public static function base64_decode($value)
     {
@@ -586,7 +609,7 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
         $options = $this->parseArgs(
             array_merge(
                 ['instance' => get_class($this)],
-                $this->getOpts()
+                $this->getOptions()
             )
         );
 
@@ -612,7 +635,6 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
         $decodedKey = self::base64_decode($privateKey);
         $signature = hash_hmac('sha1', $str, $decodedKey, true);
 
-        // dump($privateKey, $decodedKey, $signature, self::base64_encode($signature));
         return str_replace('=', '', self::base64_encode($signature));
     }
 

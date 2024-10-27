@@ -7,11 +7,11 @@ namespace Google\Builder;
  */
 interface GmObjectInterface
 {
-    public function getOpts(string $encoding);
+    public function getOptions(string $encoding);
 
-    public function setOpts(array $opts): self;
+    public function setOptions(array $options): self;
 
-    public function parseOpts(string $format): string;
+    public function parseOptions(string $format): string;
 
     public function getArgs(array $args, string $encoding);
 
@@ -19,11 +19,6 @@ interface GmObjectInterface
 
     public function getOption(string $key): ?string;
 
-    /**
-     * @param $key
-     * @param $value
-     * @return $this
-     */
     /**
      * @param $key
      * @param $value
@@ -43,13 +38,15 @@ interface GmObjectInterface
 
     public function setKey(?string $key): self;
 
+    public function loadAssets(): string;
+    public function getAssets(): \Generator;
     public function render(): string;
 
     public function getCachePath(): string;
 
     public function getCacheUrl(): string;
 
-    public function cacheExists(array $opts = []): bool;
+    public function cacheExists(array $options = []): bool;
 
     public function cacheEnabled(): bool;
 }

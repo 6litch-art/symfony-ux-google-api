@@ -4,28 +4,29 @@ namespace Google\Model\Maps;
 
 use Google\Builder\GmObject;
 use Google\Model\Coordinates\LatLng;
-use Google\Model\Maps\Overlay\MapTypeStyle;
+use Google\Model\Maps\Overlay\StyledMapType;
 use Google\Model\Maps\Overlay\Marker;
 use Symfony\Component\Config\Definition\Exception\Exception;
 
 /**
- * @author Marco Meyer <marco.meyerconde@google.maps.il.com>
+ * @author Marco Meyer <marco.meyerconde@gmail.com>
  */
 class Map extends GmObject
 {
-    public function __construct(array $opts = [])
+    public function __construct(array $options = [])
     {
-        parent::__construct($opts);
+        parent::__construct($options);
 
         $this->addListener('tilesloaded', "function(){ window.dispatchEvent(new Event('tilesloaded')); }");
         $this->addListener('idle', "function(){ window.dispatchEvent(new Event('idle')); }");
         $this->addListener('drag', "function(){ window.dispatchEvent(new Event('drag')); }");
     }
 
-    /**
-     * @param int $value
-     * @return $this
-     */
+    public function getAssets(): \Generator
+    {
+        yield "await google.maps.importLibrary('maps')";
+    }
+
     /**
      * @param int $value
      * @return $this
@@ -41,10 +42,6 @@ class Map extends GmObject
      * @param LatLng $center
      * @return $this
      */
-    /**
-     * @param LatLng $center
-     * @return $this
-     */
     public function setCenter(LatLng $center)
     {
         $this->addOption('center', $center);
@@ -52,10 +49,6 @@ class Map extends GmObject
         return $this;
     }
 
-    /**
-     * @param bool $b
-     * @return $this
-     */
     /**
      * @param bool $b
      * @return $this
@@ -83,21 +76,16 @@ class Map extends GmObject
 
     /**
      * @param $gmBuilder
-     * @param $opts
+     * @param $options
      * @return $this
      */
-    /**
-     * @param $gmBuilder
-     * @param $opts
-     * @return $this
-     */
-    public function addMarker($gmBuilder, $opts = []): self
+    public function addMarker($gmBuilder, $options = []): self
     {
         if (!$this->getId()) {
             throw new Exception('Map not yet added to builder.. cannot add marker');
         }
 
-        $marker = ($opts instanceof Marker ? $opts : new Marker($opts));
+        $marker = ($options instanceof Marker ? $options : new Marker($options));
         $marker->addOption('map', $this->getId());
         $marker->setParent($this);
 
@@ -112,19 +100,13 @@ class Map extends GmObject
      * @param $featureTypes
      * @return $this
      */
-    /**
-     * @param $gmBuilder
-     * @param $name
-     * @param $featureTypes
-     * @return $this
-     */
     public function addMapStyle($gmBuilder, $name, $featureTypes = [])
     {
         if (!$this->getId()) {
             throw new Exception('Map not yet added to builder.. cannot add a map type style');
         }
 
-        $mapStyle = ($name instanceof MapTypeStyle ? $name : new MapTypeStyle($name, $featureTypes));
+        $mapStyle = ($name instanceof StyledMapType ? $name : new StyledMapType($name, $featureTypes));
         if (array_key_exists($mapStyle->getName(), $this->mapStyleList)) {
             return $this;
         }
@@ -155,11 +137,6 @@ class Map extends GmObject
      * @param array $zStopList
      * @return $this
      */
-    /**
-     * @param $mapStyle
-     * @param array $zStopList
-     * @return $this
-     */
     public function setMapStyle($mapStyle, array $zStopList = [])
     {
         if (!$this->getId()) {
@@ -167,11 +144,11 @@ class Map extends GmObject
         }
 
         if ($this->getMapId()) {
-            throw new Exception('Custom Map ID already set.. This might conflict with MapTypeStyle');
+            throw new Exception('Custom Map ID already set.. This might conflict with StyledMapType');
         }
 
         if (!array_key_exists($mapStyle->getName(), $this->mapStyleList)) {
-            throw new Exception('MapTypeStyle ' . $mapStyle->getName() . ' is not in the list of the mapTypes for "' . $this->getId() . '"');
+            throw new Exception('StyledMapType ' . $mapStyle->getName() . ' is not in the list of the mapTypes for "' . $this->getId() . '"');
         }
 
         // No zStop position then just set the display style
@@ -189,8 +166,8 @@ class Map extends GmObject
         $N = count($zStopList);
         foreach ($zStopList as $zStop => $mapStyle2) {
             $zStop = intval($zStop);
-            if (!$mapStyle2 instanceof MapTypeStyle) {
-                throw new Exception('MapTypeStyle ' . $mapStyle2->getName() . ' is not an instance of MapTypeStyle for "' . $this->getId() . '"');
+            if (!$mapStyle2 instanceof StyledMapType) {
+                throw new Exception('StyledMapType ' . $mapStyle2->getName() . ' is not an instance of StyledMapType for "' . $this->getId() . '"');
             }
 
             if ($i++ > 0) {

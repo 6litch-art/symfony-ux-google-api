@@ -61,7 +61,7 @@ interface GmBuilderInterface
 
     public function deleteCache(string $signature);
 
-    public function cacheExists(string $signature, array $opts = []);
+    public function cacheExists(string $signature, array $options = []);
 
     public static function alreadyExists(string $id): bool;
 }

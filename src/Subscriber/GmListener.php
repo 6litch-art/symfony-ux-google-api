@@ -113,7 +113,7 @@ class GmListener
             return false;
         }
 
-        return !$this->isProfiler($event);
+        return !$this->isProfiler($event) && $event->getResponse()->getStatusCode() == 200;
     }
 
     /**
@@ -129,14 +129,15 @@ class GmListener
         if (!$this->allowRender($event)) {
             return false;
         }
-
+    
         $response = $event->getResponse();
+
         $api = $this->twig->getGlobals()["google_maps"]["api"] ?? "";
         $html2canvas = $this->twig->getGlobals()["google_maps"]["html2canvas"] ?? "";
         $initMap = $this->twig->getGlobals()["google_maps"]["initMap"] ?? "";
 
         $content = preg_replace([
-            '/<\/body\b[^>]*>/',
+            '/<\/head\b[^>]*>/',
             '/<\/head\b[^>]*>/',
             '/<\/head\b[^>]*>/'
         ], [

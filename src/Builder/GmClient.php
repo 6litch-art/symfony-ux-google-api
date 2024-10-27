@@ -27,11 +27,11 @@ abstract class GmClient extends GmObject implements GmClientInterface
 
     /**
      * @param HttpClientInterface|null $client
-     * @param $opts
+     * @param $options
      */
-    public function __construct(?HttpClientInterface $client, $opts = [])
+    public function __construct(?HttpClientInterface $client, $options = [])
     {
-        parent::__construct($opts);
+        parent::__construct($options);
         if (!$client && !GmBuilder::isReady()) {
             throw new Exception('Missing HttpClientInterface parameter and GmBuilder not initialized');
         }
@@ -43,16 +43,11 @@ abstract class GmClient extends GmObject implements GmClientInterface
      * Base baseUrl including "http://" protocol information.
      */
     protected string $baseUrl = '';
-
     public function getBaseUrl(): string
     {
         return $this->baseUrl;
     }
 
-    /**
-     * @param $baseUrl
-     * @return $this
-     */
     /**
      * @param $baseUrl
      * @return $this
@@ -98,10 +93,10 @@ abstract class GmClient extends GmObject implements GmClientInterface
 
     public function getParameters(): mixed
     {
-        return $this->getOpts(self::JsonEncoding);
+        return $this->getOptions(self::JsonEncoding);
     }
 
-    public function getRequest(string $baseUrl = '', array $opts = []): string
+    public function getRequest(string $baseUrl = '', array $options = []): string
     {
         if (empty($baseUrl)) {
             $baseUrl = $this->baseUrl;
@@ -110,13 +105,13 @@ abstract class GmClient extends GmObject implements GmClientInterface
             throw new Exception('No URL defined.');
         }
 
-        $opts = array_filter($opts, static function ($var) {
+        $options = array_filter($options, static function ($var) {
             return null !== $var;
         });
-        $opts = array_merge($this->getOpts(), $opts);
+        $options = array_merge($this->getOptions(), $options);
 
         $parameters = 'key=' . $this->key;
-        foreach ($opts as $name => $value) {
+        foreach ($options as $name => $value) {
             if (!$value) {
                 continue;
             }
@@ -135,7 +130,7 @@ abstract class GmClient extends GmObject implements GmClientInterface
 
     /**
      * @param string $baseUrl
-     * @param array $opts
+     * @param array $options
      * @param int $expiration
      * @return array|mixed|string
      * @throws ClientExceptionInterface
@@ -144,13 +139,13 @@ abstract class GmClient extends GmObject implements GmClientInterface
      * @throws TransportExceptionInterface
      * @throws InvalidArgumentException
      */
-    public function send(string $baseUrl = '', array $opts = [], int $expiration = 30 * 86400)
+    public function send(string $baseUrl = '', array $options = [], int $expiration = 30 * 86400)
     {
         if (!$this->client) {
             return ['status' => GmBuilder::STATUS_NOCLIENT];
         }
 
-        $request = $this->getRequest($baseUrl, $opts);
+        $request = $this->getRequest($baseUrl, $options);
         $request = $this->signUrl($request);
 
         if ('cli' == php_sapi_name()) {
@@ -173,9 +168,9 @@ abstract class GmClient extends GmObject implements GmClientInterface
                         return $content;
                     }
                 );
-            } catch (Exception|Symfony\Component\HttpClient\Exception\TransportException $e)
+            } catch (Exception $e)
             {
-                return ['status' => GmBuilder::STATUS_BAD];
+                return ['status' => $e->getMessage()];
             }
         }
 

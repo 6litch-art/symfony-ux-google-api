@@ -10,19 +10,19 @@ use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * @author Marco Meyer <marco.meyerconde@google.maps.il.com>
+ * @author Marco Meyer <marco.meyerconde@gmail.com>
  */
 class MapStatic extends GmClient
 {
     /**
      * @param int|null $width0
      * @param int|null $height0
-     * @param $opts
+     * @param $options
      * @param HttpClientInterface|null $client
      */
-    public function __construct(?int $width0, ?int $height0, $opts = [], HttpClientInterface $client = null)
+    public function __construct(?int $width0, ?int $height0, $options = [], HttpClientInterface $client = null)
     {
-        parent::__construct($client ?? GmBuilder::getInstance()->client, $opts);
+        parent::__construct($client ?? GmBuilder::getInstance()->client, $options);
         $this->setBaseUrl('https://maps.googleapis.com/maps/api/staticmap');
 
         $size = $this->pop('size');

@@ -105,7 +105,7 @@ class GrListener
             return false;
         }
 
-        return !$this->isProfiler($event);
+        return !$this->isProfiler($event) && $event->getResponse()->getStatusCode() == 200;
     }
 
     /**

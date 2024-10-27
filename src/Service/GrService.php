@@ -29,7 +29,7 @@ class GrService
 
     protected bool $enable;
 
-    protected Request $request;
+    protected ?Request $request;
 
     protected Environment $twig;
 

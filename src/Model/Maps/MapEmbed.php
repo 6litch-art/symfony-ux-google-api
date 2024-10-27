@@ -7,17 +7,17 @@ use Google\Builder\GmClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * @author Marco Meyer <marco.meyerconde@google.maps.il.com>
+ * @author Marco Meyer <marco.meyerconde@gmail.com>
  */
 class MapEmbed extends GmClient
 {
     /**
-     * @param $opts
+     * @param $options
      * @param HttpClientInterface|null $client
      */
-    public function __construct($opts = [], HttpClientInterface $client = null)
+    public function __construct($options = [], HttpClientInterface $client = null)
     {
-        parent::__construct($client ?? GmBuilder::getInstance()->client, $opts);
+        parent::__construct($client ?? GmBuilder::getInstance()->client, $options);
         $this->setBaseUrl('https://www.google.com/maps/embed/v1/place');
     }
 }

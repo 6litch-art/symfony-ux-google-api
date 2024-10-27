@@ -13,9 +13,9 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class Place extends GmClient
 {
-    public function __construct(?string $placeId, array $opts = [], HttpClientInterface $client = null)
+    public function __construct(?string $placeId, array $options = [], HttpClientInterface $client = null)
     {
-        parent::__construct($client ?? GmBuilder::getInstance()->client, $opts);
+        parent::__construct($client ?? GmBuilder::getInstance()->client, $options);
         $this->setOutputFormat(self::JsonEncoding);
 
         if ($this->guestIfValidPlaceId($placeId)) {
@@ -91,7 +91,7 @@ class Place extends GmClient
      */
     public function getLatLng()
     {
-        $location = $this->getOpts()['geometry']['location'] ?? [];
+        $location = $this->getOptions()['geometry']['location'] ?? [];
 
         $lat = $location['lat'] ?? 0;
         $lng = $location['lng'] ?? 0;
@@ -99,63 +99,63 @@ class Place extends GmClient
         return new LatLng($lat, $lng);
     }
 
-    public function FindPlaceFromText(string $input = null, string $inputtype = null, array $opts = []): array
+    public function FindPlaceFromText(string $input = null, string $inputtype = null, array $options = []): array
     {
-        $opts['input'] = $input ?? $opts['input'] ?? $this->getOption('input');
-        $opts['inputtype'] = $inputtype ?? $opts['inputtype'] ?? $this->getOption('inputtype') ?? 'textquery';
+        $options['input'] = $input ?? $options['input'] ?? $this->getOption('input');
+        $options['inputtype'] = $inputtype ?? $options['inputtype'] ?? $this->getOption('inputtype') ?? 'textquery';
 
-        if (!$opts['input']) {
+        if (!$options['input']) {
             throw new Exception('No input information provided.');
         }
 
-        return $this->send('https://maps.googleapis.com/maps/api/place/findplacefromtext', $opts) ?? [];
+        return $this->send('https://maps.googleapis.com/maps/api/place/findplacefromtext', $options) ?? [];
     }
 
     /**
      * @param LatLng|null $location
      * @param int|null $radius
-     * @param array $opts
+     * @param array $options
      * @return array|mixed|string
      */
-    public function NearbySearch(LatLng $location = null, int $radius = null /* meter */, array $opts = [])
+    public function NearbySearch(LatLng $location = null, int $radius = null /* meter */, array $options = [])
     {
-        $opts['radius'] = $radius ?? $opts['radius'] ?? $this->getOption('radius');
-        $opts['location'] = $input ?? $opts['location'] ?? $this->getOption('location');
+        $options['radius'] = $radius ?? $options['radius'] ?? $this->getOption('radius');
+        $options['location'] = $input ?? $options['location'] ?? $this->getOption('location');
 
-        if (!($opts['location'] ?? $opts['radius'] ?? false)) {
+        if (!($options['location'] ?? $options['radius'] ?? false)) {
             throw new Exception('No location/radius information provided.');
         }
 
-        return $this->send('https://maps.googleapis.com/maps/api/place/nearbysearch', $opts);
+        return $this->send('https://maps.googleapis.com/maps/api/place/nearbysearch', $options);
     }
 
     /**
      * @param string|null $query
-     * @param array $opts
+     * @param array $options
      * @return array|mixed|string
      */
-    public function TextSearch(string $query = null, array $opts = [])
+    public function TextSearch(string $query = null, array $options = [])
     {
-        $opts['query'] = $query ?? $opts['query'] ?? $this->getOption('query');
-        if (!$opts['query']) {
+        $options['query'] = $query ?? $options['query'] ?? $this->getOption('query');
+        if (!$options['query']) {
             throw new Exception('No input information provided.');
         }
 
-        return $this->send('https://maps.googleapis.com/maps/api/place/textsearch', $opts);
+        return $this->send('https://maps.googleapis.com/maps/api/place/textsearch', $options);
     }
 
     /**
      * @param string|null $place_id
-     * @param array $opts
+     * @param array $options
      * @return array|mixed|string
      */
-    public function Details(string $place_id = null, array $opts = [])
+    public function Details(string $place_id = null, array $options = [])
     {
-        $opts['place_id'] = $place_id ?? $opts['place_id'] ?? $this->getOption('place_id');
-        if (!$opts['place_id']) {
+        $options['place_id'] = $place_id ?? $options['place_id'] ?? $this->getOption('place_id');
+        if (!$options['place_id']) {
             throw new Exception('No place id information provided.');
         }
 
-        return $this->send('https://maps.googleapis.com/maps/api/place/details', $opts);
+        return $this->send('https://maps.googleapis.com/maps/api/place/details', $options);
     }
 }

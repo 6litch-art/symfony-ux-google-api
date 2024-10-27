@@ -8,7 +8,7 @@ use Google\Model\Maps\Map;
 use Google\Model\Maps\MapEmbed;
 use Google\Model\Maps\MapStatic;
 use Google\Model\Maps\MapUrl;
-use Google\Model\Maps\Overlay\MapTypeStyle;
+use Google\Model\Maps\Overlay\StyledMapType;
 use Google\Model\Maps\Overlay\Marker;
 use Google\Model\Places\Place;
 use League\Flysystem\UnableToDeleteFile;
@@ -19,6 +19,10 @@ use League\FlysystemBundle\Lazy\LazyFactory;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\HttpCache\Store;
+
+use Symfony\Component\HttpClient\CachingHttpClient;
+use Symfony\Component\HttpClient\HttpClient;
 
 // use Google\Model\StaticMap;
 // use Google\Model\EmbedMap;
@@ -47,8 +51,6 @@ class GmBuilder implements GmBuilderInterface
     public const STATUS_BAD = 'BAD';
     public const STATUS_NOCLIENT = 'NOCLIENT';
 
-    public $callback;
-    public $libraries;
     public $version;
 
     public HttpClientInterface $client;
@@ -83,7 +85,6 @@ class GmBuilder implements GmBuilderInterface
         CacheInterface            $cache,
         LazyFactory               $lazyFactory,
         RequestStack              $requestStack,
-        HttpClientInterface       $client,
         Security                  $security,
         CsrfTokenManagerInterface $csrfTokenManager
     )
@@ -93,13 +94,12 @@ class GmBuilder implements GmBuilderInterface
         //
         // Autowiring
         $this->cache = $cache;
-        $this->client = $client;
         $this->tokenManager = $csrfTokenManager;
         $this->router = $kernel->getContainer()->get('router');
         $this->environment = $kernel->getEnvironment(); // "dev", "prod", etc..
         $this->security = $security;
         $this->requestStack = $requestStack;
-
+        
         //
         // Get variables
         $this->enable        = $kernel->getContainer()->getParameter('google.maps.enable');
@@ -109,7 +109,8 @@ class GmBuilder implements GmBuilderInterface
         $this->cacheControl  = $kernel->getContainer()->getParameter('google.maps.cache_control');
         $this->cacheQuality  = $kernel->getContainer()->getParameter('google.maps.cache_quality');
         $this->cachePublic   = $this->getAsset($kernel->getContainer()->getParameter('google.maps.cache_public'));
-
+       
+        
         $this->cacheTilesize = $kernel->getContainer()->getParameter('google.maps.cache_tilesize');
         if ($this->cacheTilesize < 1) {
             $this->cacheTilesize = null;
@@ -123,14 +124,10 @@ class GmBuilder implements GmBuilderInterface
         $this->keyClient = $kernel->getContainer()->getParameter('google.maps.apikey.client');
         $this->keyServer = $kernel->getContainer()->getParameter('google.maps.apikey.server');
         $this->secret    = $kernel->getContainer()->getParameter('google.maps.secret');
-        $this->callback  = $kernel->getContainer()->getParameter('google.maps.callback');
-        $this->libraries = $kernel->getContainer()->getParameter('google.maps.libraries');
-        $this->version   = $kernel->getContainer()->getParameter('google.maps.version');
+        $this->version = $kernel->getContainer()->getParameter('google.maps.version');
 
-        $this->filesystem = $lazyFactory->createStorage(
-            $kernel->getContainer()->getParameter('google.maps.cache'),
-            'google.maps'
-        );
+        $this->filesystem = $lazyFactory->createStorage($kernel->getContainer()->getParameter('google.maps.cache'), 'google.maps');
+        $this->client = new CachingHttpClient(HttpClient::create(), new Store($kernel->getContainer()->getParameter("kernel.cache_dir")."/http"));
 
         $this->twig = $twig;
     }
@@ -241,12 +238,6 @@ class GmBuilder implements GmBuilderInterface
         return $this->getAsset($this->cachePool ?? null);
     }
 
-    /**
-     * @param $object
-     * @param string|null $event
-     * @param string|null $callback
-     * @return $this
-     */
     /**
      * @param $object
      * @param string|null $event
@@ -452,6 +443,7 @@ class GmBuilder implements GmBuilderInterface
                 $caseC = $cacheOnly && $isGranted && !$cacheExists;
 
                 if ($caseA || $caseB || $caseC) {
+                    $javascripts .= $object->loadAssets();
                     $javascripts .= 'var ' . $object->getId() . ' = ' . $object . ';' . PHP_EOL;
                 }
             }
@@ -548,9 +540,13 @@ class GmBuilder implements GmBuilderInterface
         }
 
         $locale = $this->requestStack->getCurrentRequest()?->getLocale() ?? 'en';
+        $bootstrap = [
+            "key" => $this->keyClient,
+            "v"   => $this->version,
+            "locale" => $locale
+        ];
 
-        $javascripts = "<script src='https://polyfill.io/v3/polyfill.min.js?features=default'></script>" . PHP_EOL;
-        $javascripts .= "<script src='https://maps.googleapis.com/maps/api/js?key=" . $this->keyClient . '&callback=' . $this->callback . '&libraries=' . $this->libraries . '&v=' . $this->version . '&language=' . $locale . "' defer async></script>";
+        $javascripts = '<script>(g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})('.json_encode($bootstrap).');</script>';
         $this->twig->addGlobal('google_maps', array_merge(
             $this->twig->getGlobals()['google_maps'] ?? [],
             ['api' => ($this->twig->getGlobals()['google_maps']['api'] ?? '') . $javascripts]
@@ -563,7 +559,7 @@ class GmBuilder implements GmBuilderInterface
             return;
         }
 
-        $initMap = "<script type='text/javascript'>function " . GmBuilder::getInstance()->callback . '() { ' . PHP_EOL . $initMapContent . PHP_EOL . ' }</script>';
+        $initMap = "<script type='text/javascript'>async function initMap() { " . PHP_EOL . $initMapContent . PHP_EOL . " }" . PHP_EOL . PHP_EOL . "initMap(); </script>";
         $this->twig->addGlobal('google_maps', array_merge(
             $this->twig->getGlobals()['google_maps'] ?? [],
             ['initMap' => $initMap]
@@ -625,19 +621,19 @@ class GmBuilder implements GmBuilderInterface
 
     /**
      * @param string $signature
-     * @param array $opts
+     * @param array $options
      * @return false|string
      */
-    public function getCache(string $signature, array $opts = [])
+    public function getCache(string $signature, array $options = [])
     {
         try {
-            $id = $opts['id'] ?? 0;
+            $id = $options['id'] ?? 0;
 
             $file = $this->getCachePath($signature, $id);
             $contents = GmBuilder::getInstance()->filesystem->read($file);
 
-            $width = $opts['width'] ?? 0;
-            $height = $opts['height'] ?? 0;
+            $width = $options['width'] ?? 0;
+            $height = $options['height'] ?? 0;
             if ($width || $height) {
                 $image = imagecreatefromstring($contents);
                 $imageCrop = $this->cropAlign($image, $width, $height);
@@ -727,13 +723,13 @@ class GmBuilder implements GmBuilderInterface
 
     /**
      * @param string $signature
-     * @param array|null $opts
+     * @param array|null $options
      * @return mixed
      */
-    public function cacheExists(string $signature, ?array $opts = [])
+    public function cacheExists(string $signature, ?array $options = [])
     {
         try {
-            $id = $opts['id'] ?? -1;
+            $id = $options['id'] ?? -1;
 
             if ($id < 0) {
                 $path = $this->getCacheDirectory() . '/' . $signature . '/metadata.txt';
@@ -845,17 +841,17 @@ class GmBuilder implements GmBuilderInterface
 
     /**
      * @param string $id
-     * @param $opts
+     * @param $options
      * @return $this
      */
     /**
      * @param string $id
-     * @param $opts
+     * @param $options
      * @return $this
      */
-    public function addPlace(string $id, $opts = []): self
+    public function addPlace(string $id, $options = []): self
     {
-        $place = ($opts instanceof Place ? $opts : new Place(null, $opts));
+        $place = ($options instanceof Place ? $options : new Place(null, $options));
 
         $this->bind($id, $place);
         $this->rules[] = $this->getInstance($id);
@@ -871,7 +867,7 @@ class GmBuilder implements GmBuilderInterface
         return $this;
     }
 
-    public function addMapStyle(string $id, MapTypeStyle $mapStyle): self
+    public function addMapStyle(string $id, StyledMapType $mapStyle): self
     {
         $this->bind($id, $mapStyle);
         $this->rules[] = $this->getInstance($id);

@@ -25,7 +25,7 @@ interface GmClientInterface
 
     public function getParameters(): mixed;
 
-    public function getRequest(string $baseUrl, array $opts): string;
+    public function getRequest(string $baseUrl, array $options): string;
 
-    public function send(string $baseUrl, array $opts, int $expiration);
+    public function send(string $baseUrl, array $options, int $expiration);
 }
