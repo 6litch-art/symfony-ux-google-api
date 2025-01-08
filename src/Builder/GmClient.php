@@ -22,6 +22,7 @@ abstract class GmClient extends GmObject implements GmClientInterface
      * @var HttpClientInterface|null
      */
     private ?HttpClientInterface $client = null;
+    private const EnableCache = true;
 
     protected mixed $mapMode;
 
@@ -126,8 +127,6 @@ abstract class GmClient extends GmObject implements GmClientInterface
         return rtrim($baseUrl, '/') . ($this->outputFormat ? '/' . $this->outputFormat : '') . '?' . $parameters;
     }
 
-    private const EnableCache = true;
-
     /**
      * @param string $baseUrl
      * @param array $options
@@ -141,6 +140,9 @@ abstract class GmClient extends GmObject implements GmClientInterface
      */
     public function send(string $baseUrl = '', array $options = [], int $expiration = 30 * 86400)
     {
+        if (!GmBuilder::getInstance()->isEnabled()) {
+            return [];
+        }
         if (!$this->client) {
             return ['status' => GmBuilder::STATUS_NOCLIENT];
         }

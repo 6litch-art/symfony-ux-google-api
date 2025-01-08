@@ -40,7 +40,7 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
 
         $ret = "";
         foreach($assets as $asset) {
-            $ret .= "const { ".$classname." } = ".$asset.";".PHP_EOL;
+            $ret .= $asset.PHP_EOL;
         }
 
         return $ret;

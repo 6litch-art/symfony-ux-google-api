@@ -24,7 +24,13 @@ class Map extends GmObject
 
     public function getAssets(): \Generator
     {
-        yield "await google.maps.importLibrary('maps')";
+        $classname = explode('\\', get_class($this));
+        $classname = $classname[count($classname) - 1];
+        yield "const { ".$classname." } = await google.maps.importLibrary('maps');";
+
+        if ( !empty($this->id) ) {
+            yield "if(!document.getElementById('" . $this->id . "')) return 1;";
+        }
     }
 
     /**
