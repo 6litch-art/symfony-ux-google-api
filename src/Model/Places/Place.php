@@ -15,7 +15,7 @@ class Place extends GmClient
 {
     public function __construct(?string $placeId, array $options = [], HttpClientInterface $client = null)
     {
-        parent::__construct($client ?? GmBuilder::getInstance()->client, $options);
+        parent::__construct($client ?? GmBuilder::getInstance()->client ?? null, $options);
         $this->setOutputFormat(self::JsonEncoding);
 
         if ($this->guestIfValidPlaceId($placeId)) {

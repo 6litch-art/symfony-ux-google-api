@@ -33,9 +33,9 @@ abstract class GmClient extends GmObject implements GmClientInterface
     public function __construct(?HttpClientInterface $client, $options = [])
     {
         parent::__construct($options);
-        if (!$client && !GmBuilder::isReady()) {
-            throw new Exception('Missing HttpClientInterface parameter and GmBuilder not initialized');
-        }
+//        if (!$client && !GmBuilder::isReady()) {
+//            throw new Exception('Missing HttpClientInterface parameter and GmBuilder not initialized');
+//        }
 
         $this->client = $client;
     }
@@ -140,7 +140,7 @@ abstract class GmClient extends GmObject implements GmClientInterface
      */
     public function send(string $baseUrl = '', array $options = [], int $expiration = 30 * 86400)
     {
-        if (!GmBuilder::getInstance()->isEnabled()) {
+        if (!GmBuilder::getInstance() || !GmBuilder::getInstance()->isEnabled()) {
             return [];
         }
         if (!$this->client) {

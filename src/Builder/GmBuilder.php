@@ -99,7 +99,7 @@ class GmBuilder implements GmBuilderInterface
         $this->environment = $kernel->getEnvironment(); // "dev", "prod", etc..
         $this->security = $security;
         $this->requestStack = $requestStack;
-        
+
         //
         // Get variables
         $this->enable        = $kernel->getContainer()->getParameter('google.maps.enable');
@@ -109,8 +109,7 @@ class GmBuilder implements GmBuilderInterface
         $this->cacheControl  = $kernel->getContainer()->getParameter('google.maps.cache_control');
         $this->cacheQuality  = $kernel->getContainer()->getParameter('google.maps.cache_quality');
         $this->cachePublic   = $this->getAsset($kernel->getContainer()->getParameter('google.maps.cache_public'));
-       
-        
+
         $this->cacheTilesize = $kernel->getContainer()->getParameter('google.maps.cache_tilesize');
         if ($this->cacheTilesize < 1) {
             $this->cacheTilesize = null;

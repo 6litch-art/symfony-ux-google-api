@@ -24,7 +24,7 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
         $this->first = true;
 
         $options['html2canvas'] = $options['html2canvas'] ?? !empty(GmBuilder::getInstance()->html2canvas);
-        $this->setKey($this->pop('key') ?? GmBuilder::getInstance()->keyServer ?? GmBuilder::getInstance()->keyClient);
+        $this->setKey($this->pop('key') ?? GmBuilder::getInstance()->keyServer ?? GmBuilder::getInstance()->keyClient ?? null);
         $this->addOption($options);
     }
 
