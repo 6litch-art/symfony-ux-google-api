@@ -77,7 +77,7 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
      */
     public function getParentId()
     {
-        return $this->parent->getId();
+        return $this->parent?->getId();
     }
 
     /**

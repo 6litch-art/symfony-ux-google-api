@@ -96,10 +96,6 @@ class LatLng extends GmObject
      * @param $lat
      * @return $this
      */
-    /**
-     * @param $lat
-     * @return $this
-     */
     public function setLatitude($lat = null): self
     {
         return $this->setLat($lat);
@@ -130,10 +126,6 @@ class LatLng extends GmObject
      * @param $lng
      * @return $this
      */
-    /**
-     * @param $lng
-     * @return $this
-     */
     public function setLng($lng = null): self
     {
         if ($this->lng) {
@@ -143,10 +135,6 @@ class LatLng extends GmObject
         return $this;
     }
 
-    /**
-     * @param $lng
-     * @return $this
-     */
     /**
      * @param $lng
      * @return $this
