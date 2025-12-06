@@ -18,15 +18,11 @@ use League\FlysystemBundle\Lazy\LazyFactory;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpKernel\HttpCache\Store;
 
 use Symfony\Component\HttpClient\CachingHttpClient;
 use Symfony\Component\HttpClient\HttpClient;
-
-// use Google\Model\StaticMap;
-// use Google\Model\EmbedMap;
-// use Google\Model\Elevation;
-// use Google\Model\StreetView;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -126,9 +122,21 @@ class GmBuilder implements GmBuilderInterface
         $this->version = $kernel->getContainer()->getParameter('google.maps.version');
 
         $this->filesystem = $lazyFactory->createStorage($kernel->getContainer()->getParameter('google.maps.cache'), 'google.maps');
-        $this->client = new CachingHttpClient(HttpClient::create(), new Store($kernel->getContainer()->getParameter("kernel.cache_dir")."/http"));
-
         $this->twig = $twig;
+
+        $cacheDir = $kernel->getContainer()->getParameter('kernel.cache_dir') . '/http';
+        $cachePool = new TagAwareAdapter(
+            new FilesystemAdapter(
+                namespace: 'http_client_cache',
+                defaultLifetime: 0,
+                directory: $cacheDir
+            )
+        );
+
+        $this->client = new CachingHttpClient(
+            HttpClient::create(),
+            $cachePool
+        );
     }
 
     /**
