@@ -15,9 +15,6 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use function is_array;
 
-/**
- *
- */
 class CaptchaValidationListener implements EventSubscriberInterface
 {
     /**
@@ -107,7 +104,7 @@ class CaptchaValidationListener implements EventSubscriberInterface
             $constraintValidator = new CaptchaValidator($this->grService);
             $constraintValidator->initialize($context);
 
-            $violations = $this->validator->validate($value ?? " ", new Captcha(["api" => $this->api]));
+            $violations = $this->validator->validate($value ?? " ", new Captcha(api: $this->api));
             foreach ($violations as $violation) {
                 $form->addError(new FormError($violation->getMessage()));
             }

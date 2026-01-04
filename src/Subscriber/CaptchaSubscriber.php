@@ -17,9 +17,6 @@ use Symfony\Component\Validator\Context\ExecutionContextFactory;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- *
- */
 class CaptchaSubscriber implements EventSubscriberInterface
 {
     protected GrService $grService;
@@ -91,7 +88,7 @@ class CaptchaSubscriber implements EventSubscriberInterface
         $constraintValidator = new CaptchaValidator($this->grService);
         $constraintValidator->initialize($context);
 
-        $violations = $this->validator->validate($value, new Captcha(['api' => $api]));
+        $violations = $this->validator->validate($value, new Captcha(api: $api));
         if ($violations->count() > 0) {
             throw new InvalidCaptchaException($violations[0]->getMessage());
         }

@@ -17,8 +17,8 @@ window.addEventListener('load', function(event) {
     $(el).css("top", "50%");
     $(el).css("left", "50%");
     $(el).css("transform", "translate(-50%, -50%)");
-    $(el).css("width", "105%");
-    $(el).css("height", "105%");
+    $(el).css("width", "100%");
+    $(el).css("height", "100%");
 
     var src = el.getAttribute("data-src");
     var signature = el.getAttribute("data-signature");
@@ -61,27 +61,32 @@ window.addEventListener('load', function(event) {
       }
     });
 
-    function objectFit(contains /* true = contain, false = cover */, containerWidth, containerHeight, width, height){
+    function objectFit(contains, containerWidth, containerHeight, width, height) {
 
-      var doRatio = width / height;
-      var cRatio = containerWidth / containerHeight;
-      var targetWidth = 0;
-      var targetHeight = 0;
-      var test = contains ? (doRatio > cRatio) : (doRatio < cRatio);
+      const doRatio = width / height;
+      const cRatio  = containerWidth / containerHeight;
+
+      let targetWidth, targetHeight;
+
+      const test = contains ? (doRatio > cRatio) : (doRatio < cRatio);
 
       if (test) {
-          targetWidth = containerWidth;
-          targetHeight = targetWidth / doRatio;
+        targetWidth  = containerWidth;
+        targetHeight = targetWidth / doRatio;
       } else {
-          targetHeight = containerHeight;
-          targetWidth = targetHeight * doRatio;
+        targetHeight = containerHeight;
+        targetWidth  = targetHeight * doRatio;
       }
 
+      // FINAL integer rounding
+      targetWidth  = Math.round(targetWidth);
+      targetHeight = Math.round(targetHeight);
+
       return {
-          width: targetWidth,
-          height: targetHeight,
-          left: (contains ? -1 : 1) * (containerWidth - targetWidth) / 2,
-          top: (contains ? -1 : 1) * (containerHeight - targetHeight) / 2
+        width:  targetWidth,
+        height: targetHeight,
+        left: Math.round((containerWidth  - targetWidth)  / 2),
+        top:  Math.round((containerHeight - targetHeight) / 2)
       };
     }
 
@@ -96,7 +101,9 @@ window.addEventListener('load', function(event) {
     
       for(ix = 0; ix < xtiles; ix++) {
 
-        var _tilesize = Math.max(tile.height/ytiles, tile.width/xtiles);
+        const tileW = Math.floor(tile.width  / xtiles);
+        const tileH = Math.floor(tile.height / ytiles);
+        const tileSize = Math.max(tileW, tileH);
         var index = iy*xtiles + ix;
 
         if (elTile[index] === undefined) {
@@ -113,16 +120,24 @@ window.addEventListener('load', function(event) {
             elTile[index].setAttribute("id", el.getAttribute("id")+"_"+index);
             elTile[index].setAttribute("data-background-image", tmp_src); //url('"+missing+"')
             elTile[index].style.opacity   = "0";
-            elTile[index].style.transition   = "opacity 0.5s ease";
+
+            var rnd = (Math.random()*0.5).toFixed(2);
+            elTile[index].style.transition   = "opacity 0.5s ease "+rnd+"s";
             el.append(elTile[index]);
         }
 
         elTile[index].style.position = "absolute";
-        elTile[index].style.left     = tile.left + (_tilesize*ix) + "px";
-        elTile[index].style.top      = tile.top  + (_tilesize*iy) + "px";    
-        elTile[index].style.width    = _tilesize + "px";
-        elTile[index].style.height   = _tilesize + "px";
-        elTile[index].style.backgroundSize   = _tilesize + "px";
+        
+        const left = tile.left + ix * tileSize;
+        const top  = tile.top  + iy * tileSize;
+        const width  = (ix === xtiles - 1) ? tile.width  - tileSize * ix +1: tileSize+1;
+        const height = (iy === ytiles - 1) ? tile.height - tileSize * iy +1: tileSize+1;
+
+        elTile[index].style.left   = left + "px";
+        elTile[index].style.top    = top  + "px";
+        elTile[index].style.width  = width  + "px";
+        elTile[index].style.height = height + "px";
+        elTile[index].style.backgroundSize = width + "px " + height + "px";
 
         el.dispatchEvent(new Event("lazyload.gm_tilemap"));
       }

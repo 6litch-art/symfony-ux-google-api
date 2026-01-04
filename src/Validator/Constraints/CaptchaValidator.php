@@ -4,64 +4,71 @@ namespace Google\Validator\Constraints;
 
 use Google\Service\GrService;
 use ReCaptcha\ReCaptcha;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
-/**
- *
- */
 final class CaptchaValidator extends ConstraintValidator
 {
     private array $responses = [];
-    private GrService $grService;
 
-    public function __construct(GrService $grService)
-    {
-        $this->grService = $grService;
-    }
+    public function __construct(
+        private readonly GrService $grService,
+        private readonly RequestStack $requestStack,
+    ) {}
 
-    /**
-     * @param $value
-     * @param Constraint $constraint
-     * @return void
-     * @throws \Exception
-     */
-    public function validate($value, Constraint $constraint): void
+    public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof Captcha) {
             throw new UnexpectedTypeException($constraint, Captcha::class);
         }
 
-        if (null !== $value && !is_scalar($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
+        if ($value === null || $value === '') {
+            if ($constraint->api === GrService::APIV3) {
+                $this->context
+                    ->buildViolation($constraint->messageMissingValue)
+                    ->addViolation();
+            }
+
+            return;
+        }
+
+        if (!is_scalar($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
             throw new UnexpectedTypeException($value, 'string');
         }
 
-        $value = explode(' ', $value)[0] ?? '';
-        if (GrService::APIV3 == $constraint->getVersion()) {
-            $value = null !== $value ? (string)$value : '';
-            if ('' === $value) {
-                $this->context->buildViolation($constraint->messageMissingValue)->addViolation();
+        $token = explode(' ', (string) $value, 2)[0];
 
-                return;
-            }
-        }
+        $request = $this->requestStack->getCurrentRequest();
+        $ip = $request?->getClientIp();
 
-        $request = Request::createFromGlobals();
-        $reCaptcha = new ReCaptcha($this->grService->getSecret($constraint->getVersion()));
+        $reCaptcha = new ReCaptcha(
+            $this->grService->getSecret($constraint->api)
+        );
 
-        $response = $reCaptcha->verify($value, $request->getClientIp());
+        $response = $reCaptcha->verify($token, $ip);
         $this->responses[] = $response;
 
         $scoreThreshold = $this->grService->getScoreThreshold();
-        if (!$response->isSuccess() || ($response->getScore() && $response->getScore() < $scoreThreshold)) {
-            if (!$response->getErrorCodes()) {
-                $this->context->buildViolation($constraint->message)->addViolation();
+
+        if (
+            !$response->isSuccess()
+            || ($response->getScore() !== null && $response->getScore() < $scoreThreshold)
+        ) {
+            $errors = $response->getErrorCodes();
+
+            if (!$errors) {
+                $this->context
+                    ->buildViolation($constraint->message)
+                    ->addViolation();
+                return;
             }
 
-            foreach ($response->getErrorCodes() as $error) {
-                $this->context->buildViolation('captcha.error.' . str_replace('-', '_', $error))->addViolation();
+            foreach ($errors as $error) {
+                $this->context
+                    ->buildViolation('captcha.error.' . str_replace('-', '_', $error))
+                    ->addViolation();
             }
         }
     }

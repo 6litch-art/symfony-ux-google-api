@@ -30,7 +30,7 @@ class ReCaptchaV2Type extends AbstractType
         $resolver
             ->setDefault('sitekey', null)
             ->setDefault('type', 'checkbox')
-            ->setDefault('constraints', new Captcha(['api' => GrService::APIV2]))
+            ->setDefault('constraints', new Captcha(api: GrService::APIV2))
             ->setAllowedValues('type', ['checkbox', 'invisible']);
     }
 

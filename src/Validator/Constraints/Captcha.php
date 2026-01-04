@@ -8,36 +8,36 @@ use Symfony\Component\Validator\Constraint;
 /**
  * @Annotation
  */
+
+#[\Attribute]
 final class Captcha extends Constraint
 {
     public string $message = 'captcha.test.failed';
     public string $messageMissingValue = 'captcha.test.missing_value';
 
-    protected mixed $api;
+    public string $api;
 
-    /**
-     * @return mixed
-     */
-    public function getVersion()
-    {
-        return $this->api;
-    }
+    public function __construct(
+        string $api,
+        ?string $message = null,
+        ?string $messageMissingValue = null,
+        array $groups = null,
+        mixed $payload = null,
+    ) {
+        parent::__construct([], $groups, $payload);
 
-    /**
-     * @param array|null $options
-     * @param string|null $message
-     * @param array|null $groups
-     * @param $payload
-     * @throws \Exception
-     */
-    public function __construct(array $options = null, string $message = null, array $groups = null, $payload = null)
-    {
-        parent::__construct($options ?? [], $groups, $payload);
-
-        $api = $options['api'];
         $this->api = match ($api) {
-            GrService::APIV2, GrService::APIV3 => $api,
-            default => throw new \Exception('Invalid API version provided.'),
+            GrService::APIV2,
+            GrService::APIV3 => $api,
+            default => throw new \InvalidArgumentException('Invalid API version provided.'),
         };
+
+        if ($message !== null) {
+            $this->message = $message;
+        }
+
+        if ($messageMissingValue !== null) {
+            $this->messageMissingValue = $messageMissingValue;
+        }
     }
 }

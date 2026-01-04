@@ -28,7 +28,7 @@ class ReCaptchaV3Type extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
-            ->setDefault('constraints', new Captcha(['api' => GrService::APIV3]))
+            ->setDefault('constraints', new Captcha(api:GrService::APIV3))
             ->setDefault('sitekey', null);
     }
 
