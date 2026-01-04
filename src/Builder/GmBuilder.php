@@ -566,7 +566,14 @@ class GmBuilder implements GmBuilderInterface
             return;
         }
 
-        $initMap = "<script type='text/javascript'>async function initMap() { " . PHP_EOL . $initMapContent . PHP_EOL . " }" . PHP_EOL . PHP_EOL . "initMap(); </script>";
+        $initMap = "<script type='text/javascript'>async function initMap() { try {"
+            . PHP_EOL
+            . $initMapContent
+            . PHP_EOL
+            . "} catch (e) { console.error('initMap error:', e); } }"
+            . PHP_EOL
+            . "initMap(); </script>";
+   
         $this->twig->addGlobal('google_maps', array_merge(
             $this->twig->getGlobals()['google_maps'] ?? [],
             ['initMap' => $initMap]
