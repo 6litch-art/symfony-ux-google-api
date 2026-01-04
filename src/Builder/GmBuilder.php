@@ -119,7 +119,7 @@ class GmBuilder implements GmBuilderInterface
         $this->keyClient = $kernel->getContainer()->getParameter('google.maps.apikey.client');
         $this->keyServer = $kernel->getContainer()->getParameter('google.maps.apikey.server');
         $this->secret    = $kernel->getContainer()->getParameter('google.maps.secret');
-        $this->version = $kernel->getContainer()->getParameter('google.maps.version');
+        $this->version   = $kernel->getContainer()->getParameter('google.maps.version');
 
         $this->filesystem = $lazyFactory->createStorage($kernel->getContainer()->getParameter('google.maps.cache'), 'google.maps');
         $this->twig = $twig;
@@ -232,7 +232,7 @@ class GmBuilder implements GmBuilderInterface
      */
     public static function isReady()
     {
-        return null != self::$_instance;
+        return null != self::$_instance || empty($this->keyClient) || empty($this->keyClient);
     }
 
     public static function getPublicDirectory(): string
@@ -433,6 +433,7 @@ class GmBuilder implements GmBuilderInterface
         }
 
         $javascripts = '';
+        $ids = [];
         foreach ($this->sortRules() as $object) {
             if ($object instanceof GmEntry) {
                 $javascripts .= $object . PHP_EOL;
@@ -454,6 +455,8 @@ class GmBuilder implements GmBuilderInterface
                     $javascripts .= 'var ' . $object->getId() . ' = ' . $object . ';' . PHP_EOL;
                 }
             }
+
+            $ids[] = $object->getId();
         }
 
         $javascripts = preg_replace("/^(?: )*\/\/.*\n/s", '', $javascripts);
@@ -463,7 +466,7 @@ class GmBuilder implements GmBuilderInterface
         }
 
         $this->loadApi();
-        $this->initMap($javascripts);
+        $this->initMap($javascripts, $ids);
 
         return true;
     }
@@ -560,20 +563,25 @@ class GmBuilder implements GmBuilderInterface
         ));
     }
 
-    public function initMap(string $initMapContent = '')
+    public function initMap(string $initMapContent = '', array $ids = [])
     {
         if (!$this->enable) {
             return;
         }
 
-        $initMap = "<script type='text/javascript'>async function initMap() { try {"
-            . PHP_EOL
-            . $initMapContent
-            . PHP_EOL
-            . "} catch (e) { console.error('initMap error:', e); } }"
-            . PHP_EOL
-            . "initMap(); </script>";
-   
+        $initMapReady = empty($this->keyServer) || empty($this->keyClient) ? 
+            "throw new Error('Google Maps API keys are not loaded');" : "";
+
+        $initMapFallback = "";
+        foreach($ids as $id) {
+            $initMapFallback .= "var el = document.getElementById(\"$id\");
+                                 if (el) el.style.display = \"none\";". PHP_EOL;
+        }
+
+        $initMap = "<script type='text/javascript'>async function initMap() {" . PHP_EOL
+                    . "try { ".$initMapReady." " . $initMapContent . PHP_EOL . " }" . PHP_EOL 
+                    . "catch (e) { console.error(e); ".$initMapFallback." } }" . PHP_EOL . "initMap(); </script>";
+
         $this->twig->addGlobal('google_maps', array_merge(
             $this->twig->getGlobals()['google_maps'] ?? [],
             ['initMap' => $initMap]

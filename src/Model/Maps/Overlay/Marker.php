@@ -13,6 +13,6 @@ class Marker extends GmObject
     {
         $classname = explode('\\', get_class($this));
         $classname = $classname[count($classname) - 1];
-        yield "const { ".$classname." } = await google.maps.importLibrary('map');";
+        yield "const { ".$classname." } = await google.maps.importLibrary('marker');";
     }
 }
