@@ -1,5 +1,4 @@
-
-window.addEventListener('load', function(event) {
+function initTileMap() {
 
   var container = document.querySelectorAll(".google-tilemap");
   for (var i = 0; i < container.length; i++) {
@@ -61,32 +60,28 @@ window.addEventListener('load', function(event) {
       }
     });
 
-    function objectFit(contains, containerWidth, containerHeight, width, height) {
+    
+    function objectFit(contains /* true = contain, false = cover */, containerWidth, containerHeight, width, height){
 
-      const doRatio = width / height;
-      const cRatio  = containerWidth / containerHeight;
-
-      let targetWidth, targetHeight;
-
-      const test = contains ? (doRatio > cRatio) : (doRatio < cRatio);
+      var doRatio = width / height;
+      var cRatio = containerWidth / containerHeight;
+      var targetWidth = 0;
+      var targetHeight = 0;
+      var test = contains ? (doRatio > cRatio) : (doRatio < cRatio);
 
       if (test) {
-        targetWidth  = containerWidth;
-        targetHeight = targetWidth / doRatio;
+          targetWidth = containerWidth;
+          targetHeight = targetWidth / doRatio;
       } else {
-        targetHeight = containerHeight;
-        targetWidth  = targetHeight * doRatio;
+          targetHeight = containerHeight;
+          targetWidth = targetHeight * doRatio;
       }
 
-      // FINAL integer rounding
-      targetWidth  = Math.round(targetWidth);
-      targetHeight = Math.round(targetHeight);
-
       return {
-        width:  targetWidth,
-        height: targetHeight,
-        left: Math.round((containerWidth  - targetWidth)  / 2),
-        top:  Math.round((containerHeight - targetHeight) / 2)
+          width: targetWidth,
+          height: targetHeight,
+          left: (contains ? -1 : 1) * (containerWidth - targetWidth) / 2,
+          top: (contains ? -1 : 1) * (containerHeight - targetHeight) / 2
       };
     }
 
@@ -126,13 +121,12 @@ window.addEventListener('load', function(event) {
             el.append(elTile[index]);
         }
 
-        elTile[index].style.position = "absolute";
-        
         const left = tile.left + ix * tileSize;
         const top  = tile.top  + iy * tileSize;
         const width  = (ix === xtiles - 1) ? tile.width  - tileSize * ix +1: tileSize+1;
         const height = (iy === ytiles - 1) ? tile.height - tileSize * iy +1: tileSize+1;
 
+        elTile[index].style.position = "absolute";
         elTile[index].style.left   = left + "px";
         elTile[index].style.top    = top  + "px";
         elTile[index].style.width  = width  + "px";
@@ -143,4 +137,7 @@ window.addEventListener('load', function(event) {
       }
     }
   }
-});
+}
+
+window.addEventListener('load', initTileMap);
+window.addEventListener('resize', initTileMap);

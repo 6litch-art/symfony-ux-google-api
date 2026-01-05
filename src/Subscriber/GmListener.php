@@ -119,9 +119,9 @@ class GmListener
      */
     public function onKernelResponse(ResponseEvent $event)
     {
-        $this->enable = $this->parameterBag->get("google.maps.enable");
+        $this->enable        = $this->parameterBag->get("google.maps.enable");
         $this->enableOnAdmin = $this->parameterBag->get("google.maps.enable_on_admin");
-        $this->autoAppend = $this->parameterBag->get("google.maps.autoappend");
+        $this->autoAppend    = $this->parameterBag->get("google.maps.autoappend");
 
         if (!$this->allowRender($event)) {
             return false;
