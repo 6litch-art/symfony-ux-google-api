@@ -70,7 +70,7 @@ class GmListener
      */
     public function isProfiler($event)
     {
-        $route = $event->getRequest()->get('_route');
+        $route = $event->getRequest()->attributes->get('_route');
         return str_starts_with($route, "_wdt") || str_starts_with($route, "_profiler");
     }
 
