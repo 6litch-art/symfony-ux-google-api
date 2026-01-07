@@ -123,16 +123,16 @@ function initTileMap() {
 
         const left = tile.left + ix * tileSize;
         const top  = tile.top  + iy * tileSize;
-        const width  = (ix === xtiles - 1) ? tile.width  - tileSize * ix +1: tileSize+1;
-        const height = (iy === ytiles - 1) ? tile.height - tileSize * iy +1: tileSize+1;
+        const width  = (ix === xtiles - 1) ? tile.width  - tileSize * ix: tileSize;
+        const height = (iy === ytiles - 1) ? tile.height - tileSize * iy: tileSize;
 
         elTile[index].style.position = "absolute";
         elTile[index].style.left   = left + "px";
         elTile[index].style.top    = top  + "px";
-        elTile[index].style.width  = width  + "px";
-        elTile[index].style.height = height + "px";
-        elTile[index].style.backgroundSize = width + "px " + height + "px";
-
+        elTile[index].style.width  = (width  + 0.1) + "px";
+        elTile[index].style.height = (height + 0.1) + "px";
+        elTile[index].style.backgroundSize = (width  + 0.1) + "px " + (height + 0.1) + "px";
+        
         el.dispatchEvent(new Event("lazyload.gm_tilemap"));
       }
     }
