@@ -21,7 +21,7 @@ export APP_ENV APP_DEBUG
 assets:
 ifeq ($(APP_DEBUG),1)
 	@cd assets && yarn install
-	@cd assets && yarn run watch
+	@cd assets && yarn run dev
 else
 	@cd assets && yarn install
 	@cd assets && yarn run prod
