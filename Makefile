@@ -2,6 +2,7 @@
 
 ROOT_DIR := $(abspath ../../../)
 
+
 APP_ENV_BAK   := $(APP_ENV)
 APP_DEBUG_BAK := $(APP_DEBUG)
 ifneq (,$(wildcard $(ROOT_DIR)/.env))
