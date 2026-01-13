@@ -23,5 +23,6 @@
   "description": "",
   "directories": {
     "test": "tests"
-  }
+  },
+  "version": "0.0.1"
 }
