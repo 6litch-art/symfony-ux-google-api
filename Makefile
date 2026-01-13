@@ -6,12 +6,30 @@ development: clean
 	@yarn install
 	@yarn run dev
 
-assets: production
-prod: production
-production: clean
-	@cd assets
-	@yarn install
-	@yarn run prod
+APP_ENV_BAK   := $(APP_ENV)
+APP_DEBUG_BAK := $(APP_DEBUG)
+ifneq (,$(wildcard $(ROOT_DIR)/.env))
+        include $(ROOT_DIR)/.env
+endif
+ifneq (,$(wildcard $(ROOT_DIR)/.env.$(APP_ENV)))
+        include $(ROOT_DIR)/.env.$(APP_ENV)
+endif
+ifneq ($(strip $(APP_ENV_BAK)),)
+        APP_ENV := $(APP_ENV_BAK)
+endif
+ifneq ($(strip $(APP_DEBUG_BAK)),)
+        APP_DEBUG := $(APP_DEBUG_BAK)
+endif
+export APP_ENV APP_DEBUG
+
+assets:
+ifeq ($(APP_DEBUG),1)
+	@cd assets && yarn install
+	@cd assets && yarn run dev
+else
+	@cd assets && yarn install
+	@cd assets && yarn run prod
+endif
 
 deploy:
 	@composer update
