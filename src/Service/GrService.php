@@ -59,6 +59,11 @@ class GrService
         }
     }
 
+    public function getCurrentRequest(): ?Request
+    {
+        return $this->request;
+    }
+
     /**
      * @return mixed|LoaderInterface|null
      */

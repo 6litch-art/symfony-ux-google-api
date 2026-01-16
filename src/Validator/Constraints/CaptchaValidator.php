@@ -4,7 +4,6 @@ namespace Google\Validator\Constraints;
 
 use Google\Service\GrService;
 use ReCaptcha\ReCaptcha;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -14,8 +13,7 @@ final class CaptchaValidator extends ConstraintValidator
     private array $responses = [];
 
     public function __construct(
-        private readonly GrService $grService,
-        private readonly RequestStack $requestStack,
+        private readonly GrService $grService
     ) {}
 
     public function validate(mixed $value, Constraint $constraint): void
@@ -40,7 +38,7 @@ final class CaptchaValidator extends ConstraintValidator
 
         $token = explode(' ', (string) $value, 2)[0];
 
-        $request = $this->requestStack->getCurrentRequest();
+        $request = $this->grService->getCurrentRequest();
         $ip = $request?->getClientIp();
 
         $reCaptcha = new ReCaptcha(
