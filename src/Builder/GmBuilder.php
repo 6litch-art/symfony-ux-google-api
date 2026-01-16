@@ -734,12 +734,10 @@ class GmBuilder implements GmBuilderInterface
         }
 
         try {
-            $contents = GmBuilder::getInstance()->filesystem->read($file);
-
+            $contents = trim(GmBuilder::getInstance()->filesystem->read($file));
             return unserialize($contents);
         } catch (UnableToReadFile $exception) {
-            throw new Exception("Unable to read metadata file \"$file\" from cache..");
-            // return ["status" => GmBuilder::STATUS_BAD];
+            return ["status" => GmBuilder::STATUS_BAD];
         }
     }
 

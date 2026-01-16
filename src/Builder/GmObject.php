@@ -486,6 +486,7 @@ abstract class GmObject implements GmObjectInterface, GmEventInterface
 
         $cacheImage = '';
         if ($cacheEnabled && ($cacheExists || $cacheOnly)) {
+
             $metadata = $this->getCacheMetadata();
 
             $signature = $this->getSignatureWithOptions();
