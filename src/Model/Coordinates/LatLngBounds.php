@@ -12,9 +12,6 @@ Complete documentation:
 
 */
 
-/**
- *
- */
 class LatLngBounds
 {
     protected LatLng $sw;

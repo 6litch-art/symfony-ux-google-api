@@ -12,9 +12,6 @@ use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use function dirname;
 
-/**
- *
- */
 class GoogleExtension extends Extension
 {
     /**

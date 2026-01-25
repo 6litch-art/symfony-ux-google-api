@@ -17,9 +17,6 @@ use Twig\Environment;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-/**
- *
- */
 class GmTwigExtension extends AbstractExtension
 {
     public function getFunctions(): array

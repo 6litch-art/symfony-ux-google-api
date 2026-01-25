@@ -9,9 +9,6 @@ use Symfony\Bundle\FrameworkBundle\DataCollector\AbstractDataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- *
- */
 class DataCollector extends AbstractDataCollector
 {
     protected ParameterBagInterface $parameterBag;

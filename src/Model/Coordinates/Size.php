@@ -9,9 +9,6 @@ Complete documentation:
 
 */
 
-/**
- *
- */
 class Size
 {
     private float $width;

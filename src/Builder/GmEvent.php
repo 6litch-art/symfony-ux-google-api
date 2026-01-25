@@ -2,9 +2,6 @@
 
 namespace Google\Builder;
 
-/**
- *
- */
 class GmEvent extends GmObject implements GmEventInterface
 {
     protected string $action;

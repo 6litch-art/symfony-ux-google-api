@@ -10,9 +10,6 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
-/**
- *
- */
 class GaListener
 {
     /** @var bool */

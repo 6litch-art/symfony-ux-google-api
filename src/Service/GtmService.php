@@ -4,9 +4,6 @@ namespace Google\Service;
 
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
-/**
- *
- */
 class GtmService
 {
     private $id;

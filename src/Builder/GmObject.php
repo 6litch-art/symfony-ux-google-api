@@ -4,9 +4,6 @@ namespace Google\Builder;
 
 use Symfony\Component\Config\Definition\Exception\Exception;
 
-/**
- *
- */
 abstract class GmObject implements GmObjectInterface, GmEventInterface
 {
     public const NoEncoding = '';

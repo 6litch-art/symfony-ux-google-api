@@ -15,9 +15,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- *
- */
 class FormTypeCaptchaExtension extends AbstractTypeExtension
 {
     protected bool $defaultEnabled;

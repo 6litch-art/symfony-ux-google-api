@@ -2,9 +2,6 @@
 
 namespace Google\Builder;
 
-/**
- *
- */
 class GmEntry extends GmObject implements GmEntryInterface
 {
     private string $cmdline;

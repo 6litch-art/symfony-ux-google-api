@@ -5,9 +5,6 @@ namespace Google\DependencyInjection;
 use Google\Service\GaService;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
-/**
- *
- */
 class CacheWarmer implements CacheWarmerInterface
 {
     protected int $shellVerbosity = 0;

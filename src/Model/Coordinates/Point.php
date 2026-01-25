@@ -9,9 +9,6 @@ Complete documentation:
 
 */
 
-/**
- *
- */
 class Point
 {
     private float $x;

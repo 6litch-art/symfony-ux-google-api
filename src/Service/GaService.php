@@ -7,9 +7,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
-/**
- *
- */
 class GaService
 {
     private \Google_Client $client;

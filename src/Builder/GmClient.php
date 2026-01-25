@@ -11,9 +11,6 @@ use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-/**
- *
- */
 abstract class GmClient extends GmObject implements GmClientInterface
 {
     /**

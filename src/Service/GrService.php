@@ -16,9 +16,6 @@ use Twig\Environment;
 use Twig\Loader\ChainLoader;
 use Twig\Loader\LoaderInterface;
 
-/**
- *
- */
 class GrService
 {
     public const CACHE_DURATION = 24 * 3600;

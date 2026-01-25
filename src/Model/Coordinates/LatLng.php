@@ -22,9 +22,6 @@ Complete documentation:
     https://developers.google.com/maps/documentation/javascript/reference/coordinates#LatLng
 */
 
-/**
- *
- */
 class LatLng extends GmObject
 {
     protected float $lat;

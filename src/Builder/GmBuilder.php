@@ -31,9 +31,6 @@ use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Twig\Environment;
 
-/**
- *
- */
 class GmBuilder implements GmBuilderInterface
 {
     protected bool $enable;
@@ -187,10 +184,7 @@ class GmBuilder implements GmBuilderInterface
 
     public ?string $secret;
 
-    /**
-     * @return array|bool|float|int|string|\UnitEnum|null
-     */
-    public function getSecret()
+    public function getSecret(): ?string
     {
         return $this->secret;
     }
@@ -211,7 +205,7 @@ class GmBuilder implements GmBuilderInterface
      * @param string|null $id
      * @return GmBuilder|mixed|null
      */
-    public static function getInstance(string $id = null)
+    public static function getInstance(?string $id = null)
     {
         if (null == $id) {
             return self::$_instance;

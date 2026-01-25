@@ -13,9 +13,6 @@ namespace Google\Badge;
 
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
 
-/**
- *
- */
 class CaptchaBadge implements BadgeInterface
 {
     private bool $resolved = false;
