@@ -6,7 +6,13 @@ Encore
     .setManifestKeyPrefix('.')
 
     .cleanupOutputBeforeBuild()
-    .enableSassLoader()
+
+    .enableSassLoader((options) => {
+        options.sassOptions = {
+            quietDeps: true
+        };
+    })
+
     .enableBuildNotifications()
     .enableSourceMaps(!Encore.isProduction())
     .enableVersioning(false)
