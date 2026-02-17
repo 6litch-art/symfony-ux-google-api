@@ -23,8 +23,10 @@ Encore
 
     .disableSingleRuntimeChunk()
 
-    // uncomment if you're having problems with a jQuery plugin
-    // .autoProvidejQuery()
+    // Use external jQuery instead of bundling it
+    .addExternals({
+        jquery: 'jQuery'
+    })
 
     .addEntry('maps', './assets/maps.js')
     .addEntry('analytics', './assets/analytics.js')

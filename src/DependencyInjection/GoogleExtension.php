@@ -6,7 +6,7 @@ use Google\Service\GtmService;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\Extension\Extension;
@@ -24,9 +24,8 @@ class GoogleExtension extends Extension
         // Load service declaration (includes services, controllers,..)
 
         // Format XML
-        $loader = new XmlFileLoader($container, new FileLocator(dirname(__DIR__, 2) . '/config'));
-        $loader->load('services.xml');
-        $loader->load('services-public.xml');
+        $loader = new PhpFileLoader($container, new FileLocator(dirname(__DIR__, 2) . '/config'));
+        $loader->load('services.php');
 
         //
         // Configuration file: ./config/package/Gtm_bundle.yaml
