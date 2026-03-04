@@ -43,7 +43,7 @@ return static function (ContainerConfigurator $container): void {
      * Google Tag Manager API
      */
     $services->set('gtm.service', Google\Service\GtmService::class)
-        ->arg(0, new Reference('kernel'));
+        ->arg(0, new Reference('parameter_bag'));
 
     $services->set(Google\Inspector\DataCollector::class)
         ->tag('data_collector', ['id' => 'gtm'])
