@@ -54,7 +54,7 @@ class CaptchaValidationListener implements EventSubscriberInterface
         ];
     }
 
-    public function __construct(GrService $grService, string $fieldName, string $api, ValidatorInterface $validator, TranslatorInterface $translator, string $translationDomain = null, ServerParams $serverParams = null)
+    public function __construct(GrService $grService, string $fieldName, string $api, ValidatorInterface $validator, TranslatorInterface $translator, ?string $translationDomain = null, ?ServerParams $serverParams = null)
     {
         $this->grService = $grService;
         $this->fieldName = $fieldName;
