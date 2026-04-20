@@ -1,5 +1,7 @@
 function initTileMap() {
 
+  var $ = window.jQuery || window.$;
+  if (!$) return; // jQuery not yet attached to window; safe no-op
   var container = document.querySelectorAll(".google-tilemap");
   for (var i = 0; i < container.length; i++) {
 
@@ -141,3 +143,6 @@ function initTileMap() {
 
 window.addEventListener('load', initTileMap);
 window.addEventListener('resize', initTileMap);
+// Transparent swaps content via AJAX without firing window 'load', so re-init tiles afterward.
+window.addEventListener('transparent:ready', initTileMap);
+window.addEventListener('transparent:postactive', initTileMap);
