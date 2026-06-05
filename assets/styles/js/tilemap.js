@@ -1,18 +1,72 @@
+// Container-level visibility gate. Without this, every .google-tilemap in the
+// DOM gets its tile <span>s created at module init — and each tile then
+// requests its background-image as soon as IntersectionObserver decides it's
+// in viewport. For maps that are display:none in night mode (or otherwise
+// hidden via parent CSS), the tile geometry can still satisfy the
+// intersection test depending on the layout, triggering N tile webp requests
+// for content the user can never see.
+//
+// The IntersectionObserver-on-the-container approach is more conservative
+// than a one-shot getComputedStyle() check: it handles tabs/accordions that
+// reveal the map later (lazy reveal), AND it doesn't run any work for maps
+// that the user never scrolls to. `rootMargin: 200px` pre-warms the map ~1
+// viewport before it's actually visible, balancing perceived responsiveness
+// against bandwidth waste.
+function _gmTilemapShouldInit(el) {
+    if (!el.isConnected) return false;
+    var style = window.getComputedStyle(el);
+    if (style.display === 'none' || style.visibility === 'hidden') return false;
+    // offsetParent === null when the element or an ancestor is display:none.
+    // Position:fixed elements have null offsetParent but ARE rendered, so
+    // exempt those.
+    if (el.offsetParent === null && style.position !== 'fixed') return false;
+    return true;
+}
+
 function initTileMap() {
 
   var $ = window.jQuery || window.$;
   if (!$) return; // jQuery not yet attached to window; safe no-op
   var container = document.querySelectorAll(".google-tilemap");
-  for (var i = 0; i < container.length; i++) {
 
-    var el = container[i];
+  // Container-level IntersectionObserver gate: only run per-container tile
+  // setup once the container is near the viewport AND actually visible
+  // (offsetParent / computed display checks). Containers that are display:none
+  // or off-screen-far never trigger the per-tile network requests.
+  if ("IntersectionObserver" in window) {
+    var containerObserver = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (!entry.isIntersecting) return;
+        if (!_gmTilemapShouldInit(entry.target)) return;
+        if (entry.target.dataset.gmTilemapInitialized === '1') return;
+        entry.target.dataset.gmTilemapInitialized = '1';
+        containerObserver.unobserve(entry.target);
+        _initTileMapContainer(entry.target, $);
+      });
+    }, { rootMargin: '200px' });
+    for (var i = 0; i < container.length; i++) {
+      if (container[i].dataset.gmTilemapInitialized === '1') continue;
+      containerObserver.observe(container[i]);
+    }
+    return;
+  }
+
+  // No IntersectionObserver support: init synchronously (legacy path).
+  for (var j = 0; j < container.length; j++) {
+    if (container[j].dataset.gmTilemapInitialized === '1') continue;
+    container[j].dataset.gmTilemapInitialized = '1';
+    _initTileMapContainer(container[j], $);
+  }
+}
+
+function _initTileMapContainer(el, $) {
 
     if(el.tagName != "DIV")
       throw "Element passed through gm_tilemap() must be a div";
 
     if (el == document) el = document.documentElement;
     if (el == window) el = document.documentElement;
-    
+
     $(el).css("object-fit", "cover");
     $(el).css("position", "relative");
     $(el).css("top", "50%");
@@ -138,7 +192,6 @@ function initTileMap() {
         el.dispatchEvent(new Event("lazyload.gm_tilemap"));
       }
     }
-  }
 }
 
 window.addEventListener('load', initTileMap);

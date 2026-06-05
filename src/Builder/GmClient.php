@@ -234,7 +234,7 @@ abstract class GmClient extends GmObject implements GmClientInterface
         return '<img ' . $options . " src='" . $this->getCacheUrl() . "'>" . PHP_EOL;
     }
 
-    public function checkUrl(string $url, string $signature = null): bool
+    public function checkUrl(string $url, ?string $signature = null): bool
     {
         // Remove signature variable
         $urlWithoutSignature = preg_replace('/([?&])signature=[^&]+(&|$)/', '$1', $url);

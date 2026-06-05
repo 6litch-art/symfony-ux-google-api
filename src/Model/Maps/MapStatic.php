@@ -99,7 +99,7 @@ class MapStatic extends GmClient
      * @param int|null $height
      * @return $this
      */
-    public function setSize($width, int $height = null)
+    public function setSize($width, ?int $height = null)
     {
         $sizde = null;
         if ($width instanceof Size) {

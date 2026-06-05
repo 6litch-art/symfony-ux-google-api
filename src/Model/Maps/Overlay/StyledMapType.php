@@ -87,7 +87,7 @@ class StyledMapType extends GmObject
         return $this->featureTypes;
     }
 
-    public function addFeatureType(string $featureTypeName, string $elementType = null, array $stylers = [])
+    public function addFeatureType(string $featureTypeName, ?string $elementType = null, array $stylers = [])
     {
         $featureType = [];
         $featureType['featureType'] = "'" . $featureTypeName . "'";

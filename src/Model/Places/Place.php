@@ -99,7 +99,7 @@ class Place extends GmClient
         return new LatLng($lat, $lng);
     }
 
-    public function FindPlaceFromText(string $input = null, string $inputtype = null, array $options = []): array
+    public function FindPlaceFromText(?string $input = null, ?string $inputtype = null, array $options = []): array
     {
         $options['input'] = $input ?? $options['input'] ?? $this->getOption('input');
         $options['inputtype'] = $inputtype ?? $options['inputtype'] ?? $this->getOption('inputtype') ?? 'textquery';
@@ -117,7 +117,7 @@ class Place extends GmClient
      * @param array $options
      * @return array|mixed|string
      */
-    public function NearbySearch(LatLng $location = null, int $radius = null /* meter */, array $options = [])
+    public function NearbySearch(?LatLng $location = null, ?int $radius = null /* meter */, array $options = [])
     {
         $options['radius'] = $radius ?? $options['radius'] ?? $this->getOption('radius');
         $options['location'] = $input ?? $options['location'] ?? $this->getOption('location');
@@ -134,7 +134,7 @@ class Place extends GmClient
      * @param array $options
      * @return array|mixed|string
      */
-    public function TextSearch(string $query = null, array $options = [])
+    public function TextSearch(?string $query = null, array $options = [])
     {
         $options['query'] = $query ?? $options['query'] ?? $this->getOption('query');
         if (!$options['query']) {
@@ -149,7 +149,7 @@ class Place extends GmClient
      * @param array $options
      * @return array|mixed|string
      */
-    public function Details(string $place_id = null, array $options = [])
+    public function Details(?string $place_id = null, array $options = [])
     {
         $options['place_id'] = $place_id ?? $options['place_id'] ?? $this->getOption('place_id');
         if (!$options['place_id']) {

@@ -530,7 +530,16 @@ class GmBuilder implements GmBuilderInterface
             return;
         }
 
-        $javascripts = "<script src='" . $this->getAsset('/bundles/google/maps.js') . "'></script>" . PHP_EOL;
+        // `defer` so the maps.js bundle (containing html2canvas + tilemap
+        // init) does NOT block initial HTML parsing. Every other script on
+        // the page already uses async/defer; this one was inherited as
+        // synchronous and ended up gating first paint. defer (not async)
+        // because tilemap.js depends on jQuery from base-defer.js — defer
+        // preserves load order across all defer-marked scripts. The map
+        // itself is optional content (tile images load via IntersectionObserver
+        // when a .google-tilemap is in viewport), so deferring the bootstrap
+        // has no functional cost.
+        $javascripts = "<script defer src='" . $this->getAsset('/bundles/google/maps.js') . "'></script>" . PHP_EOL;
         $this->twig->addGlobal('google_maps', array_merge(
             $this->twig->getGlobals()['google_maps'] ?? [],
             ['html2canvas' => ($this->twig->getGlobals()['google_maps']['html2canvas'] ?? '') . $javascripts]
