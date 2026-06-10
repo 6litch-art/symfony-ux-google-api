@@ -88,7 +88,7 @@ class DataCollector extends AbstractDataCollector
      * @param $exception
      * @return void
      */
-    public function collect(Request $request, Response $response, $exception = null)
+    public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
     {
         $this->collectDataBundle(GtmBundle::class);
 
