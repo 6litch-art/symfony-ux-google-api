@@ -65,6 +65,11 @@ class GaListener
             return false;
         }
 
+        $route = $request->attributes->get("_route");
+        if ($route && ($route === "security_rescue" || str_starts_with($route, "admin"))) {
+            return true;
+        }
+
         $controllerAttr = $request->attributes->get("_controller") ?? "";
         $array = is_array($controllerAttr) ? $controllerAttr : explode("::", $controllerAttr);
         $controller = explode("::", $array[0])[0];
@@ -76,7 +81,7 @@ class GaListener
             $parents[] = $parent;
         }
 
-        $eaParents = array_filter($parents, fn($c) => str_starts_with($c, "EasyCorp\Bundle\EasyAdminBundle"));
+        $eaParents = array_filter($parents, fn($c) => str_starts_with($c, "EasyCorp\Bundle\EasyAdminBundle") || str_starts_with($c, "Base\Admin\Controller"));
         return !empty($eaParents);
     }
 
