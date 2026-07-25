@@ -126,8 +126,7 @@ return static function (ContainerConfigurator $container): void {
         ->tag('form.type_extension')
         ->arg(0, new Reference('gr.service'))
         ->arg(1, new Reference('validator'))
-        ->arg(2, new Reference('translator'))
-        ->arg(3, new Reference('EasyCorp\Bundle\EasyAdminBundle\Provider\AdminContextProvider'));
+        ->arg(2, new Reference('translator'));
 
     $services->set(Google\Subscriber\CaptchaSubscriber::class)
         ->tag('kernel.event_subscriber')

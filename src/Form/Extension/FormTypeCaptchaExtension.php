@@ -2,8 +2,6 @@
 
 namespace Google\Form\Extension;
 
-use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
-use EasyCorp\Bundle\EasyAdminBundle\Provider\AdminContextProvider;
 use Google\Service\GrService;
 use Google\Subscriber\CaptchaValidationListener;
 use Symfony\Component\Form\AbstractTypeExtension;
@@ -26,16 +24,17 @@ class FormTypeCaptchaExtension extends AbstractTypeExtension
     protected TranslatorInterface $translator;
 
     /**
-     * @var ?AdminContext
+     * Always null: the EasyAdmin-backed admin context this used to detect
+     * has been removed from the app (base-bundle-admin has no equivalent
+     * concept), so captcha protection is no longer suppressed on admin forms.
      */
-    protected ?AdminContext $easyadminContext;
+    protected $easyadminContext = null;
 
-    public function __construct(GrService $grService, ValidatorInterface $validator, TranslatorInterface $translator, AdminContextProvider $adminContextProvider)
+    public function __construct(GrService $grService, ValidatorInterface $validator, TranslatorInterface $translator)
     {
         $this->grService = $grService;
         $this->translator = $translator;
         $this->validator = $validator;
-        $this->easyadminContext = $adminContextProvider->getContext();
     }
 
     /**
