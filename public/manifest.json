@@ -1,6 +1,6 @@
 {
-  "./maps.js": "/bundles/google-api/maps.js",
-  "./analytics.js": "/bundles/google-api/analytics.js",
-  "./recaptcha.js": "/bundles/google-api/recaptcha.js",
-  "./tag_manager.js": "/bundles/google-api/tag_manager.js"
+  "./maps.js": "/bundles/google/maps.js",
+  "./analytics.js": "/bundles/google/analytics.js",
+  "./recaptcha.js": "/bundles/google/recaptcha.js",
+  "./tag_manager.js": "/bundles/google/tag_manager.js"
 }
