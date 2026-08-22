@@ -1,0 +1,38 @@
+--- a/node_modules/@glitchr/html2canvas/src/index.js
++++ b/node_modules/@glitchr/html2canvas/src/index.js
+@@ -3037,8 +3037,22 @@
+  * JQuery Wrapper:
+  * - includes some additional parameters (dpi, width/height, object-fit)
+  * - post-process features
++ *
++ * This module is imported at the top of assets/maps.js, which the
++ * consuming app's GmListener injects into <head> with `defer` -
++ * guaranteed to execute before every <body> defer script, including
++ * whichever one sets window.jQuery (app-async.js/app-defer.js etc). The
++ * unguarded `(function($){...})(jQuery)` this used to close with
++ * referenced the bare `jQuery` global immediately at import time, so on
++ * any load where those later scripts hadn't run yet it crashed with
++ * "Can't find variable: jQuery" - intermittent because a same-named
++ * async-tagged script sometimes won that race by chance, sometimes
++ * didn't. Guard-and-retry-on-load, same pattern already used for the
++ * (separate, redundant) $.fn.html2canvas registration in maps.js itself.
+  */
+-(function ($) {
++function __registerHtml2CanvasJQueryPlugin() {
++  var $ = window.jQuery || window.$;
++  if (!$ || $.fn.html2canvas) return;
+   $.fn.html2canvas = function (container = "#html2canvas", opts = {}, onrenderedCallback = null) {
+ 
+     if(Object.keys(this).length === 0) return;
+@@ -3104,8 +3118,9 @@
+ 
+     return this;
+   };
+-
+-})(jQuery);
++}
++__registerHtml2CanvasJQueryPlugin();
++window.addEventListener('load', __registerHtml2CanvasJQueryPlugin);
+ 
+ window.html2canvas_tilemap = function (el) {
+ 

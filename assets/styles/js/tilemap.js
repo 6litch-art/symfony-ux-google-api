@@ -144,9 +144,52 @@ function _initTileMapContainer(el, $) {
     var width  = xtiles*tilesize/resolution;
     var height = ytiles*tilesize/resolution;
 
-    var tile = objectFit(true, width, height, el.clientWidth, el.clientHeight);
-    if(tile.width == width) tile = objectFit(false, width, height, el.clientWidth, el.clientHeight);
-    
+    // objectFit()'s own parameter order is (contains, containerWidth,
+    // containerHeight, width, height) - containerWidth/Height is the real
+    // on-screen box (el.clientWidth/Height), width/height is the captured
+    // image's native pixel size. The previous call here had them swapped:
+    // the image's own dimensions were passed as the "container" and the
+    // actual container size was passed as the "image", inverting both
+    // aspect-ratio terms inside objectFit() (doRatio/cRatio) and
+    // corrupting the fit-size math - a smaller crop of the source ended up
+    // stretched to fill more of the screen, rendering as "zoomed in too
+    // close" even though the captured tiles themselves are correct.
+    //
+    // Separately, this is the ONLY consumer of .google-tilemap in the
+    // whole package (GmObject.php's markup is the single source of it),
+    // and _initTileMapContainer already forces object-fit:cover on the
+    // container unconditionally above - "contain" was never actually
+    // wanted here. The old two-step "try contain, fall back to cover if
+    // tile.width == width" never worked as a real fallback either (that
+    // compared the fit result against the raw captured-image pixel width,
+    // which is not what deciding contain-vs-cover needs) - contain mode's
+    // letterboxing was silently left in place whenever the container's
+    // aspect ratio didn't exactly match the capture's, showing the site's
+    // decorative background through the gap instead of the map covering
+    // the full page. Always fitting with cover matches the CSS intent and
+    // fixes both symptoms with one call.
+    var tile = objectFit(false, el.clientWidth, el.clientHeight, width, height);
+
+    // Google's map attribution/copyright text is baked into the bottom
+    // edge of the captured screenshot (required by Maps' ToS - Map's own
+    // setDefaultUI(false)/disableDefaultUI doesn't remove it, only the
+    // optional controls). Cover's crop is centered, so whenever height
+    // ends up the exact-match dimension (no vertical crop at all - the
+    // common case for a background map, whose container is usually
+    // proportionally wider than the capture), that strip renders fully
+    // visible right at the container's bottom edge. Growing the fit
+    // uniformly (both dimensions, so the image doesn't distort) while
+    // leaving `top` untouched pushes ALL of the added height downward
+    // past the bottom edge - reserving a consistent margin there for the
+    // container's own overflow:hidden to crop away - instead of splitting
+    // it evenly top/bottom the way changing `top` too would.
+    var COPYRIGHT_MARGIN = 0.06;
+    var grownWidth  = tile.width  * (1 + COPYRIGHT_MARGIN);
+    var grownHeight = tile.height * (1 + COPYRIGHT_MARGIN);
+    tile.left -= (grownWidth - tile.width) / 2;
+    tile.width  = grownWidth;
+    tile.height = grownHeight;
+
     var elTile = $(el).find("span")
     for(iy = 0; iy < ytiles; iy++) {
     
