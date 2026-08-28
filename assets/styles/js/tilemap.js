@@ -96,12 +96,35 @@ function _initTileMapContainer(el, $) {
 
                 let preloaderImg = document.createElement("img");
                     preloaderImg.src = entry.target.dataset.backgroundImage;
-                    preloaderImg.addEventListener('load', (event) => {
 
-                      entry.target.style.backgroundImage = "url('"+event.target.src+"')";
+                    var reveal = function(src) {
+                      entry.target.style.backgroundImage = "url('"+src+"')";
                       entry.target.style.opacity   = "1";
-                      preloaderImg = null;      
-                    });
+                    };
+
+                    // Cache fast-path: a tile already in the HTTP cache is
+                    // decodable synchronously, so `complete` is true the moment
+                    // src is assigned and 'load' may never fire again. Paint it
+                    // immediately with the fade suppressed - on a revisit the
+                    // whole map is simply there, instead of dissolving in for
+                    // half a second over an empty background.
+                    if (preloaderImg.complete && preloaderImg.naturalWidth > 0) {
+
+                      entry.target.style.transition = "none";
+                      reveal(preloaderImg.src);
+                      // Drop back to the stylesheet's transition once painted,
+                      // so a later re-init (resize / transparent swap) can fade.
+                      requestAnimationFrame(function() { entry.target.style.transition = ""; });
+                      preloaderImg = null;
+
+                    } else {
+
+                      preloaderImg.addEventListener('load', (event) => {
+
+                        reveal(event.target.src);
+                        preloaderImg = null;
+                      });
+                    }
               }
 
               entry.target.removeAttribute("data-background-image");    
@@ -215,8 +238,13 @@ function _initTileMapContainer(el, $) {
             elTile[index].setAttribute("data-background-image", tmp_src); //url('"+missing+"')
             elTile[index].style.opacity   = "0";
 
-            var rnd = (Math.random()*0.5).toFixed(2);
-            elTile[index].style.transition   = "opacity 0.5s ease "+rnd+"s";
+            // No per-tile random delay. Staggering each tile by 0-0.5s meant
+            // neighbouring tiles revealed at visibly different moments, and a
+            // row still sitting at opacity 0 let the container's own
+            // background-color show through as a full-width light bar that
+            // flashed across the map and vanished. One uniform, short fade
+            // keeps the reveal calm without banding.
+            elTile[index].style.transition   = "opacity 0.25s ease";
             el.append(elTile[index]);
         }
 
