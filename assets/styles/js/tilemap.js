@@ -78,11 +78,18 @@ function _initTileMapContainer(el, $) {
     var src = el.getAttribute("data-src");
     var signature = el.getAttribute("data-signature");
     var tilesize  = parseInt(el.getAttribute("data-tilesize")) || null;
-    var resolution = 2;
     var xtiles    = parseInt(el.getAttribute("data-xtiles"));
     var ytiles    = parseInt(el.getAttribute("data-ytiles"));
     // var missing   = el.getAttribute("data-missing");
 
+    // Bound once per container, never per call: this function re-runs on
+    // every resize to re-fit the tiles, and the handler is an anonymous
+    // closure, so an unguarded addEventListener would stack another copy of
+    // it each time - one more lazy-load pass over the tiles per resize, for
+    // the lifetime of the page.
+    if(el.dataset.gmTilemapBound !== '1') {
+
+    el.dataset.gmTilemapBound = '1';
     el.addEventListener("lazyload.gm_tilemap", function() {
 
       var lazyBackgrounds = el.querySelectorAll("[data-background-image]");
@@ -138,8 +145,9 @@ function _initTileMapContainer(el, $) {
         });
       }
     });
+    }
 
-    
+
     function objectFit(contains /* true = contain, false = cover */, containerWidth, containerHeight, width, height){
 
       var doRatio = width / height;
@@ -164,8 +172,37 @@ function _initTileMapContainer(el, $) {
       };
     }
 
-    var width  = xtiles*tilesize/resolution;
-    var height = ytiles*tilesize/resolution;
+    // The tiles span the whole tile GRID (xtiles*ytiles cells), but the
+    // capture only fills the top-left of it: the exporter pads the last
+    // row/column out to a full cell, so the grid is always >= the capture
+    // and the difference is blank. GmObject.php emits the capture's real
+    // pixel size as the width/height attributes, next to the grid's own
+    // data-xtiles/data-ytiles/data-tilesize.
+    //
+    // Fitting the GRID (what this used to do) therefore fits the blank
+    // padding too, and the map proper stops short of the container by
+    // whatever fraction of the last row/column is padding - for a 3024x1875
+    // capture on a 6x4 grid of 512s that is 2048 vs 1875, i.e. 8.5% of the
+    // height left over, showing the page's own background through the
+    // bottom of a map that is supposed to cover it. Fit the CAPTURE, then
+    // scale that fit up to the grid the tiles actually span, so the padding
+    // lands outside the container instead of inside it.
+    //
+    // Both are needed: the fit decides what covers the container, the
+    // scale-up decides where the tiles go.
+    var gridWidth  = xtiles*tilesize;
+    var gridHeight = ytiles*tilesize;
+
+    // Fall back to the grid when the capture size is absent - the metadata
+    // keys behind these attributes default to 0 in GmObject.php, and 0 here
+    // would divide the whole layout to Infinity.
+    var captureWidth  = parseFloat(el.getAttribute("width"))  || 0;
+    var captureHeight = parseFloat(el.getAttribute("height")) || 0;
+    if(captureWidth <= 0 || captureHeight <= 0) {
+
+      captureWidth  = gridWidth;
+      captureHeight = gridHeight;
+    }
 
     // objectFit()'s own parameter order is (contains, containerWidth,
     // containerHeight, width, height) - containerWidth/Height is the real
@@ -191,7 +228,16 @@ function _initTileMapContainer(el, $) {
     // decorative background through the gap instead of the map covering
     // the full page. Always fitting with cover matches the CSS intent and
     // fixes both symptoms with one call.
-    var tile = objectFit(false, el.clientWidth, el.clientHeight, width, height);
+    var fit = objectFit(false, el.clientWidth, el.clientHeight, captureWidth, captureHeight);
+
+    // The capture sits at the grid's top-left, so the fit's own origin is
+    // the grid's origin too - only the size has to grow to the grid.
+    var tile = {
+      left:   fit.left,
+      top:    fit.top,
+      width:  fit.width  * (gridWidth  / captureWidth),
+      height: fit.height * (gridHeight / captureHeight)
+    };
 
     // Google's map attribution/copyright text is baked into the bottom
     // edge of the captured screenshot (required by Maps' ToS - Map's own
@@ -206,7 +252,16 @@ function _initTileMapContainer(el, $) {
     // past the bottom edge - reserving a consistent margin there for the
     // container's own overflow:hidden to crop away - instead of splitting
     // it evenly top/bottom the way changing `top` too would.
-    var COPYRIGHT_MARGIN = 0.06;
+    //
+    // This only has to clear the strip itself now. It used to be 0.06 and
+    // still left the copyright on screen, because it was also the only
+    // thing absorbing the grid padding above - and it could never win that
+    // way: the padding fraction depends on how evenly the capture divides
+    // into tiles, so no fixed constant covers every capture. With the fit
+    // corrected, the strip measures ~1.8% of the capture height on a 6x4
+    // grid; 4% clears it with room to spare without cropping much more of
+    // the map away.
+    var COPYRIGHT_MARGIN = 0.04;
     var grownWidth  = tile.width  * (1 + COPYRIGHT_MARGIN);
     var grownHeight = tile.height * (1 + COPYRIGHT_MARGIN);
     tile.left -= (grownWidth - tile.width) / 2;
@@ -266,7 +321,38 @@ function _initTileMapContainer(el, $) {
 }
 
 window.addEventListener('load', initTileMap);
-window.addEventListener('resize', initTileMap);
+
+// Re-fit already-initialized containers, then let initTileMap() pick up any
+// that still haven't passed their visibility gate.
+//
+// `resize` used to be bound to initTileMap directly, which did nothing at
+// all after the first run: data-gm-tilemap-initialized is a ONE-SHOT gate
+// (it stops the lazy IntersectionObserver re-triggering per-tile network
+// requests) and initTileMap skips every container carrying it. So the fit
+// was computed once, against whatever the viewport happened to be then, and
+// never again - resize the window or rotate a phone and the tiles kept the
+// old geometry, leaving the map either cropped or short of an edge with the
+// page background showing through. Re-laying out is cheap: the spans
+// already exist and are reused, so this only repositions them and refetches
+// nothing.
+function relayoutTileMap() {
+
+  var $ = window.jQuery || window.$;
+  if (!$) return; // jQuery not yet attached to window; safe no-op
+
+  var container = document.querySelectorAll(".google-tilemap");
+  for (var i = 0; i < container.length; i++) {
+
+    if (container[i].dataset.gmTilemapInitialized !== '1') continue;
+    if (!_gmTilemapShouldInit(container[i])) continue;
+
+    _initTileMapContainer(container[i], $);
+  }
+
+  initTileMap();
+}
+
+window.addEventListener('resize', relayoutTileMap);
 // Transparent swaps content via AJAX without firing window 'load', so re-init tiles afterward.
 window.addEventListener('transparent:ready', initTileMap);
 window.addEventListener('transparent:postactive', initTileMap);
