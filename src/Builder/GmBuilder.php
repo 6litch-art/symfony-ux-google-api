@@ -709,10 +709,42 @@ class GmBuilder implements GmBuilderInterface
         return $url;
     }
 
+    /**
+     * Per-REQUEST memo for the two cache probes below, keyed by the exact
+     * storage path / signature they resolve to.
+     *
+     * Rendering one page asks the same questions repeatedly - cacheExists()
+     * and getCacheMetadata() have eight call sites between GmObject,
+     * GmClient and GmBuilder itself, and every one of them went straight to
+     * the storage adapter. On local disk that was cheap enough to go
+     * unnoticed; on S3 each is a signed HTTP round-trip, so a profiler on
+     * ANY page of the site showed eight MinIO HEAD/GET requests before a
+     * single one of them had told us anything the previous one had not.
+     * The map's signature cannot change midway through rendering a page.
+     *
+     * Deliberately per-request rather than the configured cache pool: this
+     * is invalidation-free by construction (a fresh request re-probes), so
+     * it cannot serve a stale map after an admin captures a new tilemap.
+     * Both mutators below still clear it, so even a capture that happens in
+     * the SAME request sees its own write.
+     *
+     * @var array<string, bool>
+     */
+    private $cacheExistsMemo = [];
+    /** @var array<string, array> */
+    private $cacheMetadataMemo = [];
+
+    public function clearCacheMemo(): void
+    {
+        $this->cacheExistsMemo = [];
+        $this->cacheMetadataMemo = [];
+    }
+
     public function setCacheMetadata(string $signature, array $array, array $config = []): ?string
     {
         $path = $this->getCacheDirectory() . '/' . $signature . '/metadata.txt';
         $contents = serialize($array);
+        $this->clearCacheMemo();
 
         try {
             GmBuilder::getInstance()->filesystem->write($path, $contents, $config);
@@ -731,16 +763,29 @@ class GmBuilder implements GmBuilderInterface
      */
     public function getCacheMetadata($signature)
     {
+        if (array_key_exists($signature, $this->cacheMetadataMemo)) {
+            return $this->cacheMetadataMemo[$signature];
+        }
+
         $file = $this->getCacheDirectory() . '/' . $signature . '/metadata.txt';
-        if (!GmBuilder::getInstance()->filesystem->fileExists($file)) {
-            return ['status' => GmBuilder::STATUS_BAD];
+
+        // cacheExists() probes this exact path and is almost always called
+        // first (GmObject asks "is there a capture?" before "what is in
+        // it?"), so reuse its answer rather than paying a second identical
+        // HEAD for it.
+        $exists = array_key_exists($file, $this->cacheExistsMemo)
+            ? $this->cacheExistsMemo[$file]
+            : ($this->cacheExistsMemo[$file] = GmBuilder::getInstance()->filesystem->fileExists($file));
+
+        if (!$exists) {
+            return $this->cacheMetadataMemo[$signature] = ['status' => GmBuilder::STATUS_BAD];
         }
 
         try {
             $contents = trim(GmBuilder::getInstance()->filesystem->read($file));
-            return unserialize($contents);
+            return $this->cacheMetadataMemo[$signature] = unserialize($contents);
         } catch (UnableToReadFile $exception) {
-            return ["status" => GmBuilder::STATUS_BAD];
+            return $this->cacheMetadataMemo[$signature] = ["status" => GmBuilder::STATUS_BAD];
         }
     }
 
@@ -760,7 +805,11 @@ class GmBuilder implements GmBuilderInterface
                 $path = $this->getCachePath($signature, $id);
             }
 
-            return GmBuilder::getInstance()->filesystem->fileExists($path);
+            if (array_key_exists($path, $this->cacheExistsMemo)) {
+                return $this->cacheExistsMemo[$path];
+            }
+
+            return $this->cacheExistsMemo[$path] = GmBuilder::getInstance()->filesystem->fileExists($path);
 
         } catch (UnableToRetrieveMetadata $exception) {
 
@@ -778,6 +827,7 @@ class GmBuilder implements GmBuilderInterface
         try {
 
             $path = $this->getCacheDirectory() . '/' . $signature . '/';
+            $this->clearCacheMemo();
             GmBuilder::getInstance()->filesystem->deleteDirectory($path);
 
             return true;

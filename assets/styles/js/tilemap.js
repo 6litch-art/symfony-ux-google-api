@@ -102,6 +102,19 @@ function _initTileMapContainer(el, $) {
               if(entry.target.dataset.backgroundImage) {
 
                 let preloaderImg = document.createElement("img");
+
+                    // These tiles ARE the largest contentful paint on every
+                    // page - the map is the full-viewport background - but
+                    // they queue behind ~60 other subresources because they
+                    // are only requested once the deferred bundle has run
+                    // and this observer has fired. Nothing can make them
+                    // start earlier without defeating the dark-mode skip
+                    // (which relies on never requesting them at all), but
+                    // they can at least not wait behind lower-value work
+                    // once requested. Only for the tile that triggered this
+                    // callback, i.e. one actually on screen.
+                    preloaderImg.fetchPriority = "high";
+                    preloaderImg.decoding = "async";
                     preloaderImg.src = entry.target.dataset.backgroundImage;
 
                     var reveal = function(src) {
