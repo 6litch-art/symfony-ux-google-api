@@ -11,7 +11,8 @@ return static function (ContainerConfigurator $container): void {
     // REAL definitions
     $services->set(Google\Service\GrService::class);
     $services->set(Google\Validator\Constraints\CaptchaValidator::class);
-    $services->set(Google\Builder\GmBuilder::class);
+    $services->set(Google\Builder\GmBuilder::class)
+        ->tag('kernel.reset', ['method' => 'reset']);
 
     // Aliases
     $services->alias('gr.service', Google\Service\GrService::class);

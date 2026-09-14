@@ -30,8 +30,9 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Twig\Environment;
+use Symfony\Contracts\Service\ResetInterface;
 
-class GmBuilder implements GmBuilderInterface
+class GmBuilder implements GmBuilderInterface, ResetInterface
 {
     protected bool $enable;
 
@@ -83,6 +84,16 @@ class GmBuilder implements GmBuilderInterface
     )
     {
         self::$_instance = $this;
+
+        // A new builder means a new container, hence a new request scope. The id
+        // registry is static and would otherwise outlive the container that filled
+        // it: under FRANKENPHP_RESET_KERNEL=1 each request builds a fresh builder
+        // (and a fresh Twig, with no google_maps global) while the previous
+        // request's ids are still registered - so MapSubscriber's
+        // alreadyExists("myMap") guard returned early and every request after the
+        // first rendered no map at all. reset() covers the other long-running mode,
+        // a kernel reused across requests, where no new builder is constructed.
+        self::$_instanceId = [];
 
         //
         // Autowiring
@@ -478,7 +489,14 @@ class GmBuilder implements GmBuilderInterface
         return $this->security->isGranted(GmBuilder::getInstance()->cacheControl, $subject);
     }
 
-    public function reset()
+    /**
+     * Called by the services_resetter between requests handled by the same kernel
+     * (FrankenPHP worker mode without kernel reset) and between messenger messages.
+     * Without it the static id registry survived every request: bind() threw
+     * "Instance ID already referenced" for a changed object, and MapSubscriber's
+     * alreadyExists() guard served the first request's map to everyone after.
+     */
+    public function reset(): void
     {
         $this->rules = [];
 

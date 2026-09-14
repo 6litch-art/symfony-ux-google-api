@@ -73,7 +73,10 @@ return static function (ContainerConfigurator $container): void {
         ->arg(3, new Reference('flysystem.adapter.lazy.factory'))
         ->arg(4, new Reference('request_stack'))
         ->arg(5, new Reference('security.helper'))
-        ->arg(6, new Reference('security.csrf.token_manager'));
+        ->arg(6, new Reference('security.csrf.token_manager'))
+        // Clears the static map-id registry between requests on a reused kernel
+        // and between messenger messages; see GmBuilder::reset().
+        ->tag('kernel.reset', ['method' => 'reset']);
 
     // Optional: alias for interface
     $services->alias(Google\Builder\GmBuilderInterface::class, 'gm.builder');
