@@ -25,14 +25,14 @@ export APP_ENV APP_DEBUG
 # package.json and webpack.config.js at the root - so `cd assets` aborted with
 # "can't cd to assets" and `make build-vendor glitchr/ux-google` could never
 # build this bundle at all.
+#
+# Always a one-shot production build: with APP_DEBUG=1 - which build-vendor
+# passes on a dev machine - this used to run `yarn run dev`, which is
+# `encore dev --watch` and never returns, so build-vendor hung. Run
+# `yarn run dev` by hand to iterate on the sources.
 assets:
-ifeq ($(APP_DEBUG),1)
-	@yarn install
-	@yarn run dev
-else
 	@yarn install
 	@yarn run prod
-endif
 
 deploy:
 	@composer update
